@@ -5,8 +5,8 @@ import gym
 import gym_gazebo
 import numpy as np
 import tensorflow as tf
-from ddpg import *
-from environment import Env
+from control.ddpg import *
+from pass.environment import Env
 
 exploration_decay_start_step = 50000
 state_dim = 16

@@ -2,9 +2,9 @@
 import gym
 import tensorflow as tf
 import numpy as np
-from critic_network import CriticNetwork
-from actor_network_bn import ActorNetwork
-from replay_buffer import ReplayBuffer
+from pass.critic_network import CriticNetwork
+from pass.actor_network_bn import ActorNetwork
+from control.replay_buffer import ReplayBuffer
 
 REPLAY_BUFFER_SIZE = 100000
 REPLAY_START_SIZE = 10000
