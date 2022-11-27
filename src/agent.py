@@ -3,9 +3,9 @@
 import numpy as np
 import random
 
-from model import Actor, Critic
+from Model import Actor, Critic
 from Noise import OUNoise
-from replaybuffer import ReplayBuffer
+from Replaybuffer import ReplayBuffer
 
 import torch
 import torch.nn.functional as F
