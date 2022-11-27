@@ -36,9 +36,9 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-gazebo-ros-control 
 
 RUN source /opt/ros/noetic/setup.bash \
- && mkdir -p /ws/src \
- && cd /ws/src \
- && catkin_init_workspace \
+ && mkdir -p /ws/src 
+
+COPY . /ws/src
 
 RUN cd /ws \
  && source /opt/ros/noetic/setup.bash \
