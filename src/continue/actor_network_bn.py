@@ -14,7 +14,6 @@ TAU = 0.001
 
 model_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'model', 'actor')
 
-
 class ActorNetwork:
 	def __init__(self,sess,state_dim,action_dim):
 		self.time_step = 0
