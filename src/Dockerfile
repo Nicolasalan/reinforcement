@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
   g++ \
   gnupg gnupg1 gnupg2 \
   libcanberra-gtk* \
-  python3-catkin-tools \
+  python3-catkin-tools \m
   python3-pip \
   python3-tk \
   wget \

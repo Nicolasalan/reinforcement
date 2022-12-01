@@ -21,6 +21,7 @@ class DDPG:
         self.action_dim = action_dim
         self.sess = tf.InteractiveSession()
 
+        
         self.actor_network = ActorNetwork(self.sess, self.state_dim, self.action_dim)
         self.critic_network = CriticNetwork(self.sess, self.state_dim, self.action_dim)
 

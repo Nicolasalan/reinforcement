@@ -13,7 +13,7 @@ from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
 from gazebo_msgs.srv import SpawnModel, DeleteModel
 
-diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
+diagonal_dis = math.sqrt(2) * (3.6 + 3.8) # calcular a distancia diagonal do mapa
 goal_model_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], '..', '..', 'turtlebot3_simulations',
                               'turtlebot3_gazebo', 'models', 'Target', 'model.sdf')
 
@@ -24,95 +24,98 @@ class Env():
         self.goal_position = Pose()
         self.goal_position.position.x = 0.
         self.goal_position.position.y = 0.
-        self.pub_cmd_vel = rospy.Publisher('cmd_vel', Twist, queue_size=10)
-        self.sub_odom = rospy.Subscriber('odom', Odometry, self.getOdometry)
-        self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
-        self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
-        self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
-        self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-        self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+        self.pub_cmd_vel = rospy.Publisher('cmd_vel', Twist, queue_size=10) # publicar a velocidade do robo
+        self.sub_odom = rospy.Subscriber('odom', Odometry, self.getOdometry) # receber a odometria do robo
+        self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty) # resetar o ambiente
+        self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty) # despausar o ambiente
+        self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty) # pausar o ambiente
+        self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel) # spawnar o objetivo
+        self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel) # deletar o objetivo
         self.past_distance = 0.
         if is_training:
-            self.threshold_arrive = 0.2
+            self.threshold_arrive = 0.2 # distancia minima para considerar que o robo chegou no objetivo
         else:
-            self.threshold_arrive = 0.4
+            self.threshold_arrive = 0.4 
 
+    # pegar a distancia do robo para o objetivo
     def getGoalDistace(self):
-        goal_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
-        self.past_distance = goal_distance
+        goal_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y) # distancia euclidiana
+        self.past_distance = goal_distance # distancia euclidiana = distancia do robo para o objetivo
 
-        return goal_distance
+        return goal_distance # retornar a distancia do robo para o objetivo
 
+    # pegar a odometria do robo
     def getOdometry(self, odom):
-        self.position = odom.pose.pose.position
-        orientation = odom.pose.pose.orientation
-        q_x, q_y, q_z, q_w = orientation.x, orientation.y, orientation.z, orientation.w
-        yaw = round(math.degrees(math.atan2(2 * (q_x * q_y + q_w * q_z), 1 - 2 * (q_y * q_y + q_z * q_z))))
+        self.position = odom.pose.pose.position # pegar a posicao do robo
+        orientation = odom.pose.pose.orientation # pegar a orientacao do robo
+        q_x, q_y, q_z, q_w = orientation.x, orientation.y, orientation.z, orientation.w # pegar a orientacao do robo em quaternions
+        yaw = round(math.degrees(math.atan2(2 * (q_x * q_y + q_w * q_z), 1 - 2 * (q_y * q_y + q_z * q_z)))) # pegar o yaw do robo
 
-        if yaw >= 0:
-             yaw = yaw
-        else:
-             yaw = yaw + 360
+        if yaw >= 0: # se o yaw for maior ou igual a 0
+             yaw = yaw # yaw = yaw
+        else: # se o yaw for menor que 0
+             yaw = yaw + 360 # yaw + 360
 
-        rel_dis_x = round(self.goal_position.position.x - self.position.x, 1)
-        rel_dis_y = round(self.goal_position.position.y - self.position.y, 1)
+        rel_dis_x = round(self.goal_position.position.x - self.position.x, 1) # distancia relativa em x
+        rel_dis_y = round(self.goal_position.position.y - self.position.y, 1) # distancia relativa em y 
 
-        # Calculate the angle between robot and target
-        if rel_dis_x > 0 and rel_dis_y > 0:
-            theta = math.atan(rel_dis_y / rel_dis_x)
-        elif rel_dis_x > 0 and rel_dis_y < 0:
+        # Calcule o ângulo entre o robô e o alvo
+        if rel_dis_x > 0 and rel_dis_y > 0: # se a distancia relativa em x for maior que 0 e a distancia relativa em y for maior que 0
+            theta = math.atan(rel_dis_y / rel_dis_x) # calcular o theta
+        elif rel_dis_x > 0 and rel_dis_y < 0: # se a distancia relativa em x for maior que 0 e a distancia relativa em y for menor que 0
             theta = 2 * math.pi + math.atan(rel_dis_y / rel_dis_x)
-        elif rel_dis_x < 0 and rel_dis_y < 0:
+        elif rel_dis_x < 0 and rel_dis_y < 0: # se a distancia relativa em x for menor que 0 e a distancia relativa em y for menor que 0
             theta = math.pi + math.atan(rel_dis_y / rel_dis_x)
-        elif rel_dis_x < 0 and rel_dis_y > 0:
+        elif rel_dis_x < 0 and rel_dis_y > 0: # se a distancia relativa em x for menor que 0 e a distancia relativa em y for maior que 0
             theta = math.pi + math.atan(rel_dis_y / rel_dis_x)
-        elif rel_dis_x == 0 and rel_dis_y > 0:
-            theta = 1 / 2 * math.pi
-        elif rel_dis_x == 0 and rel_dis_y < 0:
+        elif rel_dis_x == 0 and rel_dis_y > 0: # se a distancia relativa em x for igual a 0 e a distancia relativa em y for maior que 0
+            theta = 1 / 2 * math.pi 
+        elif rel_dis_x == 0 and rel_dis_y < 0: # se a distancia relativa em x for igual a 0 e a distancia relativa em y for menor que 0
             theta = 3 / 2 * math.pi
-        elif rel_dis_y == 0 and rel_dis_x > 0:
+        elif rel_dis_y == 0 and rel_dis_x > 0: # se a distancia relativa em y for igual a 0 e a distancia relativa em x for maior que 0
             theta = 0
         else:
             theta = math.pi
-        rel_theta = round(math.degrees(theta), 2)
+        rel_theta = round(math.degrees(theta), 2) # calcular o theta relativo
 
-        diff_angle = abs(rel_theta - yaw)
+        diff_angle = abs(rel_theta - yaw) # calcular a diferenca de angulo entre o theta relativo e o yaw
 
         if diff_angle <= 180:
-            diff_angle = round(diff_angle, 2)
+            diff_angle = round(diff_angle, 2) # arredondar a diferenca de angulo
         else:
-            diff_angle = round(360 - diff_angle, 2)
+            diff_angle = round(360 - diff_angle, 2) # arredondar a diferenca de angulo
 
         self.rel_theta = rel_theta
         self.yaw = yaw
         self.diff_angle = diff_angle
 
+    # pegar o estado do robo
     def getState(self, scan):
-        scan_range = []
+        scan_range = [] # scan 
         yaw = self.yaw
         rel_theta = self.rel_theta
         diff_angle = self.diff_angle
-        min_range = 0.2
-        done = False
+        min_range = 0.2 # distancia minima
+        done = False # se o robo chegou no objetivo
         arrive = False
 
-        for i in range(len(scan.ranges)):
-            if scan.ranges[i] == float('Inf'):
-                scan_range.append(3.5)
-            elif np.isnan(scan.ranges[i]):
-                scan_range.append(0)
+        for i in range(len(scan.ranges)): # para cada leitura do laser
+            if scan.ranges[i] == float('Inf'): # se a leitura for infinita
+                scan_range.append(3.5) # adicionar 3.5 no scan 
+            elif np.isnan(scan.ranges[i]): # se a leitura for nan
+                scan_range.append(0) # adicionar 0
             else:
-                scan_range.append(scan.ranges[i])
+                scan_range.append(scan.ranges[i]) # adicionar a leitura
 
-        if min_range > min(scan_range) > 0:
-            done = True
+        if min_range > min(scan_range) > 0: # se a distancia minima for maior que a menor distancia do scan e a menor distancia do scan for maior que 0
+            done = True # o robo chegou no objetivo
 
-        current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
-        if current_distance <= self.threshold_arrive:
+        current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y) # distancia euclidiana
+        if current_distance <= self.threshold_arrive: # se a distancia euclidiana for menor ou igual ao threshold de chegada
             # done = True
-            arrive = True
+            arrive = True # o robo chegou no objetivo
 
-        return scan_range, current_distance, yaw, rel_theta, diff_angle, done, arrive
+        return scan_range, current_distance, yaw, rel_theta, diff_angle, done, arrive # retornar o scan, a distancia euclidiana, o yaw, o theta relativo, a diferenca de angulo, se o robo chegou no objetivo e se o robo chegou no objetivo
 
     def setReward(self, done, arrive):
         current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
@@ -185,7 +188,7 @@ class Env():
         try:
             self.reset_proxy()
         except (rospy.ServiceException) as e:
-            print("gazebo/reset_simulation service call failed")
+            rospy.loginfo("gazebo/reset_simulation service call failed")
 
         # Build the targetz
         rospy.wait_for_service('/gazebo/spawn_sdf_model')
@@ -197,13 +200,9 @@ class Env():
             self.goal_position.position.x = random.uniform(-3.6, 3.6)
             self.goal_position.position.y = random.uniform(-3.6, 3.6)
 
-            # if -0.3 < self.goal_position.position.x < 0.3 and -0.3 < self.goal_position.position.y < 0.3:
-            #     self.goal_position.position.x += 1
-            #     self.goal_position.position.y += 1
-
             self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
         except (rospy.ServiceException) as e:
-            print("/gazebo/failed to build the target")
+            rospy.loginfo("/gazebo/failed to build the target")
         rospy.wait_for_service('/gazebo/unpause_physics')
         data = None
         while data is None:
