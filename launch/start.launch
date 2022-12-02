@@ -1,3 +1,12 @@
 <launch>
-  <node pkg="motion-rl" type="Agent.py" name="Agent" output="screen" />
+  <node pkg="motion-rl" type="ddpg_agent.py" name="ddpg" output="screen" />
+</launch>
+
+<?xml version="1.0"?>
+<launch>    
+    <node name="motion" pkg="motion-rl" type="Agent.py" output="screen">
+        <rosparam command="load" file="$(find dodo_detector_ros)/config/main_config.yaml"/>
+        <param name="image_topic" value="/camera/rgb/image_color" />
+        <param name="point_cloud_topic" value="/camera/depth/points" />
+    </node>
 </launch>

@@ -31,14 +31,11 @@ class Env():
           self.goal_position.position.y = 0.0 # posição y do alvo
 
           # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = rospy.get_param('~target')
-          
-          cmd_vel = rospy.get_param('~cmd_vel')
-          odom = rospy.get_param('~odom')
+          self.goal_model_dir = './models/goal.sdf'
 
           ##### publicacoes e assinaturas do ROS #####
-          self.pub_cmd_vel = rospy.Publisher(cmd_vel, Twist, queue_size=10) # publicar a velocidade do robô
-          self.sub_odom = rospy.Subscriber(odom, Odometry, self.getOdometry) # receber a posição do robô
+          self.pub_cmd_vel = rospy.Publisher('cmd_vel', Twist, queue_size=10) # publicar a velocidade do robô
+          self.sub_odom = rospy.Subscriber('odom', Odometry, self.getOdometry) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
