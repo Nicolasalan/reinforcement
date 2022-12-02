@@ -19,12 +19,16 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
 # definir o diretório do robô, alvo e mundo
-goal_model_dir = os.path.join(os.path.split(os.path.realpath(__file__))[0], '..', '..', 'turtlebot3_simulations',
-                              'turtlebot3_gazebo', 'models', 'Target', 'model.sdf')
+goal_model_dir = './misc/gazebo_models/goal.sdf'
 
 
 class Env():
-     def __init__(self, is_training):
+     def __init__(self, is_training, num_scan_ranges=10, min_range=0.2):
+
+          self.num_scan_ranges = num_scan_ranges
+          self.n_step = 0
+          self.min_range = min_range
+
           self.position = Pose() # posição do robô
           self.goal_position = Pose() # posição do alvo
           self.goal_position.position.x = 0.0 # posição x do alvo
@@ -116,24 +120,28 @@ class Env():
           yaw = self.yaw
           rel_theta = self.rel_theta
           diff_angle = self.diff_angle
-          min_range = 0.2
           done = False
           arrive = False
 
-          for i in range(len(scan.ranges)):
-               if scan.ranges[i] == float('Inf'):
-                    scan_range.append(3.5)
-               elif np.isnan(scan.ranges[i]):
-                    scan_range.append(0)
-               else:
-                    scan_range.append(scan.ranges[i])
+          cof = (len(scan.ranges) / (self.num_scan_ranges - 1))
+          for i in range(0, self.num_scan_ranges):
+            n_i = math.ceil(i*cof - 1)
+            if n_i < 0:
+                n_i = 0
+            if cof == 1:
+                n_i = i
+            if scan.ranges[n_i] == float('Inf'):
+                scan_range.append(3.5)
+            elif np.isnan(scan.ranges[n_i]):
+                scan_range.append(0)
+            else:
+                scan_range.append(scan.ranges[n_i])
 
-          if min_range > min(scan_range) > 0:
+          if self.min_range > min(scan_range) > 0:
                done = True
 
           current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
           if current_distance <= self.threshold_arrive:
-               # done = True
                arrive = True
 
           return scan_range, current_distance, yaw, rel_theta, diff_angle, done, arrive

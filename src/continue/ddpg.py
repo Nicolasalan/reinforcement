@@ -11,7 +11,6 @@ REPLAY_START_SIZE = 10000
 BATCH_SIZE = 128
 GAMMA = 0.99
 
-
 class DDPG:
     def __init__(self, env, state_dim, action_dim):
         self.name = 'DDPG'
