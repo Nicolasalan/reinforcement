@@ -18,10 +18,6 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 # calcular a distância diagonal do robô
 diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
-# definir o diretório do robô, alvo e mundo
-goal_model_dir = './models/goal.sdf'
-
-
 class Env():
      def __init__(self, is_training, num_scan_ranges=10, min_range=0.2):
 
@@ -34,9 +30,15 @@ class Env():
           self.goal_position.position.x = 0.0 # posição x do alvo
           self.goal_position.position.y = 0.0 # posição y do alvo
 
+          # definir o diretório do robô, alvo e mundo
+          self.goal_model_dir = rospy.get_param('~target')
+          
+          cmd_vel = rospy.get_param('~cmd_vel')
+          odom = rospy.get_param('~odom')
+
           ##### publicacoes e assinaturas do ROS #####
-          self.pub_cmd_vel = rospy.Publisher('cmd_vel', Twist, queue_size=10) # publicar a velocidade do robô
-          self.sub_odom = rospy.Subscriber('odom', Odometry, self.getOdometry) # receber a posição do robô
+          self.pub_cmd_vel = rospy.Publisher(cmd_vel, Twist, queue_size=10) # publicar a velocidade do robô
+          self.sub_odom = rospy.Subscriber(odom, Odometry, self.getOdometry) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
@@ -166,7 +168,7 @@ class Env():
                # Build the target
                rospy.wait_for_service('/gazebo/spawn_sdf_model')
                try:
-                    goal_urdf = open(goal_model_dir, "r").read()
+                    goal_urdf = open(self.goal_model_dir, "r").read()
                     target = SpawnModel
                     target.model_name = 'target'  # the same with sdf name
                     target.model_xml = goal_urdf
@@ -224,7 +226,7 @@ class Env():
           # Build the targetz
           rospy.wait_for_service('/gazebo/spawn_sdf_model')
           try:
-               goal_urdf = open(goal_model_dir, "r").read()
+               goal_urdf = open(self.goal_model_dir, "r").read()
                target = SpawnModel
                target.model_name = 'target'  # the same with sdf name
                target.model_xml = goal_urdf
