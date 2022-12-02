@@ -19,7 +19,7 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
 # definir o diretório do robô, alvo e mundo
-goal_model_dir = './misc/gazebo_models/goal.sdf'
+goal_model_dir = './models/goal.sdf'
 
 
 class Env():
@@ -172,7 +172,9 @@ class Env():
                     target.model_xml = goal_urdf
                     self.goal_position.position.x = random.uniform(-3.6, 3.6)
                     self.goal_position.position.y = random.uniform(-3.6, 3.6)
+
                     self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+
                except (rospy.ServiceException) as e:
                     print("/gazebo/failed to build the target")
                rospy.wait_for_service('/gazebo/unpause_physics')
@@ -186,7 +188,7 @@ class Env():
           ang_vel = action[1]
 
           vel_cmd = Twist()
-          vel_cmd.linear.x = linear_vel / 4
+          vel_cmd.linear.x = linear_vel 
           vel_cmd.angular.z = ang_vel
           self.pub_cmd_vel.publish(vel_cmd)
 
@@ -226,6 +228,8 @@ class Env():
                target = SpawnModel
                target.model_name = 'target'  # the same with sdf name
                target.model_xml = goal_urdf
+
+               # randomiza o target pelo mundo
                self.goal_position.position.x = random.uniform(-3.6, 3.6)
                self.goal_position.position.y = random.uniform(-3.6, 3.6)
                self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
