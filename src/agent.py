@@ -10,6 +10,7 @@ from Replaybuffer import ReplayBuffer
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+import yaml
 
 BUFFER_SIZE = int(1e6)  # replay buffer size
 BATCH_SIZE = 128        # minibatch size

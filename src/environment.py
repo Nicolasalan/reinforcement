@@ -7,6 +7,7 @@ import numpy as np
 import math
 from math import pi
 import random
+import yaml
 
 # importar mensagens do ROS
 from geometry_msgs.msg import Twist, Point, Pose
@@ -17,6 +18,19 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 
 # calcular a distância diagonal do robô
 diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
+
+# folder to load config file
+CONFIG_PATH = "../config/"
+
+# Function to load yaml configuration file
+def load_config(config_name):
+    with open(os.path.join(CONFIG_PATH, config_name)) as file:
+        config = yaml.safe_load(file)
+
+    return config
+
+
+config = load_config("main_config.yaml")
 
 class Env():
      def __init__(self, is_training, num_scan_ranges=10, min_range=0.2):
