@@ -10,6 +10,7 @@ echo "Sourced Catkin workspace!"
 # Set environment variables
 export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(rospack find motion-rl)/models
 
-roslaunch motion-rl start.launch
+roslaunch motion-rl start.launch & \
+cd ~/gzweb && npm start
 # Execute the command passed into this entrypoint
 exec "$@"
