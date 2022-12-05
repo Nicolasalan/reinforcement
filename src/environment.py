@@ -62,7 +62,7 @@ class Env():
           # definir o estado inicial
           self.threshold_arrive = config["threshold_arrive"] # distância de chegada
 
-     def getState(self, scan):
+     def state(self, scan):
           scan_range = []
           yaw = self.yaw
           rel_theta = self.rel_theta
@@ -93,7 +93,7 @@ class Env():
 
           return scan_range, current_distance, yaw, rel_theta, diff_angle, done, arrive
 
-     def setReward(self, done, arrive):
+     def reward(self, done, arrive):
           current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
           distance_rate = (self.past_distance - current_distance)
 
@@ -146,16 +146,16 @@ class Env():
                except:
                     pass
 
-          state, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.getState(data)
-          state = [i / 3.5 for i in state]
+          states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
+          states = [i / 3.5 for i in states]
 
           for pa in past_action:
                state.append(pa)
 
-          state = state + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
-          reward = self.setReward(done, arrive)
+          states = states + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
+          reward = self.reward(done, arrive)
 
-          return np.asarray(state), reward, done
+          return np.asarray(states), reward, done
 
      def reset(self):
           # Reset the env #
@@ -191,12 +191,12 @@ class Env():
                     pass
 
           self.goal_distance = self.getGoalDistace()
-          state, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.getState(data)
-          state = [i / 3.5 for i in state]
+          states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
+          states = [i / 3.5 for i in states]
 
-          state.append(0)
-          state.append(0)
+          states.append(0)
+          states.append(0)
 
-          state = state + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
+          states = states + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
 
-          return np.asarray(state)
+          return np.asarray(states)
