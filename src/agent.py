@@ -114,7 +114,7 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        # 
+        # normailize the gradient
         torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1) # clip gradient to 1 norm (prevent exploding gradient)
         self.critic_optimizer.step()
 
