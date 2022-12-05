@@ -216,7 +216,7 @@ class Env():
           state = state + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
           reward = self.setReward(done, arrive)
 
-          return np.asarray(state), reward, done, arrive
+          return np.asarray(state), reward, done
 
      def reset(self):
           # Reset the env #
