@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-teleop-twist-keyboard \
  && apt-get install -y ros-noetic-gazebo-ros \
  && apt-get install -y ros-noetic-gazebo-ros-control \
-  && apt-get install -y ros-noetic-rplidar-ros
+ && apt-get install -y ros-noetic-rplidar-ros
 
 RUN source /opt/ros/noetic/setup.bash \
  && mkdir -p /ws/src 

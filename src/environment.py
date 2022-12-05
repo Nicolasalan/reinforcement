@@ -32,11 +32,11 @@ def load_config(config_name):
 config = load_config("main_config.yaml")
 
 class Env():
-     def __init__(self, num_scan_ranges=10, min_range=0.2):
+     def __init__(self):
 
-          self.num_scan_ranges = num_scan_ranges
+          self.num_scan_ranges = config["num_scan_ranges"]
           self.n_step = 0
-          self.min_range = min_range
+          self.min_range = config["min_range"]
 
           self.position = Pose() # posição do robô
           self.goal_position = Pose() # posição do alvo
@@ -75,19 +75,19 @@ class Env():
 
           cof = (len(scan.ranges) / (self.num_scan_ranges - 1))
           for i in range(0, self.num_scan_ranges):
-            n_i = math.ceil(i*cof - 1)
-            if n_i < 0:
-                n_i = 0
-            if cof == 1:
-                n_i = i
-            if scan.ranges[n_i] == float('Inf'):
-                scan_range.append(3.5)
-            elif np.isnan(scan.ranges[n_i]):
-                scan_range.append(0)
-            else:
-                scan_range.append(scan.ranges[n_i])
+               n_i = math.ceil(i*cof - 1)
+               if n_i < 0:
+                    n_i = 0
+               if cof == 1:
+                    n_i = i
+               if scan.ranges[n_i] == float('Inf'):
+                    scan_range.append(3.5)
+               elif np.isnan(scan.ranges[n_i]):
+                    scan_range.append(0)
+               else:
+                    scan_range.append(scan.ranges[n_i])
 
-          if self.min_range > min(scan_range) > 0:
+          if self.min_range > min(scan_range) > 0: # se o robô colidir com algum obstáculo
                done = True
 
           current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
@@ -150,9 +150,9 @@ class Env():
                     pass
 
           states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
-          states = [i / 3.5 for i in states]
+          states = [i / 3.5 for i in states] # normalizar os dados de entrada
 
-          for pa in past_action:
+          for pa in past_action: # adicionar a ação anterior ao estado
                states.append(pa)
 
           states = states + [rel_dis / self.diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
