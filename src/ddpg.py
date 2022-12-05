@@ -21,12 +21,12 @@ CONFIG_PATH = "../config/"
 # Function to load yaml configuration file
 def load_config(config_name):
     with open(os.path.join(CONFIG_PATH, config_name)) as file:
-        config = yaml.safe_load(file)
+        param = yaml.safe_load(file)
 
-    return config
+    return param
 
 
-config = load_config("main_config.yaml")
+param = load_config("main_config.yaml")
 
 state_dim = 16
 action_dim = 2
@@ -89,10 +89,10 @@ def ddpg():
      return scores
 
 if __name__ == '__main__':
-     n_episodes = config["N_EPISODES"]
-     print_every = config["PRINT_EVERY"] 
-     max_t = config["MAX_T"]
-     score_solved = config["SCORE_SOLVED"]
+     n_episodes = param["N_EPISODES"]
+     print_every = param["PRINT_EVERY"] 
+     max_t = param["MAX_T"]
+     score_solved = param["SCORE_SOLVED"]
 
      scores = ddpg(n_episodes, print_every, max_t, score_solved)
 

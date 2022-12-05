@@ -24,19 +24,19 @@ CONFIG_PATH = "../config/"
 # Function to load yaml configuration file
 def load_config(config_name):
     with open(os.path.join(CONFIG_PATH, config_name)) as file:
-        config = yaml.safe_load(file)
+        param = yaml.safe_load(file)
 
-    return config
+    return param
 
 
-config = load_config("main_config.yaml")
+param = load_config("main_config.yaml")
 
 class Env():
      def __init__(self):
 
-          self.num_scan_ranges = config["num_scan_ranges"]
+          self.num_scan_ranges = param["num_scan_ranges"]
           self.n_step = 0
-          self.min_range = config["min_range"]
+          self.min_range = param["min_range"]
 
           self.position = Pose() # posição do robô
           self.goal_position = Pose() # posição do alvo
@@ -44,13 +44,13 @@ class Env():
           self.goal_position.position.y = 0.0 # posição y do alvo
 
           # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = config["target"]
+          self.goal_model_dir = param["target"]
           # calcular a distância diagonal do robô
           self.diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
           ##### publicacoes e assinaturas do ROS #####
-          self.pub_cmd_vel = rospy.Publisher(config["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
-          self.sub_odom = rospy.Subscriber(config["topic_odom"], Odometry, getOdometry) # receber a posição do robô
+          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
+          self.sub_odom = rospy.Subscriber(param["topic_odom"], Odometry, getOdometry) # receber a posição do robô
 
           self.diff_angle, self.rel_theta, self.yaw = self.sub_odom
 
@@ -63,7 +63,7 @@ class Env():
           self.past_distance = 0.0 # distância do alvo no passado
 
           # definir o estado inicial
-          self.threshold_arrive = config["threshold_arrive"] # distância de chegada
+          self.threshold_arrive = param["threshold_arrive"] # distância de chegada
 
      def state(self, scan):
           scan_range = []
@@ -145,7 +145,7 @@ class Env():
           data = None
           while data is None:
                try:
-                    data = rospy.wait_for_message(config["topic_scan"], LaserScan, timeout=5)
+                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
                except:
                     pass
 
@@ -189,7 +189,7 @@ class Env():
           data = None
           while data is None:
                try:
-                    data = rospy.wait_for_message(config["topic_scan"], LaserScan, timeout=5)
+                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
                except:
                     pass
 
