@@ -18,9 +18,6 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 
 from utils import getGoalDistace, getOdometry
 
-# calcular a distância diagonal do robô
-diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
-
 # folder to load config file
 CONFIG_PATH = "../config/"
 
@@ -48,6 +45,8 @@ class Env():
 
           # definir o diretório do robô, alvo e mundo
           self.goal_model_dir = config["target"]
+          # calcular a distância diagonal do robô
+          self.diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(config["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
@@ -156,7 +155,7 @@ class Env():
           for pa in past_action:
                states.append(pa)
 
-          states = states + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
+          states = states + [rel_dis / self.diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
           reward = self.reward(done, arrive)
 
           return np.asarray(states), reward, done
@@ -201,6 +200,6 @@ class Env():
           states.append(0)
           states.append(0)
 
-          states = states + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
+          states = states + [rel_dis / self.diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
 
           return np.asarray(states)

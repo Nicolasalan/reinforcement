@@ -13,6 +13,20 @@ import rospy
 import gym
 import gym_gazebo
 import numpy as np
+import os
+
+# folder to load config file
+CONFIG_PATH = "../config/"
+
+# Function to load yaml configuration file
+def load_config(config_name):
+    with open(os.path.join(CONFIG_PATH, config_name)) as file:
+        config = yaml.safe_load(file)
+
+    return config
+
+
+config = load_config("main_config.yaml")
 
 state_dim = 16
 action_dim = 2
@@ -23,7 +37,8 @@ print('State Dimensions: ' + str(state_dim))
 print('Action Dimensions: ' + str(action_dim))
 print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular_max) + ' rad/s')
 
-def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=1000):
+
+def ddpg():
      rospy.init_node('ddpg_stage')
      env = Env()
      past_action = np.array([0., 0.])
@@ -72,3 +87,10 @@ def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=1000):
                break
 
      return scores
+
+if __name__ == '__main__':
+     n_episodes = config["N_EPISODES"]
+     print_every = config["PRINT_EVERY"] 
+     max_t = config["MAX_T"]
+     score_solved = config["SCORE_SOLVED"]
+     scores = ddpg(n_episodes, print_every, max_t, score_solved)
