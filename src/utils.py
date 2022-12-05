@@ -56,7 +56,5 @@ def getOdometry(self, odom):
           diff_angle = round(diff_angle, 2)
      else:
           diff_angle = round(360 - diff_angle, 2)
-
-     self.rel_theta = rel_theta # relacao de angulo entre o robo e o alvo
-     self.yaw = yaw # orientacao do robo
-     self.diff_angle = diff_angle # diferenca de angulo entre o robo e o alvo
+     # diferenca de angulo entre o robo e o alvo, # relacao de angulo entre o robo e o alvo, # orientacao do robo
+     return diff_angle, rel_theta, yaw

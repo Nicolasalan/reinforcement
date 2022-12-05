@@ -53,6 +53,8 @@ class Env():
           self.pub_cmd_vel = rospy.Publisher(config["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
           self.sub_odom = rospy.Subscriber(config["topic_odom"], Odometry, getOdometry) # receber a posição do robô
 
+          self.diff_angle, self.rel_theta, self.yaw = self.sub_odom
+
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
@@ -102,11 +104,11 @@ class Env():
           reward = 500.*distance_rate
           self.past_distance = current_distance
 
-          if done:
+          if done: # se o robô colidir com algum obstáculo
                reward = -100.
                self.pub_cmd_vel.publish(Twist())
 
-          if arrive:
+          if arrive: # se o robô chegar ao alvo
                reward = 120.
                self.pub_cmd_vel.publish(Twist())
                rospy.wait_for_service('/gazebo/delete_model')
