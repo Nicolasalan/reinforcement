@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import math
 
 # funcao para pegar a distancia do alvo 
