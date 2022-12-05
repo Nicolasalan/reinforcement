@@ -93,4 +93,12 @@ if __name__ == '__main__':
      print_every = config["PRINT_EVERY"] 
      max_t = config["MAX_T"]
      score_solved = config["SCORE_SOLVED"]
+     
      scores = ddpg(n_episodes, print_every, max_t, score_solved)
+
+     fig = plt.figure()
+     ax = fig.add_subplot(111)
+     plt.plot(np.arange(1, len(scores)+1), scores)
+     plt.ylabel('Score')
+     plt.xlabel('Episode')
+     plt.show()
