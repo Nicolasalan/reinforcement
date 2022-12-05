@@ -52,7 +52,32 @@ RUN python3 -m pip --no-cache-dir install \
     tqdm \
     yaml \
     os \
-    collections 
+    collections \
+    tune
+
+# Gzweb 
+RUN apt-get clean
+
+# setup keys
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2486D2DD83DB69272AFE98867170598AF249743
+
+# setup sources.list
+RUN . /etc/os-release \
+    && echo "deb http://packages.osrfoundation.org/gazebo/$ID-stable `lsb_release -sc` main" > /etc/apt/sources.list.d/gazebo-latest.list
+
+RUN apt-get install -y libgazebo11 gazebo11
+
+#install gazebo packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgazebo11-dev=11.12.0-1* 
+
+# clone gzweb
+ENV GZWEB_WS /root/gzweb
+RUN git clone -b master https://github.com/osrf/gzweb $GZWEB_WS
+
+# setup environment
+EXPOSE 8080
+EXPOSE 7681
 
 RUN mkdir -p /ws/src \
  && cd /ws/src \
