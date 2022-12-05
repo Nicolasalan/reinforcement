@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import random
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +13,7 @@ import gym
 import gym_gazebo
 import numpy as np
 import os
+import yaml
 
 # folder to load config file
 CONFIG_PATH = "../config/"
