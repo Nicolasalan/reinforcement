@@ -20,28 +20,28 @@ def main():
     rospy.init_node('ddpg_stage_1')
     env = Env(is_training)
     agent = DDPG(env, state_dim, action_dim)
-    past_action = np.array([0., 0.])
+    past_action = np.array([0., 0.]) # linear, angular
     print('State Dimensions: ' + str(state_dim))
     print('Action Dimensions: ' + str(action_dim))
     print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular_max) + ' rad/s')
 
     if is_training:
         print('Training mode')
-        avg_reward_his = []
+        avg_reward_his = [] # recompensa média de cada episódio
         total_reward = 0
-        var = 1.
+        var = 1.  # 
 
         while True:
             state = env.reset()
-            one_round_step = 0
+            one_round_step = 0 # número de passos em um episódio
 
             while True:
-                a = agent.action(state)
+                a = agent.action(state) # escolha uma ação
                 a[0] = np.clip(np.random.normal(a[0], var), 0., 1.)
                 a[1] = np.clip(np.random.normal(a[1], var), -0.5, 0.5)
 
                 state_, r, done, arrive = env.step(a, past_action)
-                time_step = agent.perceive(state, a, r, state_, done)
+                time_step = agent.perceive(state, a, r, state_, done) # retorna o número de etapas de tempo
 
                 if arrive:
                     result = 'Success'

@@ -64,7 +64,6 @@ class Env():
 
      ##### funcao para pegar a distancia do alvo #####
      def getGoalDistace(self):
-
           # calcular a distancia do alvo em relacao ao robo
           goal_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
           # distancia do alvo no passado se torna a distancia do alvo atual
@@ -89,7 +88,6 @@ class Env():
           # se nao for maior que 0, entao o yaw sera o yaw atual mais 360
           else:
                yaw = yaw + 360
-
           # relacao de distancia entre o robo e o alvo em relacao ao eixo x
           rel_dis_x = round(self.goal_position.position.x - self.position.x, 1)
           # relacao de distancia entre o robo e o alvo em relacao ao eixo y
