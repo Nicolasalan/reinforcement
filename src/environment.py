@@ -45,11 +45,11 @@ class Env():
           self.goal_position.position.y = 0.0 # posição y do alvo
 
           # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = './models/goal.sdf'
+          self.goal_model_dir = config["target"]
 
           ##### publicacoes e assinaturas do ROS #####
-          self.pub_cmd_vel = rospy.Publisher('cmd_vel', Twist, queue_size=10) # publicar a velocidade do robô
-          self.sub_odom = rospy.Subscriber('odom', Odometry, self.getOdometry) # receber a posição do robô
+          self.pub_cmd_vel = rospy.Publisher(config["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
+          self.sub_odom = rospy.Subscriber(config["topic_odom"], Odometry, self.getOdometry) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
@@ -208,7 +208,7 @@ class Env():
           data = None
           while data is None:
                try:
-                    data = rospy.wait_for_message('scan', LaserScan, timeout=5)
+                    data = rospy.wait_for_message(config["topic_scan"], LaserScan, timeout=5)
                except:
                     pass
 
@@ -252,7 +252,7 @@ class Env():
           data = None
           while data is None:
                try:
-                    data = rospy.wait_for_message('scan', LaserScan, timeout=5)
+                    data = rospy.wait_for_message(config["topic_scan"], LaserScan, timeout=5)
                except:
                     pass
 

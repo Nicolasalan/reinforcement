@@ -1,2 +1,5 @@
 
 target: ~/.models/goal.sdf
+topic_cmd: /cmd_vel
+topic_odom: /odom
+topic_scan: /scan
