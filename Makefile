@@ -16,7 +16,7 @@ docker-clean:
 .PHONY: run-docker
 run-docker:
 	@echo "Running docker container"
-	@sudo docker run -it --net=multihost -p 8080:8080 social_docker bash
+	@sudo docker run -it --net=multihost -p 8080:8080 drl-docker bash
 
 # === Delete port ===
 .PHONY: delete-port
