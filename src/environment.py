@@ -33,7 +33,7 @@ def load_config(config_name):
 config = load_config("main_config.yaml")
 
 class Env():
-     def __init__(self, is_training, num_scan_ranges=10, min_range=0.2):
+     def __init__(self, num_scan_ranges=10, min_range=0.2):
 
           self.num_scan_ranges = num_scan_ranges
           self.n_step = 0
@@ -60,10 +60,7 @@ class Env():
           self.past_distance = 0.0 # distância do alvo no passado
 
           # definir o estado inicial
-          if is_training:
-               self.threshold_arrive = 0.2 # distância de chegada
-          else:
-               self.threshold_arrive = 0.4 # distância de chegada
+          self.threshold_arrive = 0.2 # distância de chegada
 
      ##### funcao para pegar a distancia do alvo #####
      def getGoalDistace(self):
