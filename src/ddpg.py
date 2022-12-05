@@ -55,7 +55,7 @@ def ddpg():
                 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
           agent.reset()                                     # redefinir ambiente
-          states = env.reset()            # obtém o estado atual de cada agente
+          states = env.reset()                              # obtém o estado atual de cada agente
 
           for t in range(max_t):
                actions = agent.action(states)                  # escolha uma ação para cada agente
@@ -70,7 +70,7 @@ def ddpg():
                states = next_states
                score += rewards
                past_action = actions
-               if np.any(dones):                             # loop de saída quando o episódio termina
+               if np.any(dones):                            # loop de saída quando o episódio termina
                     break              
                
           scores_window.append(score)                       # salvar pontuação média para o episódio
@@ -93,7 +93,7 @@ if __name__ == '__main__':
      print_every = config["PRINT_EVERY"] 
      max_t = config["MAX_T"]
      score_solved = config["SCORE_SOLVED"]
-     
+
      scores = ddpg(n_episodes, print_every, max_t, score_solved)
 
      fig = plt.figure()
