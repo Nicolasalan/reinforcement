@@ -72,6 +72,6 @@ RUN mkdir /tmp/runtime-root
 ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
-WORKDIR /turtlebot3_ws
-COPY ./docker/entrypoint.sh /
+WORKDIR /ws
+COPY ./entrypoint.sh /
 ENTRYPOINT [ "/entrypoint.sh" ]
