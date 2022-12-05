@@ -29,7 +29,7 @@ def main():
         print('Training mode')
         avg_reward_his = [] # recompensa média de cada episódio
         total_reward = 0
-        var = 1.  # 
+        epsilon = 1. # control exploration
 
         while True:
             state = env.reset()

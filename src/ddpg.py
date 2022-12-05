@@ -26,6 +26,7 @@ print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular
 def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=30):
      rospy.init_node('ddpg_stage')
      env = Env()
+     past_action = np.array([0., 0.])
      """
      Parâmetros
      ======
@@ -40,16 +41,13 @@ def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=30):
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
           agent.reset()                                     # redefinir ambiente
           states = env.reset()            # obtém o estado atual de cada agente
-          var = 1.0
 
           for t in range(max_t):
-               actions = agent.act(states)                   # selecione uma ação
-
-               actions[0] = np.clip(np.random.normal(actions[0], var), 0., 1.)
-               actions[1] = np.clip(np.random.normal(actions[1], var), -0.5, 0.5)
-
-               state, reward, done, arrive = env.step(actions, past_action)
-               env_info = env.step(actions)                  # e
+               actions = agent.action(states)                  # escolha uma ação para cada agente
+               actions[0] = agent.action(states, 0.0, 1.0)                   # selecione uma ação
+               actions[1] = agent.action(states,-0.5, 0.5)
+               next_states, rewards, dones, arrive = env.step(actions, past_action) # envia todas as ações ao ambiente
+           
                
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
                for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
