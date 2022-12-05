@@ -46,8 +46,7 @@ def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=30):
                actions = agent.action(states)                  # escolha uma ação para cada agente
                actions[0] = agent.action(states, 0.0, 1.0)                   # selecione uma ação
                actions[1] = agent.action(states,-0.5, 0.5)
-               next_states, rewards, dones, arrive = env.step(actions, past_action) # envia todas as ações ao ambiente
-           
+               next_states, rewards, dones = env.step(actions, past_action) # envia todas as ações ao ambiente
                
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
                for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
@@ -55,6 +54,7 @@ def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=30):
                     
                states = next_states
                score += rewards
+               past_action = actions
                if np.any(dones):                             # loop de saída quando o episódio termina
                     break              
                
