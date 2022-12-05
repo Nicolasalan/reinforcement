@@ -31,14 +31,14 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-joint-state-controller \
  && apt-get install -y ros-noetic-joint-state-publisher \
  && apt-get install -y ros-noetic-robot-state-publisher \
- && apt-get install -y ros-noetic-robot-state-controller
+ && apt-get install -y ros-noetic-robot-state-controller \
  && apt-get install -y ros-noetic-xacro \ 
  && apt-get install -y ros-noetic-smach-ros \
  && apt-get install -y ros-noetic-teleop-twist-keyboard \
  && apt-get install -y ros-noetic-gazebo-ros \
  && apt-get install -y ros-noetic-gazebo-ros-control \
- && apt-get install -y ros-noetic-rplidar-ros
- && apt-get install -y ros-noetic-driver-base
+ && apt-get install -y ros-noetic-rplidar-ros \
+ && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
 RUN python3 -m pip --no-cache-dir install \
