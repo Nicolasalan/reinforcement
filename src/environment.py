@@ -16,6 +16,8 @@ from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
 from gazebo_msgs.srv import SpawnModel, DeleteModel
 
+from utils import getGoalDistace, getOdometry
+
 # calcular a distância diagonal do robô
 diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
@@ -49,7 +51,7 @@ class Env():
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(config["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
-          self.sub_odom = rospy.Subscriber(config["topic_odom"], Odometry, self.getOdometry) # receber a posição do robô
+          self.sub_odom = rospy.Subscriber(config["topic_odom"], Odometry, getOdometry) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
@@ -125,7 +127,7 @@ class Env():
                except (rospy.ServiceException) as e:
                     print("/gazebo/failed to build the target")
                rospy.wait_for_service('/gazebo/unpause_physics')
-               self.goal_distance = self.getGoalDistace()
+               self.goal_distance = getGoalDistace()
                arrive = False
 
           return reward
@@ -150,7 +152,7 @@ class Env():
           states = [i / 3.5 for i in states]
 
           for pa in past_action:
-               state.append(pa)
+               states.append(pa)
 
           states = states + [rel_dis / diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
           reward = self.reward(done, arrive)
@@ -190,7 +192,7 @@ class Env():
                except:
                     pass
 
-          self.goal_distance = self.getGoalDistace()
+          self.goal_distance = getGoalDistace()
           states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
           states = [i / 3.5 for i in states]
 
