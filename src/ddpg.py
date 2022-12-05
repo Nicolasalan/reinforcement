@@ -23,7 +23,7 @@ print('State Dimensions: ' + str(state_dim))
 print('Action Dimensions: ' + str(action_dim))
 print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular_max) + ' rad/s')
 
-def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=30):
+def ddpg(n_episodes=2000, print_every=10, max_t=1000, score_solved=1000):
      rospy.init_node('ddpg_stage')
      env = Env()
      past_action = np.array([0., 0.])
