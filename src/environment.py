@@ -60,7 +60,7 @@ class Env():
           self.past_distance = 0.0 # distância do alvo no passado
 
           # definir o estado inicial
-          self.threshold_arrive = 0.2 # distância de chegada
+          self.threshold_arrive = config["threshold_arrive"] # distância de chegada
 
      ##### funcao para pegar a distancia do alvo #####
      def getGoalDistace(self):
