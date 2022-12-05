@@ -30,8 +30,8 @@ param = load_config("main_config.yaml")
 
 state_dim = 16
 action_dim = 2
-action_linear_max = 0.25  # m/s
-action_angular_max = 0.5  # rad/s
+action_linear_max = param["action_linear_max"]
+action_angular_max = param["action_angular_max"]
 
 print('State Dimensions: ' + str(state_dim))
 print('Action Dimensions: ' + str(action_dim))

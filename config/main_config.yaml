@@ -7,6 +7,8 @@ topic_scan: /scan
 threshold_arrive: 0.2
 num_scan_ranges: 10 
 min_range: 0.2
+action_linear_max: 0.25  # m/s
+action_angular_max: 0.5  # rad/s
 
 # parameters for the model
 BUFFER_SIZE: int(1e6)  # replay buffer size
