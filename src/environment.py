@@ -16,8 +16,6 @@ from std_srvs.srv import Empty
 from gazebo_msgs.srv import SpawnModel, DeleteModel
 from squaternion import Quaternion
 
-from utils import getGoalDistace, getOdometry
-
 # folder to load config file
 CONFIG_PATH = "../config/"
 
@@ -27,7 +25,6 @@ def load_config(config_name):
         param = yaml.safe_load(file)
 
     return param
-
 
 param = load_config("main_config.yaml")
 
@@ -50,8 +47,7 @@ class Env():
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
-          self.sub_odom = rospy.Subscriber(param["topic_odom"], Odometry, getOdometry) # receber a posição do robô
-          self.diff_angle, self.rel_theta, self.yaw = self.sub_odom
+          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
@@ -74,11 +70,15 @@ class Env():
           return goal_distance
 
      # funcao para pegar a posicao do robo por meio do topico '/odom' 
-     def getOdometry(self, odom):
+     def odom_callback(self, od_data):
+          self.last_odom = od_data
+
+     def state(self, scan):
+          
           # pegar a posicao do robo
-          self.position = odom.pose.pose.position
+          self.position = self.odom.pose.pose.position
           # pegar a orientacao do robo
-          orientation = odom.pose.pose.orientation
+          orientation = self.odom.pose.pose.orientation
           # converter a orientacao do robo para euler
           q_x, q_y, q_z, q_w = orientation.x, orientation.y, orientation.z, orientation.w
           # converter a orientacao do robo para euler
@@ -120,46 +120,7 @@ class Env():
                diff_angle = round(diff_angle, 2)
           else:
                diff_angle = round(360 - diff_angle, 2)
-          # diferenca de angulo entre o robo e o alvo, # relacao de angulo entre o robo e o alvo, # orientacao do robo
-          return diff_angle, rel_theta, yaw
-
-     def state(self, action):
-          target = False
-          # diferenca entre o angulo do robo e o angulo do alvo ?
-          # relacao de angulo entre o robo e o alvo theta ?
-          # orientacao do robo yaw ?
-
-
-          # Calculate robot heading from odometry data
-          self.odom_x = self.last_odom.pose.pose.position.x
-          self.odom_y = self.last_odom.pose.pose.position.y
-          quaternion = Quaternion(
-            self.last_odom.pose.pose.orientation.w,
-            self.last_odom.pose.pose.orientation.x,
-            self.last_odom.pose.pose.orientation.y,
-            self.last_odom.pose.pose.orientation.z,
-          )
-
-          skew_x = self.goal_x - self.odom_x
-          skew_y = self.goal_y - self.odom_y
-          dot = skew_x * 1 + skew_y * 0
-          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
-          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          beta = math.acos(dot / (mag1 * mag2))
-          if skew_y < 0:
-               if skew_x < 0:
-                    beta = -beta
-               else:
-                    beta = 0 - beta
-          theta = beta - angle
-          if theta > np.pi:
-               theta = np.pi - theta
-               theta = -np.pi - theta
-          if theta < -np.pi:
-               theta = -np.pi - theta
-               theta = np.pi - theta
-
-
+          
           scan_range = []
           yaw = self.yaw
           rel_theta = self.rel_theta
@@ -222,7 +183,7 @@ class Env():
                except (rospy.ServiceException) as e:
                     print("/gazebo/failed to build the target")
                rospy.wait_for_service('/gazebo/unpause_physics')
-               self.goal_distance = getGoalDistace()
+               self.goal_distance = self.getGoalDistace()
                arrive = False
 
           return reward
@@ -287,7 +248,7 @@ class Env():
                except:
                     pass
 
-          self.goal_distance = getGoalDistace()
+          self.goal_distance = self.getGoalDistace()
           states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
           states = [i / 3.5 for i in states]
 
