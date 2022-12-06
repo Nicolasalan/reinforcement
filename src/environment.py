@@ -14,6 +14,7 @@ from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
 from gazebo_msgs.srv import SpawnModel, DeleteModel
+from squaternion import Quaternion
 
 from utils import getGoalDistace, getOdometry
 
@@ -50,7 +51,6 @@ class Env():
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
           self.sub_odom = rospy.Subscriber(param["topic_odom"], Odometry, getOdometry) # receber a posição do robô
-
           self.diff_angle, self.rel_theta, self.yaw = self.sub_odom
 
           ##### servicos do ROS #####
@@ -123,7 +123,43 @@ class Env():
           # diferenca de angulo entre o robo e o alvo, # relacao de angulo entre o robo e o alvo, # orientacao do robo
           return diff_angle, rel_theta, yaw
 
-     def state(self, scan):
+     def state(self, action):
+          target = False
+          # diferenca entre o angulo do robo e o angulo do alvo ?
+          # relacao de angulo entre o robo e o alvo theta ?
+          # orientacao do robo yaw ?
+
+
+          # Calculate robot heading from odometry data
+          self.odom_x = self.last_odom.pose.pose.position.x
+          self.odom_y = self.last_odom.pose.pose.position.y
+          quaternion = Quaternion(
+            self.last_odom.pose.pose.orientation.w,
+            self.last_odom.pose.pose.orientation.x,
+            self.last_odom.pose.pose.orientation.y,
+            self.last_odom.pose.pose.orientation.z,
+          )
+
+          skew_x = self.goal_x - self.odom_x
+          skew_y = self.goal_y - self.odom_y
+          dot = skew_x * 1 + skew_y * 0
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          beta = math.acos(dot / (mag1 * mag2))
+          if skew_y < 0:
+               if skew_x < 0:
+                    beta = -beta
+               else:
+                    beta = 0 - beta
+          theta = beta - angle
+          if theta > np.pi:
+               theta = np.pi - theta
+               theta = -np.pi - theta
+          if theta < -np.pi:
+               theta = -np.pi - theta
+               theta = np.pi - theta
+
+
           scan_range = []
           yaw = self.yaw
           rel_theta = self.rel_theta
