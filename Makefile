@@ -5,14 +5,12 @@ docker-build:
 	@sudo docker build -t drl-docker . 
 
 # === Clean docker ===
-
 .PHONY: docker-clean
 docker-clean:
 	@echo "Closing all running docker containers"
 	@sudo docker system prune -f
 
 # === Run terminal docker ===
-
 .PHONY: run-docker
 run-docker:
 	@echo "Running docker container"
