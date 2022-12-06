@@ -39,7 +39,7 @@ print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular
 
 
 def ddpg():
-     rospy.init_node('ddpg_stage')
+     rospy.init_node('baseline')
      env = Env()
      past_action = np.array([0., 0.])
      """

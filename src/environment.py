@@ -74,7 +74,6 @@ class Env():
           self.last_odom = od_data
 
      def state(self, scan):
-          
           # pegar a posicao do robo
           self.position = self.odom.pose.pose.position
           # pegar a orientacao do robo
