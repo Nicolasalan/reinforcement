@@ -13,10 +13,6 @@ import torch.optim as optim
 import yaml
 import os
 
-from ray import tune
-from ray.tune import CLIReporter
-from ray.tune.schedulers import ASHAScheduler
-
 # folder to load config file
 CONFIG_PATH = "../config/"
 
