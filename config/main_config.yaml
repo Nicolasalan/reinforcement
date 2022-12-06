@@ -4,7 +4,7 @@ target: ~/.models/goal.sdf
 topic_cmd: /cmd_vel
 topic_odom: /odom
 topic_scan: /scan
-threshold_arrive: 0.2
+threshold_target: 0.2
 num_scan_ranges: 10 
 min_range: 0.2
 action_linear_max: 0.25  # m/s

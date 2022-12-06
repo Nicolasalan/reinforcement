@@ -58,7 +58,7 @@ class Env():
           self.past_distance = 0.0 # distância do alvo no passado
 
           # definir o estado inicial
-          self.threshold_arrive = param["threshold_arrive"] # distância de chegada
+          self.threshold_target = param["threshold_target"] # distância de chegada
 
      # funcao para pegar a distancia do alvo 
      def getGoalDistace(self):
@@ -125,7 +125,7 @@ class Env():
           rel_theta = self.rel_theta
           diff_angle = self.diff_angle
           done = False
-          arrive = False
+          target = False
 
           cof = (len(scan.ranges) / (self.num_scan_ranges - 1))
           for i in range(0, self.num_scan_ranges):
@@ -145,12 +145,12 @@ class Env():
                done = True
 
           current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
-          if current_distance <= self.threshold_arrive:
-               arrive = True
+          if current_distance <= self.threshold_target:
+               target = True
 
-          return scan_range, current_distance, yaw, rel_theta, diff_angle, done, arrive
+          return scan_range, current_distance, yaw, rel_theta, diff_angle, done, target
 
-     def reward(self, done, arrive):
+     def reward(self, done, target):
           current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
           distance_rate = (self.past_distance - current_distance)
 
@@ -161,7 +161,7 @@ class Env():
                reward = -100.
                self.pub_cmd_vel.publish(Twist())
 
-          if arrive: # se o robô chegar ao alvo
+          if target: # se o robô chegar ao alvo
                reward = 120.
                self.pub_cmd_vel.publish(Twist())
                rospy.wait_for_service('/gazebo/delete_model')
@@ -183,7 +183,7 @@ class Env():
                     print("/gazebo/failed to build the target")
                rospy.wait_for_service('/gazebo/unpause_physics')
                self.goal_distance = self.getGoalDistace()
-               arrive = False
+               target = False
 
           return reward
 
@@ -203,14 +203,14 @@ class Env():
                except:
                     pass
 
-          states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
+          states, rel_dis, yaw, rel_theta, diff_angle, done, target = self.state(data)
           states = [i / 3.5 for i in states] # normalizar os dados de entrada
 
           for pa in past_action: # adicionar a ação anterior ao estado
                states.append(pa)
 
           states = states + [rel_dis / self.diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
-          reward = self.reward(done, arrive)
+          reward = self.reward(done, target)
 
           return np.asarray(states), reward, done
 
@@ -248,7 +248,7 @@ class Env():
                     pass
 
           self.goal_distance = self.getGoalDistace()
-          states, rel_dis, yaw, rel_theta, diff_angle, done, arrive = self.state(data)
+          states, rel_dis, yaw, rel_theta, diff_angle, done, target = self.state(data)
           states = [i / 3.5 for i in states]
 
           states.append(0)
