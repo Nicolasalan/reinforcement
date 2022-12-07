@@ -52,8 +52,7 @@ RUN python3 -m pip --no-cache-dir install \
     tqdm \
     yaml \
     os \
-    collections \
-    tune
+    collections
 
 # Gzweb 
 RUN apt-get clean
@@ -91,6 +90,8 @@ RUN cd /ws \
  && source /opt/ros/noetic/setup.bash \
  && rosdep install -y --from-paths src --ignore-src \
  && catkin build
+
+RUN cd /root/gzweb && source /usr/share/gazebo/setup.sh && npm run deploy
 
 RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc \
  && echo "source /usr/share/gazebo-11/setup.bash" >> ~/.bashrc 
