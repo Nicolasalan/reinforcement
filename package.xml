@@ -3,6 +3,7 @@
   <name>motion-rl</name>
   <version>0.0.0</version>
   <description>Reinforcement learnings with DDPG</description>
+  <maintainer email="nicolasalangrotti03@gmail.com">Nicolas Alan</maintainer>
   <license>TODO</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>

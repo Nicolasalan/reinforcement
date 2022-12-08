@@ -56,12 +56,6 @@ RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
     rm get-pip.py && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN python3 -m pip install pyyaml 
-RUN python3 -m pip install matplotlib 
-RUN python3 -m pip install numpy
-RUN python3 -m pip install os-sys 
-RUN python3 -m pip install collections
-
 # Gzweb 
 RUN apt-get clean
 
@@ -89,8 +83,9 @@ EXPOSE 7681
 RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
- && catkin_init_workspace \
+ && catkin_init_workspace 
 
+WORKDIR /ws
 COPY . /ws/src
 
 # Build the Catkin workspace
@@ -109,6 +104,7 @@ RUN mkdir /tmp/runtime-root
 ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
-WORKDIR /ws
+RUN pip3 install -r requirements.txt
+
 COPY ./entrypoint.sh /
 ENTRYPOINT [ "/entrypoint.sh" ]
