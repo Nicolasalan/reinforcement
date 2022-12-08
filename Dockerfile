@@ -44,15 +44,23 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
+RUN apt-get update && apt-get install -y software-properties-common
+
 RUN python3 -m pip --no-cache-dir install \
-    torch \
-    torchvision \
-    matplotlib \
-    numpy \
-    tqdm \
-    yaml \
-    os \
-    collections
+    torch 
+
+RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
+    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python3 get-pip.py && \
+    rm get-pip.py && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN python3 -m pip install pyyaml 
+RUN python3 -m pip install matplotlib 
+RUN python3 -m pip install numpy
+RUN python3 -m pip install os-sys 
+RUN python3 -m pip install collections
 
 # Gzweb 
 RUN apt-get clean
@@ -91,7 +99,7 @@ RUN cd /ws \
  && rosdep install -y --from-paths src --ignore-src \
  && catkin build
 
-RUN cd /root/gzweb && source /usr/share/gazebo/setup.sh && npm run deploy
+RUN cd /root/gzweb && source /usr/share/gazebo-11/setup.sh && npm run deploy
 
 RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc \
  && echo "source /usr/share/gazebo-11/setup.bash" >> ~/.bashrc 
