@@ -4,16 +4,12 @@ FROM osrf/ros:noetic-desktop-full
 SHELL [ "/bin/bash" , "-c" ]
 
 # Setup minimal
-RUN apt-get update \
-   && apt-get install -y --no-install-recommends apt-utils
 ARG DEBIAN_FRONTEND=noninteractive 
-
-RUN apt-get update && apt-get install -y locales lsb-release
-RUN dpkg-reconfigure locales
 
 # Install basic apt packages
 RUN apt-get update && apt-get install -y \
   cmake \
+  apt-utils \
   g++ \
   gnupg gnupg1 gnupg2 \
   libcanberra-gtk* \
@@ -24,6 +20,7 @@ RUN apt-get update && apt-get install -y \
   python3-dev \
   python3-numpy \
   wget \
+  git \
   curl \
   xterm \
   npm
@@ -42,9 +39,6 @@ RUN apt-get update && apt-get install -q -y --no-install-recommends \
     psmisc \
     xvfb
 
-# Install Git
-RUN apt-get update && apt-get install -y git && apt-get install -y build-essential
-
 # Install dependencies
 RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-joint-state-controller \
@@ -59,9 +53,6 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-rplidar-ros \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
-
-# Install software
-RUN apt-get update && apt-get install -y software-properties-common
 
 # create a python3.9 symlink
 RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
