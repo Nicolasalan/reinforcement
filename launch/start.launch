@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <launch>
-  <node name="motion-planner" pkg="motion-rl" type="ddpg.py" output="screen"/>
+  <node name="motion-planner" pkg="motion" type="ddpg.py" output="screen"/>
 </launch>

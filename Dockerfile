@@ -95,7 +95,7 @@ RUN mkdir -p /ws/src \
 
 # Copy the source files
 WORKDIR /ws
-VOLUME . /ws/src/motion-rl
+VOLUME . /ws/src/motion
 
 # Build the Catkin workspace
 RUN cd /ws \
@@ -116,7 +116,7 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
 # Install python dependencies
-RUN cd /src/motion-rl && pip3 install -r requirements.txt
+RUN cd /src/motion && pip3 install -r requirements.txt
 
 # entrypoint script
-ENTRYPOINT [ "/src/motion-rl/entrypoint.sh" ]
+ENTRYPOINT [ "/src/motion/entrypoint.sh" ]
