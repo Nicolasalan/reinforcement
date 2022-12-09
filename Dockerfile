@@ -22,6 +22,8 @@ RUN apt-get install -q -y --no-install-recommends \
   python3-yaml \
   python3-dev \
   python3-numpy \
+  rospkg \
+  catkin_pkg \
   wget \
   git \
   curl \
