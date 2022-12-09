@@ -6,12 +6,15 @@ SHELL [ "/bin/bash" , "-c" ]
 # Setup minimal
 ARG DEBIAN_FRONTEND=noninteractive 
 
-# Install basic apt packages
-RUN apt-get update && apt-get install -y \
-  cmake \
+# Setup minimal
+RUN apt-get update
+
+RUN apt-get install -q -y --no-install-recommends \
+  build-essential \
   apt-utils \
+  cmake \
   g++ \
-  gnupg gnupg1 gnupg2 \
+  git \
   libcanberra-gtk* \
   python3-catkin-tools \
   python3-pip \
@@ -22,7 +25,6 @@ RUN apt-get update && apt-get install -y \
   wget \
   git \
   curl \
-  xterm \
   npm
 
 # depenpencies gzweb
@@ -54,16 +56,8 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
-# create a python3.9 symlink
-RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
-    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python3 get-pip.py && \
-    rm get-pip.py && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 # Install torch latest
-RUN python3 -m pip --no-cache-dir install \
+RUN pip3 --no-cache-dir install \
     torch 
 
 # Gzweb 
@@ -101,12 +95,6 @@ RUN mkdir -p /ws/src \
 WORKDIR /ws
 VOLUME . /ws/src/motion-rl
 
-# Rosdep
-RUN apt-get install python3-rosdep \
- && rm /etc/ros/rosdep/sources.list.d/20-default.list \
- && sudo rosdep init \
- && rosdep update 
-
 # Build the Catkin workspace
 RUN cd /ws \
  && source /opt/ros/noetic/setup.bash \
@@ -126,7 +114,7 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
 # Install python dependencies
-#RUN cd /src/motion-rl && pip3 install -r requirements.txt
+RUN cd /src/motion-rl && pip3 install -r requirements.txt
 
 # entrypoint script
-#ENTRYPOINT [ "/src/motion-rl/entrypoint.sh" ]
+ENTRYPOINT [ "/src/motion-rl/entrypoint.sh" ]
