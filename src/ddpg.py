@@ -59,8 +59,8 @@ def ddpg():
 
           for t in range(max_t):
                actions = agent.action(states)                  # escolha uma ação para cada agente
-               actions[0] = agent.action(states, 0.0, 1.0)                   # selecione uma ação
-               actions[1] = agent.action(states,-0.5, 0.5)
+               actions[0] = agent.action(states)                   # selecione uma ação
+               actions[1] = agent.action(states)
                next_states, rewards, dones, target = env.step(actions, past_action) # envia todas as ações ao ambiente
                
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
