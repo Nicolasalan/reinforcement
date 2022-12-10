@@ -1,5 +1,5 @@
 # Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
-FROM nvidia/cudagl:11.4.2-base-ubuntu20.04
+FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-devel
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
@@ -61,22 +61,22 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
-RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
-    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python3 get-pip.py && \
-    rm get-pip.py && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
+#    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
+#    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+#    python3 get-pip.py && \
+#    rm get-pip.py && \
+#    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
- && catkin_init_workspace 
+ && catkin_init_workspace \
+ && git clone -b main https://github.com/Nicolasalan/motion.git
 
 # Copy the source files
 WORKDIR /ws
-VOLUME . /ws/src/motion
 
 # Build the Catkin workspace
 RUN cd /ws \
@@ -85,8 +85,7 @@ RUN cd /ws \
  && catkin build
 
 # Setup bashrc
-RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc \
- && echo "source /usr/share/gazebo-11/setup.bash" >> ~/.bashrc 
+RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc 
 
 # Remove display warnings
 RUN mkdir /tmp/runtime-root
@@ -94,7 +93,7 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
 # Install python dependencies
-RUN cd /src/motion && pip3 install -r requirements.txt
+RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
 # entrypoint script
 ENTRYPOINT [ "/src/motion/entrypoint.sh" ]
