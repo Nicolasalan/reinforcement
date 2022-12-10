@@ -8,5 +8,3 @@ source /ws/devel/setup.bash
 echo "Sourced Catkin workspace!"
 
 roslaunch motion start.launch
-# Execute the command passed into this entrypoint
-exec "$@"
