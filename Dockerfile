@@ -1,6 +1,5 @@
 # Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
 FROM nvidia/cudagl:11.4.2-base-ubuntu20.04
->>>>>>> ba9d0e7056348af315a0f5f54e6af3a4be56b342
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
