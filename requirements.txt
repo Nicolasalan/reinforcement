@@ -1,4 +1,3 @@
 pyyaml
 matplotlib
 numpy
-collections
