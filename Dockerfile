@@ -1,4 +1,3 @@
-# Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
 FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-devel
 
 # Install basic apt packages
