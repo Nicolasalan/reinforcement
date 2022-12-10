@@ -44,6 +44,13 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
+RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
+    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python3 get-pip.py && \
+    rm get-pip.py && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    
 # Install torch latest
 RUN pip3 --no-cache-dir install \
     torch 
