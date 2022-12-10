@@ -25,11 +25,10 @@ def load_config(config_name):
 
     return param
 
-
 param = load_config("main_config.yaml")
 
-state_dim = 16
-action_dim = 2
+state_dim = param["state_dim"]
+action_dim = param["action_dim"]
 action_linear_max = param["action_linear_max"]
 action_angular_max = param["action_angular_max"]
 

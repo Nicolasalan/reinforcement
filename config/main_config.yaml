@@ -9,6 +9,8 @@ num_scan_ranges: 10
 min_range: 0.2
 action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
+state_dim: 16
+action_dim: 2 
 waypoints: './config/waypoints.yaml'
 
 # parameters for the model
