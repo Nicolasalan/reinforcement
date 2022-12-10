@@ -1,5 +1,5 @@
 # Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
-FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-devel
+FROM nvidia/cudagl:11.4.2-base-ubuntu20.04
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
@@ -61,12 +61,7 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
-#RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
-#    ln -s /usr/bin/python3.9 /usr/local/bin/python3 && \
-#    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-#    python3 get-pip.py && \
-#    rm get-pip.py && \
-#    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \
