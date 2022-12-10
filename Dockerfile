@@ -61,7 +61,7 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
-RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \
@@ -81,11 +81,6 @@ RUN cd /ws \
 
 # Setup bashrc
 RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc 
-
-# Remove display warnings
-RUN mkdir /tmp/runtime-root
-ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
-ENV NO_AT_BRIDGE 1
 
 # Install python dependencies
 RUN cd /ws/src/motion && pip3 install -r requirements.txt

@@ -1,5 +1,4 @@
 pyyaml
 matplotlib
 numpy
-os-sys
 collections
