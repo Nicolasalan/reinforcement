@@ -68,10 +68,6 @@ RUN ln -s /usr/bin/python3.9 /usr/local/bin/python && \
     rm get-pip.py && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install torch latest
-RUN pip3 install \
-    torch
-
 # create a catkin workspace
 RUN mkdir -p /ws/src \
  && cd /ws/src \

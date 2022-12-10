@@ -1,4 +1,5 @@
 pyyaml
+torch
 matplotlib
 numpy
 os
