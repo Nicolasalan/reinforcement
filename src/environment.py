@@ -59,6 +59,23 @@ class Env():
 
           # definir o estado inicial
           self.threshold_target = param["threshold_target"] # distância de chegada
+          self.goals = []
+          self.goals_id = 0
+          list = []
+
+          with open(param["waypoints"]) as f:
+               data = yaml.safe_load(f)
+               for i in data:
+                    list.append(i['position'])
+
+               for i in list:
+                    str_x = (i[0]).strip('[]')
+                    str_y = (i[1]).strip('[]')
+                    x = float(str_x)
+                    y = float(str_y)
+                    # add x and y to goals
+                    self.goals.append((x, y))
+
 
      # funcao para pegar a distancia do alvo 
      def getGoalDistace(self):
@@ -174,8 +191,9 @@ class Env():
                     target = SpawnModel
                     target.model_name = 'target'  # the same with sdf name
                     target.model_xml = goal_urdf
-                    self.goal_position.position.x = random.uniform(-3.6, 3.6)
-                    self.goal_position.position.y = random.uniform(-3.6, 3.6)
+                    self.goal_position.position.x, self.goal_position.position.y = random.choice(self.goals)
+                    #self.goal_position.position.x = random.uniform(-3.6, 3.6)
+                    #self.goal_position.position.y = random.uniform(-3.6, 3.6)
 
                     self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
 
@@ -234,8 +252,9 @@ class Env():
                target.model_xml = goal_urdf
 
                # randomiza o target pelo mundo
-               self.goal_position.position.x = random.uniform(-3.6, 3.6)
-               self.goal_position.position.y = random.uniform(-3.6, 3.6)
+               self.goal_position.position.x, self.goal_position.position.y = random.choice(self.goals)
+               #self.goal_position.position.x = random.uniform(-3.6, 3.6)
+               #self.goal_position.position.y = random.uniform(-3.6, 3.6)
                self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
