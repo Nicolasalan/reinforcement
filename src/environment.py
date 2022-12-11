@@ -45,15 +45,15 @@ class Env():
 
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
 
-          #self.set_self_state = ModelState()
-          #self.set_self_state.model_name = "target"
-          #self.set_self_state.pose.position.x = 0.0
-          #self.set_self_state.pose.position.y = 0.0
-          #self.set_self_state.pose.position.z = 0.0
-          #self.set_self_state.pose.orientation.x = 0.0
-          #self.set_self_state.pose.orientation.y = 0.0
-          #self.set_self_state.pose.orientation.z = 0.0
-          #self.set_self_state.pose.orientation.w = 1.0
+          self.set_self_state = ModelState()
+          self.set_self_state.model_name = "target"
+          self.set_self_state.pose.position.x = 0.0
+          self.set_self_state.pose.position.y = 0.0
+          self.set_self_state.pose.position.z = 0.0
+          self.set_self_state.pose.orientation.x = 0.0
+          self.set_self_state.pose.orientation.y = 0.0
+          self.set_self_state.pose.orientation.z = 0.0
+          self.set_self_state.pose.orientation.w = 1.0
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
