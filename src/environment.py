@@ -174,7 +174,7 @@ class Env():
                print("unpause")
           except (rospy.ServiceException) as e:
                print("/gazebo/unpause_physics service call failed")
-          
+
           time.sleep(0.1)
           print("step 2")
           rospy.wait_for_service("/gazebo/pause_physics")
@@ -191,8 +191,10 @@ class Env():
                print(data)
                try:
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-                    rospy.spin()
+                    print("###########################")
+                    print("Data received", data)
                except:
+                    print("Waiting for data", data)
                     pass
           
           min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
