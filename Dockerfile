@@ -86,4 +86,4 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
 # cmd script
-CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash && export GAZEBO_MODEL_PATH=/ws/src/motion/models
+CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash && export GAZEBO_MODEL_PATH=/ws/src/motion/models && export GAZEBO_RESOURCE_PATH=/home/socialdroids/ws_socialdroids/src/3rd/aws-robomaker-bookstore-world/launch
