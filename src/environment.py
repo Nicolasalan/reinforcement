@@ -46,7 +46,7 @@ class Env():
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
 
           self.set_self_state = ModelState()
-          self.set_self_state.model_name = "r1"
+          self.set_self_state.model_name = "target"
           self.set_self_state.pose.position.x = 0.0
           self.set_self_state.pose.position.y = 0.0
           self.set_self_state.pose.position.z = 0.0
