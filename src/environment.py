@@ -218,11 +218,13 @@ class Env():
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
 
-               self.goal_x, self.goal_y = random.choice(self.goals)
-               
+               _x, _y = random.choice(self.goals)
+               self.goal_x = _x
+               self.goal_y = _y
+
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
-               print("Goal x: ", -4, "Goal y: ", 5)
+               print("Goal x: ", self.goal_x, "Goal y: ", self.goal_y)
 
                object_state.pose.orientation.x = quaternion.x
                object_state.pose.orientation.y = quaternion.y
