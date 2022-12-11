@@ -201,8 +201,8 @@ class Env():
 
      def reset(self):
           print("Resetting environment")
-          rospy.wait_for_service("/gazebo/reset_world")
-          #rospy.wait_for_service('gazebo/reset_simulation')
+          #rospy.wait_for_service("/gazebo/reset_world")
+          rospy.wait_for_service('gazebo/reset_simulation')
           try:
                self.reset_proxy()
           except (rospy.ServiceException) as e:
@@ -210,7 +210,6 @@ class Env():
 
           # Build the target
           try:
-
                # randomiza o target pelo mundo
                angle = np.random.uniform(-np.pi, np.pi)
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
