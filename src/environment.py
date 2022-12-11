@@ -250,6 +250,7 @@ class Env():
           print("Unpausing physics")
           data = None
           while data is None:
+               print(data)
                try:
                     data = rospy.wait_for_message('base_scan_front', LaserScan, timeout=5)
                     rospy.spin()
