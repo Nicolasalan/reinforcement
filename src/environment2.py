@@ -10,7 +10,7 @@ import math
 import time
 
 # importar mensagens do ROS
-from geometry_msgs.msg import Twist, Point, Pose
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
@@ -54,7 +54,7 @@ class Env():
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
           self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)s
+          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 
           # definir o estado inicial
           self.threshold_target = param["threshold_target"] # distância de chegada
