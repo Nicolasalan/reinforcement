@@ -89,6 +89,7 @@ class Env():
                     y = float(str_y)
                     # add x and y to goals
                     self.goals.append((x, y))
+          print(self.goals)
 
      # funcao para pegar a posicao do robo por meio do topico '/odom' 
      def odom_callback(self, od_data):
@@ -233,6 +234,7 @@ class Env():
                print("/gazebo/failed to build the target")
           rospy.wait_for_service('/gazebo/unpause_physics')
           
+          print("Unpausing physics")
           data = None
           while data is None:
                try:
