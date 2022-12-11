@@ -14,7 +14,8 @@ from geometry_msgs.msg import Twist, Pose, Point, Quaternion
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
-from gazebo_msgs.srv import SpawnModel, DeleteModel, ModelState
+from gazebo_msgs.srv import SpawnModel, DeleteModel
+from gazebo_msgs.msg import ModelState
 from squaternion import Quaternion
 
 # folder to load config file
