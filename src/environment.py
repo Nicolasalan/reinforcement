@@ -227,6 +227,7 @@ class Env():
                object_state.pose.orientation.z = quaternion.z
                object_state.pose.orientation.w = quaternion.w
                self.set_state.publish(object_state)
+               print("Target randomized")
 
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
