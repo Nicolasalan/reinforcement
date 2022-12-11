@@ -67,6 +67,7 @@ class Env():
           self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
           self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
+          self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
           self.past_distance = 0.0
 
           # definir o estado inicial
