@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from collections import deque
 from agent import Agent
-from environment2 import Env
+from environment import Env
 
 import rospy
 import numpy as np

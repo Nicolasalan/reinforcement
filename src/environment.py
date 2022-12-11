@@ -7,13 +7,15 @@ import numpy as np
 import random
 import yaml
 import math
+import time
 
 # importar mensagens do ROS
-from geometry_msgs.msg import Twist, Point, Pose
+from geometry_msgs.msg import Twist, Pose, Point, Quaternion
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
 from gazebo_msgs.srv import SpawnModel, DeleteModel
+from gazebo_msgs.msg import ModelState
 from squaternion import Quaternion
 
 # folder to load config file
@@ -32,33 +34,45 @@ class Env():
      def __init__(self):
 
           self.num_scan_ranges = param["num_scan_ranges"]
-          self.n_step = 0
           self.min_range = param["min_range"]
 
-          self.position = None # posição do robô
-          self.goal_position = None # posição do alvo
-          #self.goal_position.position.x = 0.0 # posição x do alvo
-          #self.goal_position.position.y = 0.0 # posição y do alvo
+          self.last_odom = None
+          self.odom_x = 0
+          self.odom_y = 0
 
-          # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = param["target"]
-          # calcular a distância diagonal do robô
-          self.diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
+          self.goal_x = 1
+          self.goal_y = 0.0
+
+          self.diagonal = math.sqrt(2) * (3.6 + 3.8)
+
+          self.set_self_state = ModelState()
+          self.set_self_state.model_name = "r1"
+          self.set_self_state.pose.position.x = 0.0
+          self.set_self_state.pose.position.y = 0.0
+          self.set_self_state.pose.position.z = 0.0
+          self.set_self_state.pose.orientation.x = 0.0
+          self.set_self_state.pose.orientation.y = 0.0
+          self.set_self_state.pose.orientation.z = 0.0
+          self.set_self_state.pose.orientation.w = 1.0
 
           ##### publicacoes e assinaturas do ROS #####
-          self.pub_cmd_vel = rospy.Publisher(str(param["topic_cmd"]), Twist, queue_size=10) # publicar a velocidade do robô
-          self.odom = rospy.Subscriber(str(param["topic_odom"]), Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
+          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
+          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
+          self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
-          self.goal = rospy.ServiceProxy('gazebo/spawn_sdf_model', SpawnModel)
-          self.del_model = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
-          self.past_distance = 0.0 # distância do alvo no passado
+          self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
+          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+          self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
+          self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
+          self.past_distance = 0.0
 
           # definir o estado inicial
           self.threshold_target = param["threshold_target"] # distância de chegada
+
           self.goals = []
           self.goals_id = 0
           list = []
@@ -76,103 +90,206 @@ class Env():
                     # add x and y to goals
                     self.goals.append((x, y))
 
-
-     # funcao para pegar a distancia do alvo 
-     def getGoalDistace(self):
-          # calcular a distancia do alvo em relacao ao robo
-          goal_distance = math.hypot(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y)
-          # distancia do alvo no passado se torna a distancia do alvo atual
-          self.past_distance = goal_distance
-          # retornar a distancia do alvo
-          return goal_distance
-
      # funcao para pegar a posicao do robo por meio do topico '/odom' 
      def odom_callback(self, od_data):
           self.last_odom = od_data
 
      def state(self, scan):
-          # pegar a posicao do robo
-          self.position = self.odom.pose.pose.position
-          # pegar a orientacao do robo
-          orientation = self.odom.pose.pose.orientation
-          # converter a orientacao do robo para euler
-          q_x, q_y, q_z, q_w = orientation.x, orientation.y, orientation.z, orientation.w
-          # converter a orientacao do robo para euler
-          yaw = round(math.degrees(math.atan2(2 * (q_x * q_y + q_w * q_z), 1 - 2 * (q_y * q_y + q_z * q_z))))
-
-          # se o yaw for maior que 0, entao o yaw sera o yaw atual
-          if yaw >= 0:
-               yaw = yaw
-          # se nao for maior que 0, entao o yaw sera o yaw atual mais 360
-          else:
-               yaw = yaw + 360
-          # relacao de distancia entre o robo e o alvo em relacao ao eixo x
-          rel_dis_x = round(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, 1)
-          # relacao de distancia entre o robo e o alvo em relacao ao eixo y
-          rel_dis_y = round(self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y, 1)
-
-          # Calcule o ângulo entre o robô e o alvo
-          if rel_dis_x > 0 and rel_dis_y > 0:
-               theta = math.atan(rel_dis_y / rel_dis_x)
-          elif rel_dis_x > 0 and rel_dis_y < 0:
-               theta = 2 * math.pi + math.atan(rel_dis_y / rel_dis_x)
-          elif rel_dis_x < 0 and rel_dis_y < 0:
-               theta = math.pi + math.atan(rel_dis_y / rel_dis_x)
-          elif rel_dis_x < 0 and rel_dis_y > 0:
-               theta = math.pi + math.atan(rel_dis_y / rel_dis_x)
-          elif rel_dis_x == 0 and rel_dis_y > 0:
-               theta = 1 / 2 * math.pi
-          elif rel_dis_x == 0 and rel_dis_y < 0:
-               theta = 3 / 2 * math.pi
-          elif rel_dis_y == 0 and rel_dis_x > 0:
-               theta = 0
-          else:
-               theta = math.pi
-          rel_theta = round(math.degrees(theta), 2)
-
-          diff_angle = abs(rel_theta - yaw)
-
-          if diff_angle <= 180:
-               diff_angle = round(diff_angle, 2)
-          else:
-               diff_angle = round(360 - diff_angle, 2)
-          
-          scan_range = []
-          yaw = self.yaw
-          rel_theta = self.rel_theta
-          diff_angle = self.diff_angle
           done = False
           target = False
 
-          cof = (len(scan.ranges) / (self.num_scan_ranges - 1))
-          for i in range(0, self.num_scan_ranges):
-               n_i = math.ceil(i*cof - 1)
-               if n_i < 0:
-                    n_i = 0
-               if cof == 1:
-                    n_i = i
-               if scan.ranges[n_i] == float('Inf'):
-                    scan_range.append(3.5)
-               elif np.isnan(scan.ranges[n_i]):
-                    scan_range.append(0)
+          # Calculate robot heading from odometry data
+          self.odom_x = self.last_odom.pose.pose.position.x
+          self.odom_y = self.last_odom.pose.pose.position.y
+          quaternion = Quaternion(
+               self.last_odom.pose.pose.orientation.w,
+               self.last_odom.pose.pose.orientation.x,
+               self.last_odom.pose.pose.orientation.y,
+               self.last_odom.pose.pose.orientation.z,
+          )
+          euler = quaternion.to_euler(degrees=False)
+          yaw = round(math.degrees(euler[2]))
+          angle = round(euler[2], 4) # angulo do robo
+          # Calculate distance to the goal from the robot
+          distance = np.linalg.norm(
+               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+          )
+          # Calculate the relative angle between the robots heading and heading toward the goal
+          skew_x = self.goal_x - self.odom_x
+          skew_y = self.goal_y - self.odom_y
+          dot = skew_x * 1 + skew_y * 0
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          beta = math.acos(dot / (mag1 * mag2))
+          if skew_y < 0:
+               if skew_x < 0:
+                    beta = -beta
                else:
-                    scan_range.append(scan.ranges[n_i])
+                    beta = 0 - beta
+          theta = beta - angle
+          if theta > np.pi:
+               theta = np.pi - theta
+               theta = -np.pi - theta
+          if theta < -np.pi:
+               theta = -np.pi - theta
+               theta = np.pi - theta
+
+          thetas = round(math.degrees(theta), 2)
+
+          diff = abs(thetas - yaw)
+
+          if diff <= 180:
+               diff = round(diff, 2)
+          else:
+               diff = round(360 - diff, 2)
+          
+          scan_range = self.check_scan_range(scan, self.num_scan_ranges)
 
           if self.min_range > min(scan_range) > 0: # se o robô colidir com algum obstáculo
                done = True
-
-          current_distance = math.hypot(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y)
-          if current_distance <= self.threshold_target:
+          
+          # Detect if the goal has been reached and give a large positive reward
+          if distance <= self.threshold_target:
                target = True
+               done = True
 
-          return scan_range, current_distance, yaw, rel_theta, diff_angle, done, target
+          return scan_range, distance, yaw, thetas, diff, done, target
 
+     def step(self, action):
+          target = False
+
+          # Publish the robot action
+          vel_cmd = Twist()
+          vel_cmd.linear.x = action[0]
+          vel_cmd.angular.z = action[1]
+          self.pub_cmd_vel.publish(vel_cmd)
+
+          rospy.wait_for_service("/gazebo/unpause_physics")
+          try:
+               self.unpause()
+          except (rospy.ServiceException) as e:
+               print("/gazebo/unpause_physics service call failed")
+
+          time.sleep(0.1)
+
+          rospy.wait_for_service("/gazebo/pause_physics")
+          try:
+               pass
+               self.pause()
+          except (rospy.ServiceException) as e:
+               print("/gazebo/pause_physics service call failed")
+
+          past = np.array([0., 0.])
+
+          data = None
+          while data is None:
+               try:
+                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
+               except:
+                    pass
+
+          min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
+          states = [i / 3.5 for i in min_laser] # normalizar os dados de entrada
+
+          for action in past: # adicionar a ação anterior ao estado
+               states.append(action)
+
+          states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
+          reward = self.reward(done, target)
+
+          return np.asarray(states), reward, done, target
+
+     def reset(self):
+          rospy.wait_for_service("/gazebo/reset_world")
+          #rospy.wait_for_service('gazebo/reset_simulation')
+          try:
+               self.reset_proxy()
+          except (rospy.ServiceException) as e:
+               print("gazebo/reset_simulation service call failed")
+
+          # Build the targetz
+          try:
+
+               # randomiza o target pelo mundo
+               angle = np.random.uniform(-np.pi, np.pi)
+               quaternion = Quaternion.from_euler(0.0, 0.0, angle)
+               object_state = self.set_self_state
+               self.goal_x, self.goal_y = random.choice(self.goals)
+               
+               object_state.pose.position.x = self.goal_x
+               object_state.pose.position.y = self.goal_y
+
+               object_state.pose.orientation.x = quaternion.x
+               object_state.pose.orientation.y = quaternion.y
+               object_state.pose.orientation.z = quaternion.z
+               object_state.pose.orientation.w = quaternion.w
+               self.set_state.publish(object_state)
+
+               #self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
+               #self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+          except (rospy.ServiceException) as e:
+               print("/gazebo/failed to build the target")
+          rospy.wait_for_service('/gazebo/unpause_physics')
+          
+          data = None
+          while data is None:
+               try:
+                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
+               except:
+                    pass
+          
+          self.odom_x = self.last_odom.pose.pose.position.x
+          self.odom_y = self.last_odom.pose.pose.position.y
+
+          # Calculate distance to the goal from the robot
+          distance = np.linalg.norm(
+               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+          )
+          self.past_distance = distance
+
+          states, distance, yaw, thetas, diff, done, target = self.state(data)
+          states = [i / 3.5 for i in states]
+
+          states.append(0)
+          states.append(0)
+
+          states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
+
+          return np.asarray(states)
+
+     @staticmethod
+     def check_scan_range(scan, num_scan_ranges):
+          scan_range = []
+          cof = (len(scan.ranges) / (num_scan_ranges - 1)) 
+          for i in range(0, num_scan_ranges): 
+               n_i = math.ceil(i*cof - 1) 
+               if n_i < 0: 
+                    n_i = 0 
+               if cof == 1:
+                    n_i = i 
+               if scan.ranges[n_i] == float('Inf'): 
+                    scan_range.append(3.5) 
+               elif np.isnan(scan.ranges[n_i]): 
+                    scan_range.append(0) 
+               else:
+                    scan_range.append(scan.ranges[n_i]) 
+          
+          return scan_range
+
+     @staticmethod
      def reward(self, done, target):
-          current_distance = math.hypot(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y)
-          distance_rate = (self.past_distance - current_distance)
+          # Calculate robot heading from odometry data
+          self.odom_x = self.last_odom.pose.pose.position.x
+          self.odom_y = self.last_odom.pose.pose.position.y
+
+          # Calculate distance to the goal from the robot
+          distance = np.linalg.norm(
+               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+          )
+          distance_rate = (self.past_distance - distance)
 
           reward = 500.*distance_rate
-          self.past_distance = current_distance
+          self.past_distance = distance
 
           if done: # se o robô colidir com algum obstáculo
                reward = -100.
@@ -182,100 +299,36 @@ class Env():
                reward = 120.
                self.pub_cmd_vel.publish(Twist())
                rospy.wait_for_service('/gazebo/delete_model')
-               self.del_model('target')
 
-               # Build the target
-               rospy.wait_for_service('/gazebo/spawn_sdf_model')
                try:
-                    goal_urdf = open(self.goal_model_dir, "r").read()
-                    target = SpawnModel
-                    target.model_name = 'target'  # the same with sdf name
-                    target.model_xml = goal_urdf
-                    self.goal_position.pose.pose.position.x, self.goal_position.pose.pose.position.y = random.choice(self.goals)
-                    #self.goal_position.position.x = random.uniform(-3.6, 3.6)
-                    #self.goal_position.position.y = random.uniform(-3.6, 3.6)
 
-                    self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+                    # randomiza o target pelo mundo
+                    angle = np.random.uniform(-np.pi, np.pi)
+                    quaternion = Quaternion.from_euler(0.0, 0.0, angle)
+                    object_state = self.set_self_state
+                    self.goal_x, self.goal_y = random.choice(self.goals)
+                    
+                    object_state.pose.position.x = self.goal_x
+                    object_state.pose.position.y = self.goal_y
+
+                    object_state.pose.orientation.x = quaternion.x
+                    object_state.pose.orientation.y = quaternion.y
+                    object_state.pose.orientation.z = quaternion.z
+                    object_state.pose.orientation.w = quaternion.w
+                    self.set_state.publish(object_state)
 
                except (rospy.ServiceException) as e:
                     print("/gazebo/failed to build the target")
                rospy.wait_for_service('/gazebo/unpause_physics')
-               self.goal_distance = self.getGoalDistace()
+
+               self.odom_x = self.last_odom.pose.pose.position.x
+               self.odom_y = self.last_odom.pose.pose.position.y
+
+               # Calculate distance to the goal from the robot
+               distance = np.linalg.norm(
+                    [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+               )
+               self.past_distance = distance
                target = False
 
           return reward
-
-     def step(self, action, past_action):
-          linear_vel = action[0]
-          ang_vel = action[1]
-
-          vel_cmd = Twist()
-          vel_cmd.linear.x = linear_vel 
-          vel_cmd.angular.z = ang_vel
-          self.pub_cmd_vel.publish(vel_cmd)
-
-          data = None
-          while data is None:
-               try:
-                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-               except:
-                    pass
-
-          states, rel_dis, yaw, rel_theta, diff_angle, done, target = self.state(data)
-          states = [i / 3.5 for i in states] # normalizar os dados de entrada
-
-          for pa in past_action: # adicionar a ação anterior ao estado
-               states.append(pa)
-
-          states = states + [rel_dis / self.diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
-          reward = self.reward(done, target)
-
-          return np.asarray(states), reward, done
-
-     def reset(self):
-          # Reset the env #
-          print("Resetting the environment")
-          rospy.wait_for_service('/gazebo/delete_model')  # espera o serviço do gazebo
-          print("delete target")
-          self.del_model('target')
-          
-
-          rospy.wait_for_service('gazebo/reset_simulation')
-          try:
-               self.reset_proxy()
-          except (rospy.ServiceException) as e:
-               print("gazebo/reset_simulation service call failed")
-
-          # Build the targetz
-          rospy.wait_for_service('/gazebo/spawn_sdf_model')
-          try:
-               goal_urdf = open(self.goal_model_dir, "r").read()
-               target = SpawnModel
-               target.model_name = 'target'  # the same with sdf name
-               target.model_xml = goal_urdf
-
-               # randomiza o target pelo mundo
-               self.goal_position.pose.pose.position.x, self.goal_position.pose.pose.position.y = random.choice(self.goals)
-               #self.goal_position.position.x = random.uniform(-3.6, 3.6)
-               #self.goal_position.position.y = random.uniform(-3.6, 3.6)
-               self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
-          except (rospy.ServiceException) as e:
-               print("/gazebo/failed to build the target")
-          rospy.wait_for_service('/gazebo/unpause_physics')
-          data = None
-          while data is None:
-               try:
-                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-               except:
-                    pass
-
-          self.goal_distance = self.getGoalDistace()
-          states, rel_dis, yaw, rel_theta, diff_angle, done, target = self.state(data)
-          states = [i / 3.5 for i in states]
-
-          states.append(0)
-          states.append(0)
-
-          states = states + [rel_dis / self.diagonal_dis, yaw / 360, rel_theta / 360, diff_angle / 180]
-
-          return np.asarray(states)
