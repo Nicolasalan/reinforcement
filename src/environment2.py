@@ -52,6 +52,7 @@ class Env():
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
+          self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
           self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
