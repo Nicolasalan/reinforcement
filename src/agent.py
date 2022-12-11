@@ -72,7 +72,7 @@ class Agent():
                 experiences = self.memory.sample()
                 self.learn(experiences, float(param["GAMMA"]))
 
-    def action(self, state, q1=0.0, q2=1.0, add_noise=True):
+    def action(self, state, q1=-1.0, q2=1.0, add_noise=True):
         """Returns actions for given state as per current policy."""
         #state = torch.from_numpy(state).float().to(device) 
         state = torch.Tensor(state.reshape(1, -1)).to(device) # esp
