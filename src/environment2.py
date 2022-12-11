@@ -43,7 +43,7 @@ class Env():
           self.goal_y = 0.0
 
           # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = param["target"]
+          self.goal_model_dir = '/ws/src/motion/models/goal.sdf'
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
 
           ##### publicacoes e assinaturas do ROS #####
