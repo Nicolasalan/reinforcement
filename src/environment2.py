@@ -173,10 +173,10 @@ class Env():
           for action in state: # adicionar a ação anterior ao estado
                states.append(action)
 
-          robot_state = [states, distance, theta, diff, yaw, action[0], action[1]]
+          robot_state = states + [distance, theta, diff, yaw, action]
           reward = self.get_reward(target, done, action, min_laser)
 
-          return np.asarray(robot_state), reward, done
+          return np.asarray(robot_state), reward, done, target
 
      def reset(self):
           rospy.wait_for_service('/gazebo/delete_model')

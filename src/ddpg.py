@@ -63,9 +63,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
           for t in range(max_t):# escolha uma ação para cada agente
                print('timestep: ' + str(t))
                print(np.array(states))
-               action = agent.action(np.array(states))  
-               # concatena os estados de todos os agentes e converte para float32
-               actions = np.concatenate(action, axis=0).flatten() # concatena as ações de todos os agentes            
+               actions = agent.action(np.array(states))            
                actions[0] = agent.action(states)                   # selecione uma ação
                actions[1] = agent.action(states)
                next_states, rewards, dones, target = env.step(actions, past_action) # envia todas as ações ao ambiente
