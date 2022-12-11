@@ -253,8 +253,10 @@ class Env():
                print(data)
                try:
                     data = rospy.wait_for_message('base_scan_front', LaserScan, timeout=5)
+                    print("Data received", data)
                     rospy.spin()
                except:
+                    print("Waiting for data", data)
                     pass
           
           print("Odom received")
