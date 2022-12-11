@@ -176,7 +176,7 @@ class Env():
           robot_state = states + [distance, theta, diff, yaw, action]
           reward = self.get_reward(target, done, action, min_laser)
 
-          return np.asarray(robot_state), reward, done, target
+          return np.array(robot_state), reward, done, target
 
      def reset(self):
           rospy.wait_for_service('/gazebo/delete_model')
