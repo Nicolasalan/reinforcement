@@ -66,6 +66,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                print('action: ' + str(action))
                actions = [(action[0] + 1) / 2, action[1]]
                next_states, rewards, dones, _ = env.step(actions) # envia todas as ações ao ambiente
+               print('rewards: ' + str(rewards))
                
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
                for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
