@@ -14,7 +14,7 @@ from geometry_msgs.msg import Twist, Pose, Point, Quaternion
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
-from gazebo_msgs.srv import SpawnModel, DeleteModel
+from gazebo_msgs.srv import SpawnModel, DeleteModel, ModelState
 from squaternion import Quaternion
 
 # folder to load config file
@@ -45,6 +45,16 @@ class Env():
           # definir o diretório do robô, alvo e mundo
           self.goal_model_dir = param["target"]
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
+
+          self.set_self_state = ModelState()
+          self.set_self_state.model_name = "target"
+          self.set_self_state.pose.position.x = 0.0
+          self.set_self_state.pose.position.y = 0.0
+          self.set_self_state.pose.position.z = 0.0
+          self.set_self_state.pose.orientation.x = 0.0
+          self.set_self_state.pose.orientation.y = 0.0
+          self.set_self_state.pose.orientation.z = 0.0
+          self.set_self_state.pose.orientation.w = 1.0
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
@@ -208,9 +218,22 @@ class Env():
                target.model_xml = goal_urdf
 
                # randomiza o target pelo mundo
+               angle = np.random.uniform(-np.pi, np.pi)
+               quaternion = Quaternion.from_euler(0.0, 0.0, angle)
+               object_state = self.set_self_state
                self.goal_x, self.goal_y = random.choice(self.goals)
-               self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
-               self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+               
+               object_state.pose.position.x = self.goal_x
+               object_state.pose.position.y = self.goal_y
+
+               object_state.pose.orientation.x = quaternion.x
+               object_state.pose.orientation.y = quaternion.y
+               object_state.pose.orientation.z = quaternion.z
+               object_state.pose.orientation.w = quaternion.w
+               self.set_state.publish(object_state)
+
+               #self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
+               #self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
           rospy.wait_for_service('/gazebo/unpause_physics')
@@ -294,9 +317,19 @@ class Env():
                     target.model_xml = goal_urdf
 
                     # randomiza o target pelo mundo
+                    angle = np.random.uniform(-np.pi, np.pi)
+                    quaternion = Quaternion.from_euler(0.0, 0.0, angle)
+                    object_state = self.set_self_state
                     self.goal_x, self.goal_y = random.choice(self.goals)
-                    self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
-                    self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+                    
+                    object_state.pose.position.x = self.goal_x
+                    object_state.pose.position.y = self.goal_y
+
+                    object_state.pose.orientation.x = quaternion.x
+                    object_state.pose.orientation.y = quaternion.y
+                    object_state.pose.orientation.z = quaternion.z
+                    object_state.pose.orientation.w = quaternion.w
+                    self.set_state.publish(object_state)
 
                except (rospy.ServiceException) as e:
                     print("/gazebo/failed to build the target")
