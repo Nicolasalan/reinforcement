@@ -85,8 +85,8 @@ class Env():
                for i in list:
                     str_x = str(i[0]).strip('[]')
                     str_y = str(i[1]).strip('[]')
-                    x = float(str_x)
-                    y = float(str_y)
+                    x = round(float(str_x))
+                    y = round(float(str_y))
                     # add x and y to goals
                     self.goals.append((x, y))
           print(self.goals)
@@ -222,6 +222,7 @@ class Env():
                
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
+               print("Goal x: ", self.goal_x, "Goal y: ", self.goal_y)
 
                object_state.pose.orientation.x = quaternion.x
                object_state.pose.orientation.y = quaternion.y
