@@ -18,7 +18,7 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 from squaternion import Quaternion
 
 # folder to load config file
-CONFIG_PATH = "../config/"
+CONFIG_PATH = "/ws/src/motion/config/"
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -39,6 +39,7 @@ class Env():
           self.goal_position = Pose() # posição do alvo
           self.goal_position.position.x = 0.0 # posição x do alvo
           self.goal_position.position.y = 0.0 # posição y do alvo
+          self.last_odom = None
 
           # definir o diretório do robô, alvo e mundo
           self.goal_model_dir = param["target"]
@@ -56,6 +57,23 @@ class Env():
 
           # definir o estado inicial
           self.threshold_target = param["threshold_target"] # distância de chegada
+
+          self.goals = []
+          self.goals_id = 0
+          list = []
+
+          with open(param["waypoints"]) as f:
+               data = yaml.safe_load(f)
+               for i in data:
+                    list.append(i['position'])
+
+               for i in list:
+                    str_x = str(i[0]).strip('[]')
+                    str_y = str(i[1]).strip('[]')
+                    x = float(str_x)
+                    y = float(str_y)
+                    # add x and y to goals
+                    self.goals.append((x, y))
 
      # funcao para pegar a posicao do robo por meio do topico '/odom' 
      def odom_callback(self, od_data):

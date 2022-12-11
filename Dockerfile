@@ -67,9 +67,9 @@ RUN pip3 install torch torchvision torchaudio --extra-index-url https://download
 RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
- && catkin_init_workspace \
- && git clone -b main https://github.com/Nicolasalan/motion.git
+ && catkin_init_workspace 
 
+COPY . /ws/src/motion
 # Copy the source files
 WORKDIR /ws
 
@@ -85,5 +85,5 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 # Install python dependencies
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
-# entrypoint script
-ENTRYPOINT [ "/src/motion/entrypoint.sh" ]
+# cmd script
+CMD source /devel/setup.bash

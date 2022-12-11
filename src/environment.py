@@ -17,7 +17,7 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 from squaternion import Quaternion
 
 # folder to load config file
-CONFIG_PATH = "../config/"
+CONFIG_PATH = "/ws/src/motion/config/"
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -35,10 +35,10 @@ class Env():
           self.n_step = 0
           self.min_range = param["min_range"]
 
-          self.position = Pose() # posição do robô
-          self.goal_position = Pose() # posição do alvo
-          self.goal_position.position.x = 0.0 # posição x do alvo
-          self.goal_position.position.y = 0.0 # posição y do alvo
+          self.position = None # posição do robô
+          self.goal_position = None # posição do alvo
+          #self.goal_position.position.x = 0.0 # posição x do alvo
+          #self.goal_position.position.y = 0.0 # posição y do alvo
 
           # definir o diretório do robô, alvo e mundo
           self.goal_model_dir = param["target"]
@@ -46,15 +46,15 @@ class Env():
           self.diagonal_dis = math.sqrt(2) * (3.6 + 3.8)
 
           ##### publicacoes e assinaturas do ROS #####
-          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
-          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
+          self.pub_cmd_vel = rospy.Publisher(str(param["topic_cmd"]), Twist, queue_size=10) # publicar a velocidade do robô
+          self.odom = rospy.Subscriber(str(param["topic_odom"]), Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
-          self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+          self.goal = rospy.ServiceProxy('gazebo/spawn_sdf_model', SpawnModel)
+          self.del_model = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
           self.past_distance = 0.0 # distância do alvo no passado
 
           # definir o estado inicial
@@ -69,8 +69,8 @@ class Env():
                     list.append(i['position'])
 
                for i in list:
-                    str_x = (i[0]).strip('[]')
-                    str_y = (i[1]).strip('[]')
+                    str_x = str(i[0]).strip('[]')
+                    str_y = str(i[1]).strip('[]')
                     x = float(str_x)
                     y = float(str_y)
                     # add x and y to goals
@@ -80,7 +80,7 @@ class Env():
      # funcao para pegar a distancia do alvo 
      def getGoalDistace(self):
           # calcular a distancia do alvo em relacao ao robo
-          goal_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
+          goal_distance = math.hypot(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y)
           # distancia do alvo no passado se torna a distancia do alvo atual
           self.past_distance = goal_distance
           # retornar a distancia do alvo
@@ -107,9 +107,9 @@ class Env():
           else:
                yaw = yaw + 360
           # relacao de distancia entre o robo e o alvo em relacao ao eixo x
-          rel_dis_x = round(self.goal_position.position.x - self.position.x, 1)
+          rel_dis_x = round(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, 1)
           # relacao de distancia entre o robo e o alvo em relacao ao eixo y
-          rel_dis_y = round(self.goal_position.position.y - self.position.y, 1)
+          rel_dis_y = round(self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y, 1)
 
           # Calcule o ângulo entre o robô e o alvo
           if rel_dis_x > 0 and rel_dis_y > 0:
@@ -161,14 +161,14 @@ class Env():
           if self.min_range > min(scan_range) > 0: # se o robô colidir com algum obstáculo
                done = True
 
-          current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
+          current_distance = math.hypot(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y)
           if current_distance <= self.threshold_target:
                target = True
 
           return scan_range, current_distance, yaw, rel_theta, diff_angle, done, target
 
      def reward(self, done, target):
-          current_distance = math.hypot(self.goal_position.position.x - self.position.x, self.goal_position.position.y - self.position.y)
+          current_distance = math.hypot(self.goal_position.pose.pose.position.x - self.position.pose.pose.position.x, self.goal_position.pose.pose.position.y - self.position.pose.pose.position.y)
           distance_rate = (self.past_distance - current_distance)
 
           reward = 500.*distance_rate
@@ -191,7 +191,7 @@ class Env():
                     target = SpawnModel
                     target.model_name = 'target'  # the same with sdf name
                     target.model_xml = goal_urdf
-                    self.goal_position.position.x, self.goal_position.position.y = random.choice(self.goals)
+                    self.goal_position.pose.pose.position.x, self.goal_position.pose.pose.position.y = random.choice(self.goals)
                     #self.goal_position.position.x = random.uniform(-3.6, 3.6)
                     #self.goal_position.position.y = random.uniform(-3.6, 3.6)
 
@@ -234,8 +234,11 @@ class Env():
 
      def reset(self):
           # Reset the env #
-          rospy.wait_for_service('/gazebo/delete_model')
+          print("Resetting the environment")
+          rospy.wait_for_service('/gazebo/delete_model')  # espera o serviço do gazebo
+          print("delete target")
           self.del_model('target')
+          
 
           rospy.wait_for_service('gazebo/reset_simulation')
           try:
@@ -252,7 +255,7 @@ class Env():
                target.model_xml = goal_urdf
 
                # randomiza o target pelo mundo
-               self.goal_position.position.x, self.goal_position.position.y = random.choice(self.goals)
+               self.goal_position.pose.pose.position.x, self.goal_position.pose.pose.position.y = random.choice(self.goals)
                #self.goal_position.position.x = random.uniform(-3.6, 3.6)
                #self.goal_position.position.y = random.uniform(-3.6, 3.6)
                self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')

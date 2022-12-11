@@ -14,7 +14,7 @@ import yaml
 import os
 
 # folder to load config file
-CONFIG_PATH = "../config/"
+CONFIG_PATH = "/ws/src/motion/config/"
 
 # Function to load yaml configuration file
 def load_config(config_name):
@@ -39,6 +39,7 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
+        print('Initializing agent')
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
@@ -47,18 +48,18 @@ class Agent():
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=param["LR_ACTOR"])
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=float(param["LR_ACTOR"]))
 
         # Critic Network (w/ Target Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=param["LR_ACTOR"], weight_decay=param["WEIGHT_DECAY"])
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=float(param["LR_ACTOR"]), weight_decay=float(param["WEIGHT_DECAY"]))
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
 
         # Replay memory
-        self.memory = ReplayBuffer(action_size, param["BUFFER_SIZE"], param["BATCH_SIZE"], random_seed)
+        self.memory = ReplayBuffer(action_size, int(param["BUFFER_SIZE"]), int(param["BATCH_SIZE"]), random_seed)
     
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
@@ -66,10 +67,10 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > param["BATCH_SIZE"] and timestep % param["LEARN_EVERY"] == 0:
+        if len(self.memory) > param["BATCH_SIZE"] and timestep % float(param["LEARN_EVERY"]) == 0:
             for _ in range(param["LEARN_NUM"]):
                 experiences = self.memory.sample()
-                self.learn(experiences, param["GAMMA"])
+                self.learn(experiences, float(param["GAMMA"]))
 
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -124,11 +125,11 @@ class Agent():
         self.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic_local, self.critic_target, param["TAU"])
-        self.soft_update(self.actor_local, self.actor_target, param["TAU"]) 
+        self.soft_update(self.critic_local, self.critic_target, float(param["TAU"]))
+        self.soft_update(self.actor_local, self.actor_target, float(param["TAU"])) 
 
         # ---------------------------- update noise ---------------------------- #
-        self.epsilon -= param["EPSILON_DECAY"]
+        self.epsilon -= float(param["EPSILON_DECAY"])
         self.noise.reset()               
 
     def soft_update(self, local_model, target_model, tau):
