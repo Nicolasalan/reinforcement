@@ -222,7 +222,7 @@ class Env():
                
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
-               print("Goal x: ", self.goal_x, "Goal y: ", self.goal_y)
+               print("Goal x: ", -4, "Goal y: ", 5)
 
                object_state.pose.orientation.x = quaternion.x
                object_state.pose.orientation.y = quaternion.y
