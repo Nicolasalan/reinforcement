@@ -58,6 +58,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
           agent.reset()                                     # redefinir ambiente
           states = env.reset()                              # obtém o estado atual de cada agente
+          print('states: ' + str(states))
 
           for t in range(max_t):# escolha uma ação para cada agente
                print('timestep: ' + str(t))
