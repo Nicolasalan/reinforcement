@@ -43,7 +43,7 @@ class Env():
           self.goal_y = 0.0
 
           # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = '/ws/src/motion/models/goal.sdf'
+          self.goal_model_dir = param["target"]
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
 
           ##### publicacoes e assinaturas do ROS #####
@@ -52,7 +52,7 @@ class Env():
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
-          self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
+          
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
           self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
