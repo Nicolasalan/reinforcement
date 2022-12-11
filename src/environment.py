@@ -60,7 +60,8 @@ class Env():
           self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
 
           ##### servicos do ROS #####
-          self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
+          #self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
+          self.reset_proxy = rospy.ServiceProxy("/gazebo/reset_world", Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
@@ -202,8 +203,8 @@ class Env():
 
      def reset(self):
           print("Resetting environment")
-          #rospy.wait_for_service("/gazebo/reset_world")
-          rospy.wait_for_service('gazebo/reset_simulation')
+          rospy.wait_for_service("/gazebo/reset_world")
+          #rospy.wait_for_service('gazebo/reset_simulation')
           try:
                self.reset_proxy()
           except (rospy.ServiceException) as e:
@@ -235,11 +236,6 @@ class Env():
                box_state.pose.orientation.z = 0.0
                box_state.pose.orientation.w = 1.0
                self.set_state.publish(box_state)
-               #object_state.pose.orientation.x = quaternion.x
-               #object_state.pose.orientation.y = quaternion.y
-               #object_state.pose.orientation.z = quaternion.z
-               #object_state.pose.orientation.w = quaternion.w
-               #self.set_state.publish(object_state)
                print("Target randomized")
                
                self.goal_x = x
