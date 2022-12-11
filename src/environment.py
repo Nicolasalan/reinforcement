@@ -190,7 +190,7 @@ class Env():
                     rospy.spin()
                except:
                     pass
-
+          
           min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
           states = [i / 3.5 for i in min_laser] # normalizar os dados de entrada
 
@@ -250,7 +250,8 @@ class Env():
           data = None
           while data is None:
                try:
-                    data = rospy.wait_for_message(str(param["topic_scan"]), LaserScan, timeout=5)
+                    data = rospy.wait_for_message('base_scan_front', LaserScan, timeout=5)
+                    rospy.spin()
                except:
                     pass
           
@@ -269,6 +270,8 @@ class Env():
 
           states.append(0)
           states.append(0)
+
+          print("Passed states")
 
           states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
 
