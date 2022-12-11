@@ -250,12 +250,12 @@ class Env():
           rospy.wait_for_service('/gazebo/unpause_physics')
           
           print("Unpausing physics")
-          #data = None
-          #while data is None:
-          #     try:
-          data = rospy.wait_for_message(str(param["topic_scan"]), LaserScan, timeout=5)
-          #     except:
-          #          pass
+          data = None
+          while data is None:
+               try:
+                    data = rospy.wait_for_message(str(param["topic_scan"]), LaserScan, timeout=5)
+               except:
+                    pass
           
           print("Odom received")
           self.odom_x = self.last_odom.pose.pose.position.x
