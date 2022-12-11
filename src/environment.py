@@ -220,11 +220,11 @@ class Env():
 
                _x, _y = random.sample(self.goals, k=2)
                seq = [_x, _y]
-               self.goal_x, self.goal_y = random.choice(seq)
+               x, y = random.choice(seq)
 
-               object_state.pose.position.x = self.goal_x
-               object_state.pose.position.y = self.goal_y
-               print("Goal x: ", self.goal_x, "Goal y: ", self.goal_y)
+               object_state.pose.position.x = x
+               object_state.pose.position.y = y
+               print("Goal x: ", x, "Goal y: ", y)
 
                object_state.pose.orientation.x = quaternion.x
                object_state.pose.orientation.y = quaternion.y
@@ -232,6 +232,9 @@ class Env():
                object_state.pose.orientation.w = quaternion.w
                self.set_state.publish(object_state)
                print("Target randomized")
+               
+               self.goal_x = x
+               self.goal_y = y
 
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
