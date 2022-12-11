@@ -235,9 +235,9 @@ class Env():
           states.append(0)
           states.append(0)
 
-          state = state + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
+          states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
 
-          return np.asarray(state)
+          return np.asarray(states)
 
      @staticmethod
      def check_scan_range(scan, num_scan_ranges):
