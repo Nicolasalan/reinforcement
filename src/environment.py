@@ -186,7 +186,8 @@ class Env():
           data = None
           while data is None:
                try:
-                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
+                    data = rospy.wait_for_message('/base_scan_front', LaserScan, timeout=5)
+                    rospy.spin()
                except:
                     pass
 
