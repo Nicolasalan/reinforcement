@@ -86,4 +86,4 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
 # cmd script
-CMD source /devel/setup.bash
+CMD source /devel/setup.bash && export GAZEBO_MODEL_PATH=/ws/src/motion/models
