@@ -226,11 +226,20 @@ class Env():
                object_state.pose.position.y = y
                print("Goal x: ", x, "Goal y: ", y)
 
-               object_state.pose.orientation.x = quaternion.x
-               object_state.pose.orientation.y = quaternion.y
-               object_state.pose.orientation.z = quaternion.z
-               object_state.pose.orientation.w = quaternion.w
-               self.set_state.publish(object_state)
+               box_state = ModelState()
+               box_state.model_name = "target"
+               box_state.pose.position.x = x
+               box_state.pose.position.y = y
+               box_state.pose.orientation.x = quaternion.x
+               box_state.pose.orientation.y = quaternion.y
+               box_state.pose.orientation.z = quaternion.z
+               box_state.pose.orientation.w = quaternion.w
+               self.set_state.publish(box_state)
+               #object_state.pose.orientation.x = quaternion.x
+               #object_state.pose.orientation.y = quaternion.y
+               #object_state.pose.orientation.z = quaternion.z
+               #object_state.pose.orientation.w = quaternion.w
+               #self.set_state.publish(object_state)
                print("Target randomized")
                
                self.goal_x = x
