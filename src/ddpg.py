@@ -58,11 +58,9 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
           agent.reset()                                     # redefinir ambiente
           states = env.reset()                              # obtém o estado atual de cada agente
-          print('States: ' + str(states))
 
           for t in range(max_t):# escolha uma ação para cada agente
                print('timestep: ' + str(t))
-               print(states)
                action = agent.action(states) 
                actions = [(action[0] + 1) / 2, action[1]]
                next_states, rewards, dones, _ = env.step(actions) # envia todas as ações ao ambiente

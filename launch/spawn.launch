@@ -2,9 +2,9 @@
 <launch>
     <include file="$(find motion)/launch/spawn_sdf.launch">
         <arg name="target" value="target" />
-        <arg name="x" value="0.0" />
+        <arg name="x" value="1.0" />
         <arg name="y" value="0.0" />
-        <arg name="z" value="1.0" />
+        <arg name="z" value="0.0" />
         <arg name="roll" value="0"/>
         <arg name="pitch" value="0"/>
         <arg name="yaw" value="0.0" />
