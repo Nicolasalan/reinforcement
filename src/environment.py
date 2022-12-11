@@ -85,8 +85,8 @@ class Env():
                for i in list:
                     str_x = str(i[0]).strip('[]')
                     str_y = str(i[1]).strip('[]')
-                    x = int(str_x)
-                    y = int(str_y)
+                    x = round(int(str_x))
+                    y = round(int(str_y))
                     # add x and y to goals
                     self.goals.append((x, y))
           print(self.goals)
