@@ -167,23 +167,6 @@ class Env():
           vel_cmd.angular.z = action[1]
           self.pub_cmd_vel.publish(vel_cmd)
 
-          rospy.wait_for_service("/gazebo/unpause_physics")
-          print("pause")
-          try:
-               self.unpause()
-               print("unpause")
-          except (rospy.ServiceException) as e:
-               print("/gazebo/unpause_physics service call failed")
-
-          time.sleep(0.1)
-          print("step 2")
-          rospy.wait_for_service("/gazebo/pause_physics")
-          try:
-               pass
-               self.pause()
-          except (rospy.ServiceException) as e:
-               print("/gazebo/pause_physics service call failed")
-
           past = np.array([0., 0.])
           print("step 3")
           data = None
