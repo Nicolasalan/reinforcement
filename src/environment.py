@@ -85,8 +85,8 @@ class Env():
                for i in list:
                     str_x = str(i[0]).strip('[]')
                     str_y = str(i[1]).strip('[]')
-                    x = round(float(str_x))
-                    y = round(float(str_y))
+                    x = float(str_x)
+                    y = float(str_y)
                     # add x and y to goals
                     self.goals.append((x, y))
           print(self.goals)
@@ -218,9 +218,7 @@ class Env():
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
 
-               _x, _y = random.choice(self.goals)
-               self.goal_x = _x
-               self.goal_y = _y
+               self.goal_x, self.goal_y = random.choice(self.goals)
 
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
