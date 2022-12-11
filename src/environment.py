@@ -85,8 +85,8 @@ class Env():
                for i in list:
                     str_x = str(i[0]).strip('[]')
                     str_y = str(i[1]).strip('[]')
-                    x = round(float(str_x))
-                    y = round(float(str_y))
+                    x = int(str_x)
+                    y = int(str_y)
                     # add x and y to goals
                     self.goals.append((x, y))
           print(self.goals)
@@ -218,7 +218,7 @@ class Env():
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
 
-               self.goal_x, self.goal_y = np.random.choice(self.goals)
+               self.goal_x, self.goal_y = random.choice(self.goals)
                
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
@@ -239,8 +239,10 @@ class Env():
           data = None
           while data is None:
                try:
+                    print("Waiting for scan")
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
                except:
+                    print("Error waiting for scan")
                     pass
           
           print("Odom received")
