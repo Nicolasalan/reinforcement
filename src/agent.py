@@ -82,7 +82,7 @@ class Agent():
         self.actor_local.train()
         if add_noise:
             action += self.epsilon * self.noise.sample()
-        return np.clip(action, q1, q2)
+        return np.clip(np.random.normal(action), q1, q2)
 
     def reset(self):
         self.noise.reset()
