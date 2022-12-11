@@ -122,7 +122,7 @@ class Env():
           
           diff = angle - theta
           
-          scan_range = self.check_scan_range(scan, scan_range, self.num_scan_ranges)
+          scan_range = self.check_scan_range(scan, self.num_scan_ranges)
 
           if self.min_range > min(scan_range) > 0: # se o robô colidir com algum obstáculo
                done = True
@@ -222,7 +222,8 @@ class Env():
           return np.asarray(robot_state)
 
      @staticmethod
-     def check_scan_range(scan, scan_range, num_scan_ranges):
+     def check_scan_range(scan, num_scan_ranges):
+          scan_range = []
           cof = (len(scan.ranges) / (num_scan_ranges - 1)) 
           for i in range(0, num_scan_ranges): 
                n_i = math.ceil(i*cof - 1) 
