@@ -62,7 +62,6 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
 
           for t in range(max_t):
                print('timestep: ' + str(t))
-               print(np.array(states), dtype=np.float32)
                actions = agent.action(np.array(states))                # escolha uma ação para cada agente
                actions[0] = agent.action(states)                   # selecione uma ação
                actions[1] = agent.action(states)
