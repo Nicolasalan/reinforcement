@@ -218,7 +218,7 @@ class Env():
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
 
-               self.goal_x, self.goal_y = random.choice(self.goals)
+               self.goal_x, self.goal_y = np.random.choice(self.goals)
                
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
