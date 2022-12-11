@@ -208,6 +208,7 @@ class Env():
           except (rospy.ServiceException) as e:
                print("gazebo/reset_simulation service call failed")
 
+          print("Resetting robot")
           # Build the target
           try:
                # randomiza o target pelo mundo
