@@ -78,7 +78,7 @@ class Agent():
         state = torch.Tensor(state).to(device)
         self.actor_local.eval()
         with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy()
+            action = self.actor_local(state).cpu().data.numpy().flatten()
         self.actor_local.train()
         if add_noise:
             action += self.epsilon * self.noise.sample()
