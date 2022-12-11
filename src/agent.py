@@ -74,8 +74,8 @@ class Agent():
 
     def action(self, state, q1=-1.0, q2=1.0, add_noise=True):
         """Returns actions for given state as per current policy."""
-        state = torch.from_numpy(state).float().to(device) 
-        #state = torch.Tensor(state.reshape(1, -1)).to(device)
+        #state = torch.from_numpy(state).float().to(device) 
+        state = torch.Tensor(state).to(device)
         self.actor_local.eval()
         with torch.no_grad():
             action = self.actor_local(state).cpu().data.numpy()
@@ -144,5 +144,4 @@ class Agent():
         """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
-        
         
