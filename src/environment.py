@@ -212,6 +212,7 @@ class Env():
           # Build the target
           try:
                # randomiza o target pelo mundo
+               print("Randomizing target position")
                angle = np.random.uniform(-np.pi, np.pi)
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
@@ -238,6 +239,7 @@ class Env():
                except:
                     pass
           
+          print("Odom received")
           self.odom_x = self.last_odom.pose.pose.position.x
           self.odom_y = self.last_odom.pose.pose.position.y
 
