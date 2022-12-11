@@ -110,13 +110,13 @@ class Env():
                self.last_odom.pose.pose.orientation.z,
           )
 
-          yaw = quaternion.to_euler(degrees=False)
-          
+          yaw = round(math.degrees(math.atan2(2 * (quaternion.w * quaternion.z + quaternion.x * quaternion.y), 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z))), 2)
+
           if yaw >= 0:
                yaw = yaw
           else:
                yaw = yaw + 360
-
+               
           # Calculate distance to the goal from the robot
           distance = np.linalg.norm(
                [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
