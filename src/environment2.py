@@ -42,8 +42,6 @@ class Env():
           self.goal_x = 1
           self.goal_y = 0.0
 
-          # definir o diretório do robô, alvo e mundo
-          self.goal_model_dir = param["target"]
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
 
           self.set_self_state = ModelState()
