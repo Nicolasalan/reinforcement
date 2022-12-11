@@ -240,7 +240,7 @@ class Env():
           while data is None:
                try:
                     print("Waiting for scan")
-                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
+                    data = rospy.wait_for_message(str(param["topic_scan"]), LaserScan, timeout=5)
                except:
                     print("Error waiting for scan")
                     pass
