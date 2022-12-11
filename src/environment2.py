@@ -35,11 +35,12 @@ class Env():
           self.num_scan_ranges = param["num_scan_ranges"]
           self.min_range = param["min_range"]
 
-          self.position = Pose() # posição do robô
-          self.goal_position = Pose() # posição do alvo
-          self.goal_position.position.x = 0.0 # posição x do alvo
-          self.goal_position.position.y = 0.0 # posição y do alvo
           self.last_odom = None
+          self.odom_x = 0
+          self.odom_y = 0
+
+          self.goal_x = 1
+          self.goal_y = 0.0
 
           # definir o diretório do robô, alvo e mundo
           self.goal_model_dir = param["target"]
@@ -53,7 +54,7 @@ class Env():
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
           self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)s
 
           # definir o estado inicial
           self.threshold_target = param["threshold_target"] # distância de chegada
@@ -97,11 +98,11 @@ class Env():
           angle = round(euler[2], 4) # angulo do robo
           # Calculate distance to the goal from the robot
           distance = np.linalg.norm(
-               [self.odom_x - self.goal_position.position.x, self.odom_y - self.goal_position.position.y]
+               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
           )
           # Calculate the relative angle between the robots heading and heading toward the goal
-          skew_x = self.goal_position.position.x - self.odom_x
-          skew_y = self.goal_position.position.y - self.odom_y
+          skew_x = self.goal_x - self.odom_x
+          skew_y = self.goal_y - self.odom_y
           dot = skew_x * 1 + skew_y * 0
           mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
           mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
@@ -196,8 +197,7 @@ class Env():
                target.model_xml = goal_urdf
 
                # randomiza o target pelo mundo
-               self.goal_position.position.x = random.uniform(-3.6, 3.6)
-               self.goal_position.position.y = random.uniform(-3.6, 3.6)
+               self.goal_x, self.goal_y = random.choice(self.goals)
                self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
