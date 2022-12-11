@@ -200,7 +200,6 @@ class Env():
 
      def reset(self):
           rospy.wait_for_service('/gazebo/delete_model')
-          self.del_model('target')
 
           rospy.wait_for_service('gazebo/reset_simulation')
           try:
@@ -209,12 +208,7 @@ class Env():
                print("gazebo/reset_simulation service call failed")
 
           # Build the targetz
-          rospy.wait_for_service('/gazebo/spawn_sdf_model')
           try:
-               goal_urdf = open(self.goal_model_dir, "r").read()
-               target = SpawnModel
-               target.model_name = 'target'  # the same with sdf name
-               target.model_xml = goal_urdf
 
                # randomiza o target pelo mundo
                angle = np.random.uniform(-np.pi, np.pi)
@@ -305,15 +299,8 @@ class Env():
                reward = 120.
                self.pub_cmd_vel.publish(Twist())
                rospy.wait_for_service('/gazebo/delete_model')
-               self.del_model('target')
 
-               # Build the target
-               rospy.wait_for_service('/gazebo/spawn_sdf_model')
                try:
-                    goal_urdf = open(self.goal_model_dir, "r").read()
-                    target = SpawnModel
-                    target.model_name = 'target'  # the same with sdf name
-                    target.model_xml = goal_urdf
 
                     # randomiza o target pelo mundo
                     angle = np.random.uniform(-np.pi, np.pi)
