@@ -207,13 +207,14 @@ class Env():
           except (rospy.ServiceException) as e:
                print("gazebo/reset_simulation service call failed")
 
-          # Build the targetz
+          # Build the target
           try:
 
                # randomiza o target pelo mundo
                angle = np.random.uniform(-np.pi, np.pi)
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
+
                self.goal_x, self.goal_y = random.choice(self.goals)
                
                object_state.pose.position.x = self.goal_x
@@ -225,8 +226,6 @@ class Env():
                object_state.pose.orientation.w = quaternion.w
                self.set_state.publish(object_state)
 
-               #self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
-               #self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
           rospy.wait_for_service('/gazebo/unpause_physics')
