@@ -218,8 +218,9 @@ class Env():
           states.append(0)
 
           robot_state = [states, distance, theta, diff, yaw]
+          state = np.array(robot_state)
 
-          return np.array(robot_state)
+          return state
 
      @staticmethod
      def check_scan_range(scan, num_scan_ranges):
