@@ -109,9 +109,14 @@ class Env():
                self.last_odom.pose.pose.orientation.y,
                self.last_odom.pose.pose.orientation.z,
           )
-          euler = quaternion.to_euler(degrees=False)
-          yaw = round(math.degrees(euler[2]))
-          angle = round(euler[2], 4) # angulo do robo
+
+          yaw = quaternion.to_euler(degrees=False)
+          
+          if yaw >= 0:
+               yaw = yaw
+          else:
+               yaw = yaw + 360
+
           # Calculate distance to the goal from the robot
           distance = np.linalg.norm(
                [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
@@ -120,15 +125,15 @@ class Env():
           skew_x = self.goal_x - self.odom_x
           skew_y = self.goal_y - self.odom_y
           dot = skew_x * 1 + skew_y * 0
-          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
-          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          beta = math.acos(dot / (mag1 * mag2))
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2)) # magnitude do vetor do objetivo
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2)) # magnitude do vetor do robo
+          beta = math.acos(dot / (mag1 * mag2)) # beta = angulo entre o vetor do robo e o vetor do objetivo
           if skew_y < 0:
                if skew_x < 0:
                     beta = -beta
                else:
                     beta = 0 - beta
-          theta = beta - angle
+          theta = beta - yaw 
           if theta > np.pi:
                theta = np.pi - theta
                theta = -np.pi - theta
