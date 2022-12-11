@@ -222,7 +222,7 @@ class Env():
                
                object_state.pose.position.x = self.goal_x
                object_state.pose.position.y = self.goal_y
-               print("Goal x: ", self.goal_x, "Goal y: ", self.goal_y)
+               print("Goal x: ", s, "Goal y: ", self.goal_y)
 
                object_state.pose.orientation.x = quaternion.x
                object_state.pose.orientation.y = quaternion.y
@@ -239,10 +239,8 @@ class Env():
           data = None
           while data is None:
                try:
-                    print("Waiting for scan")
                     data = rospy.wait_for_message(str(param["topic_scan"]), LaserScan, timeout=5)
                except:
-                    print("Error waiting for scan")
                     pass
           
           print("Odom received")
