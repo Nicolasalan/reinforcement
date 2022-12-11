@@ -1,8 +1,8 @@
 
 # parameters environment specific configuration
-topic_cmd: /cmd_vel
-topic_odom: /odom
-topic_scan: /base_scan_front
+topic_cmd: '/cmd_vel'
+topic_odom: '/odom'
+topic_scan: '/base_scan_front'
 threshold_target: 0.2
 num_scan_ranges: 10 
 min_range: 0.2
