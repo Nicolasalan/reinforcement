@@ -153,8 +153,8 @@ class Env():
           # Detect if the goal has been reached and give a large positive reward
           if distance <= self.threshold_target:
                target = True
-               done = True
-
+               # done = True
+          print(scan_range, distance, yaw, thetas, diff, done, target)
           return scan_range, distance, yaw, thetas, diff, done, target
 
      def step(self, action):
