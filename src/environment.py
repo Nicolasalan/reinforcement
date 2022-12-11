@@ -174,7 +174,6 @@ class Env():
                print(data)
                try:
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-                    print("###########################")
                     print("Data received", data)
                except:
                     print("Waiting for data", data)
@@ -242,7 +241,6 @@ class Env():
                print(data)
                try:
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-                    print("###########################")
                     print("Data received", data)
                except:
                     print("Waiting for data", data)
