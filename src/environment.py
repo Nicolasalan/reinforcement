@@ -89,7 +89,7 @@ class Env():
                     y = float(str_y)
                     # add x and y to goals
                     self.goals.append((x, y))
-          print(self.goals)
+          #print(self.goals)
 
      # funcao para pegar a posicao do robo por meio do topico '/odom' 
      def odom_callback(self, od_data):
@@ -217,7 +217,7 @@ class Env():
                angle = np.random.uniform(-np.pi, np.pi)
                quaternion = Quaternion.from_euler(0.0, 0.0, angle)
                object_state = self.set_self_state
-
+               print(self.goals)
                _x, _y = random.sample(self.goals, k=2)
                seq = [_x, _y]
                x, y = random.choice(seq)
