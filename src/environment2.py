@@ -44,6 +44,7 @@ class Env():
 
           # definir o diretório do robô, alvo e mundo
           self.goal_model_dir = param["target"]
+          self.diagonal = math.sqrt(2) * (3.6 + 3.8)
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
@@ -55,6 +56,7 @@ class Env():
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
           self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
           self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+          self.past_distance = 0.0
 
           # definir o estado inicial
           self.threshold_target = param["threshold_target"] # distância de chegada
@@ -119,8 +121,15 @@ class Env():
           if theta < -np.pi:
                theta = -np.pi - theta
                theta = np.pi - theta
-          
-          diff = angle - theta
+
+          thetas = round(math.degrees(theta), 2)
+
+          diff = abs(thetas - yaw)
+
+          if diff <= 180:
+               diff = round(diff, 2)
+          else:
+               diff = round(360 - diff, 2)
           
           scan_range = self.check_scan_range(scan, self.num_scan_ranges)
 
@@ -132,7 +141,7 @@ class Env():
                target = True
                done = True
 
-          return scan_range, distance, theta, diff, yaw, done, target
+          return scan_range, distance, yaw, thetas, diff, done, target
 
      def step(self, action):
           target = False
@@ -158,7 +167,7 @@ class Env():
           except (rospy.ServiceException) as e:
                print("/gazebo/pause_physics service call failed")
 
-          state = np.array([0., 0.])
+          past = np.array([0., 0.])
 
           data = None
           while data is None:
@@ -167,16 +176,16 @@ class Env():
                except:
                     pass
 
-          min_laser, distance, theta, diff, yaw, done, target = self.state(data)
+          min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
           states = [i / 3.5 for i in min_laser] # normalizar os dados de entrada
 
-          for action in state: # adicionar a ação anterior ao estado
+          for action in past: # adicionar a ação anterior ao estado
                states.append(action)
 
-          robot_state = states + [distance, theta, diff, yaw, action]
-          reward = self.get_reward(target, done, action, min_laser)
+          states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
+          reward = self.reward(done, target)
 
-          return np.array(robot_state), reward, done, target
+          return np.asarray(states), reward, done, target
 
      def reset(self):
           rospy.wait_for_service('/gazebo/delete_model')
@@ -210,15 +219,23 @@ class Env():
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
                except:
                     pass
+          
+          self.odom_x = self.last_odom.pose.pose.position.x
+          self.odom_y = self.last_odom.pose.pose.position.y
 
-          states, distance, theta, diff, yaw, done, target = self.state(data)
+          # Calculate distance to the goal from the robot
+          distance = np.linalg.norm(
+               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+          )
+          self.past_distance = distance
+
+          states, distance, yaw, thetas, diff, done, target = self.state(data)
           states = [i / 3.5 for i in states]
 
           states.append(0)
           states.append(0)
 
-          robot_state = [states, distance, theta, diff, yaw]
-          state = np.array(robot_state)
+          state = state + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
 
           return np.asarray(state)
 
@@ -242,11 +259,55 @@ class Env():
           return scan_range
 
      @staticmethod
-     def get_reward(target, done, action, min_laser):
-          if target:
-               return 100.0
-          elif done:
-               return -100.0
-          else:
-               r3 = lambda x: 1 - x if x < 1 else 0.0 # função de recompensa
-               return action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2 # acao[0] / 2 mais ação[1] / 2 menos a distância minima do laser / 2
+     def reward(self, done, target):
+          # Calculate robot heading from odometry data
+          self.odom_x = self.last_odom.pose.pose.position.x
+          self.odom_y = self.last_odom.pose.pose.position.y
+
+          # Calculate distance to the goal from the robot
+          distance = np.linalg.norm(
+               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+          )
+          distance_rate = (self.past_distance - distance)
+
+          reward = 500.*distance_rate
+          self.past_distance = distance
+
+          if done: # se o robô colidir com algum obstáculo
+               reward = -100.
+               self.pub_cmd_vel.publish(Twist())
+
+          if target: # se o robô chegar ao alvo
+               reward = 120.
+               self.pub_cmd_vel.publish(Twist())
+               rospy.wait_for_service('/gazebo/delete_model')
+               self.del_model('target')
+
+               # Build the target
+               rospy.wait_for_service('/gazebo/spawn_sdf_model')
+               try:
+                    goal_urdf = open(self.goal_model_dir, "r").read()
+                    target = SpawnModel
+                    target.model_name = 'target'  # the same with sdf name
+                    target.model_xml = goal_urdf
+
+                    # randomiza o target pelo mundo
+                    self.goal_x, self.goal_y = random.choice(self.goals)
+                    self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
+                    self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+
+               except (rospy.ServiceException) as e:
+                    print("/gazebo/failed to build the target")
+               rospy.wait_for_service('/gazebo/unpause_physics')
+
+               self.odom_x = self.last_odom.pose.pose.position.x
+               self.odom_y = self.last_odom.pose.pose.position.y
+
+               # Calculate distance to the goal from the robot
+               distance = np.linalg.norm(
+                    [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
+               )
+               self.past_distance = distance
+               target = False
+
+          return reward
