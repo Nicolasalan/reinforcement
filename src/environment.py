@@ -200,6 +200,7 @@ class Env():
           return np.asarray(states), reward, done, target
 
      def reset(self):
+          print("Resetting environment")
           rospy.wait_for_service("/gazebo/reset_world")
           #rospy.wait_for_service('gazebo/reset_simulation')
           try:
