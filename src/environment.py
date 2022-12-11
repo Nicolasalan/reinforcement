@@ -159,6 +159,7 @@ class Env():
 
      def step(self, action):
           target = False
+          print("step")
 
           # Publish the robot action
           vel_cmd = Twist()
@@ -173,7 +174,7 @@ class Env():
                print("/gazebo/unpause_physics service call failed")
 
           time.sleep(0.1)
-
+          print("step 2")
           rospy.wait_for_service("/gazebo/pause_physics")
           try:
                pass
@@ -182,12 +183,12 @@ class Env():
                print("/gazebo/pause_physics service call failed")
 
           past = np.array([0., 0.])
-
+          print("step 3")
           data = None
           while data is None:
                print(data)
                try:
-                    data = rospy.wait_for_message('base_scan_front', LaserScan, timeout=5)
+                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
                     rospy.spin()
                except:
                     pass
@@ -195,12 +196,13 @@ class Env():
           min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
           states = [i / 3.5 for i in min_laser] # normalizar os dados de entrada
 
+          print("step 4")
           for action in past: # adicionar a ação anterior ao estado
                states.append(action)
 
           states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
           reward = self.reward(done, target)
-
+          print("step 5", states, reward, done, target)
           return np.asarray(states), reward, done, target
 
      def reset(self):
@@ -252,7 +254,7 @@ class Env():
           while data is None:
                print(data)
                try:
-                    data = rospy.wait_for_message('base_scan_front', LaserScan, timeout=5)
+                    data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
                     print("Data received", data)
                     rospy.spin()
                except:
