@@ -51,11 +51,11 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      scores = []                                            # lista de pontuações médias de cada episódio
 
      print('Starting training')
-     print('Number of episodes: ' + str(n_episodes))
-     print('Max timesteps per episode: ' + str(max_t))
-     print('Score solved: ' + str(score_solved))
+     print('scores_window: ' + str(scores_window))
+     print('scores: ' + str(scores))
 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
+          print('episode: ' + str(i_episode))
           agent.reset()                                     # redefinir ambiente
           states = env.reset()                              # obtém o estado atual de cada agente
           print('states: ' + str(states))
