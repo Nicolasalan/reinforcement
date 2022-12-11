@@ -10,7 +10,7 @@ import math
 import time
 
 # importar mensagens do ROS
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose, Point, Quaternion
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from std_srvs.srv import Empty
@@ -198,6 +198,7 @@ class Env():
 
                # randomiza o target pelo mundo
                self.goal_x, self.goal_y = random.choice(self.goals)
+               self.goal_position = Pose(Point(x=self.goal_x, y=self.goal_y, z=0.0), Quaternion(0.0, 0.0, 0.0, 1.0))
                self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
           except (rospy.ServiceException) as e:
                print("/gazebo/failed to build the target")
