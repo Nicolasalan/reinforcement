@@ -44,24 +44,25 @@ class Env():
           self.goal_y = 0.0
 
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
+          self.goal_model = '/ws/src/motion/models/target.sdf'
 
-          self.set_self_state = ModelState()
-          self.set_self_state.model_name = "target"
-          self.set_self_state.pose.position.x = 0.0
-          self.set_self_state.pose.position.y = 0.0
-          self.set_self_state.pose.position.z = 0.0
-          self.set_self_state.pose.orientation.x = 0.0
-          self.set_self_state.pose.orientation.y = 0.0
-          self.set_self_state.pose.orientation.z = 0.0
-          self.set_self_state.pose.orientation.w = 1.0
+          #self.set_self_state = ModelState()
+          #self.set_self_state.model_name = "target"
+          #self.set_self_state.pose.position.x = 0.0
+          #self.set_self_state.pose.position.y = 0.0
+          #self.set_self_state.pose.position.z = 0.0
+          #self.set_self_state.pose.orientation.x = 0.0
+          #self.set_self_state.pose.orientation.y = 0.0
+          #self.set_self_state.pose.orientation.z = 0.0
+          #self.set_self_state.pose.orientation.w = 1.0
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
           self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
 
           ##### servicos do ROS #####
-          #self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
-          self.reset_proxy = rospy.ServiceProxy("/gazebo/reset_world", Empty)
+          self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
+          #self.reset_proxy = rospy.ServiceProxy("/gazebo/reset_world", Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
@@ -90,7 +91,6 @@ class Env():
                     y = float(str_y)
                     # add x and y to goals
                     self.goals.append((x, y))
-          #print(self.goals)
 
      # funcao para pegar a posicao do robo por meio do topico '/odom' 
      def odom_callback(self, od_data):
@@ -137,22 +137,28 @@ class Env():
                self.pub_cmd_vel.publish(Twist())
 
                try:
-
                     # randomiza o target pelo mundo
-                    angle = np.random.uniform(-np.pi, np.pi)
-                    quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-                    object_state = self.set_self_state
-                    self.goal_x, self.goal_y = random.choice(self.goals)
+                    print("Randomizing target position")
+
+                    print(self.goals)
+                    x, y = random.choice(self.goals)
+
+                    print("Goal x: ", x, "Goal y: ", y)
+
+                    box_state = ModelState()
+                    box_state.model_name = "target"
+                    box_state.pose.position.x = x
+                    box_state.pose.position.y = y
+                    box_state.pose.orientation.x = 0.0
+                    box_state.pose.orientation.y = 0.0
+                    box_state.pose.orientation.z = 0.0
+                    box_state.pose.orientation.w = 1.0
+                    self.set_state.publish(box_state)
+                    print("Target randomized")
                     
-                    object_state.pose.position.x = self.goal_x
-                    object_state.pose.position.y = self.goal_y
-
-                    object_state.pose.orientation.x = quaternion.x
-                    object_state.pose.orientation.y = quaternion.y
-                    object_state.pose.orientation.z = quaternion.z
-                    object_state.pose.orientation.w = quaternion.w
-                    self.set_state.publish(object_state)
-
+                    self.goal_x = x
+                    self.goal_y = y
+               
                except (rospy.ServiceException) as e:
                     print("/gazebo/failed to build the target")
                rospy.wait_for_service('/gazebo/unpause_physics')
@@ -270,8 +276,8 @@ class Env():
 
      def reset(self):
           print("Resetting environment")
-          rospy.wait_for_service("/gazebo/reset_world")
-          #rospy.wait_for_service('gazebo/reset_simulation')
+
+          rospy.wait_for_service('gazebo/reset_simulation')
           try:
                self.reset_proxy()
           except (rospy.ServiceException) as e:
@@ -282,16 +288,10 @@ class Env():
           try:
                # randomiza o target pelo mundo
                print("Randomizing target position")
-               angle = np.random.uniform(-np.pi, np.pi)
-               quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-               object_state = self.set_self_state
-               print(self.goals)
-               _x, _y = random.sample(self.goals, k=2)
-               seq = [_x, _y]
-               x, y = random.choice(seq)
 
-               object_state.pose.position.x = x
-               object_state.pose.position.y = y
+               print(self.goals)
+               x, y = random.choice(self.goals)
+
                print("Goal x: ", x, "Goal y: ", y)
 
                box_state = ModelState()
