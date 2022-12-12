@@ -65,7 +65,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
                agent.step(states, actions, rewards, next_states, dones, t)
                states = next_states
-               score += int(rewards)
+               score += rewards
                if np.any(dones):                           # loop de saída quando o episódio termina
                     break              
                
