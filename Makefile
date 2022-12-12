@@ -16,12 +16,6 @@ terminal:
 	@echo "Terminal docker"
 	@sudo docker run -it --net=host motion-rl bash
 
-# === Spawn model docker ===
-.PHONY: spawn 
-spawn:
-	@echo "Spawn model"
-	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
-
 # === Start train docker ===
 .PHONY: start 
 start:
