@@ -6,11 +6,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-def hidden_init(layer):
-    fan_in = layer.weight.data.size()[0]
-    lim = 1. / np.sqrt(fan_in)
-    return (-lim, lim)
-
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
@@ -30,12 +25,6 @@ class Actor(nn.Module):
         self.layer_2 = nn.Linear(fc1_units, fc2_units)
         self.layer_3 = nn.Linear(fc2_units, action_dim)
         self.tanh = nn.Tanh()
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1)) # inicializar os pesos da camada de entrada com valores aleatórios
-        self.layer_2.weight.data.uniform_(*hidden_init(self.layer_2)) # inicializar os pesos da camada oculta com valores aleatórios
-        self.layer_3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, s):
         """Build an actor (policy) network that maps states -> actions."""
@@ -43,7 +32,6 @@ class Actor(nn.Module):
         s = F.relu(self.layer_2(s))
         a = self.tanh(self.layer_3(s))
         return a
-
 
 class Critic(nn.Module):
     """Critic (Value) Model."""
@@ -69,16 +57,6 @@ class Critic(nn.Module):
         self.layer_5_s = nn.Linear(fc1_units, fc2_units)
         self.layer_5_a = nn.Linear(action_dim, fc2_units)
         self.layer_6 = nn.Linear(fc2_units, 1)
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1)) 
-        self.layer_2_s.weight.data.uniform_(*hidden_init(self.layer_2_s)) 
-        self.layer_2_a.weight.data.uniform_(*hidden_init(self.layer_2_a)) 
-        self.layer_4.weight.data.uniform_(*hidden_init(self.layer_4)) 
-        self.layer_5_s.weight.data.uniform_(*hidden_init(self.layer_5_s)) 
-        self.layer_5_a.weight.data.uniform_(*hidden_init(self.layer_5_a)) 
-        self.layer_6.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
