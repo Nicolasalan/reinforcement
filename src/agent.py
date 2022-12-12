@@ -79,8 +79,8 @@ class Agent():
         state = torch.from_numpy(state).float().to(device) 
         #state = torch.Tensor(state.reshape(1, -1)).to(device)
         self.actor_local.eval()
-        #with torch.no_grad():
-        action = self.actor_local(state).cpu().data.numpy()
+        with torch.no_grad():
+            action = self.actor_local(state).cpu().data.numpy().flatten()
         self.actor_local.train()
         if add_noise:
             action += self.epsilon * self.noise.sample()
@@ -108,7 +108,6 @@ class Agent():
         actions_next = self.actor_target(next_states)
         Q_targets_next = self.critic_target(next_states, actions_next)
         # Compute Q targets for current states (y_i)
-        print(Q_targets_next, dones)
         Q_targets = float(rewards) + (gamma * Q_targets_next * (1 - dones)).detach()
         # Compute critic loss
         Q_expected = self.critic_local(states, actions)
