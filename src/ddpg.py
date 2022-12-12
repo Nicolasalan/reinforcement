@@ -66,6 +66,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                agent.step(states, actions, rewards, next_states, dones, t)
                states = next_states
                score += rewards
+               print('reward: ' + str(rewards))
                if np.any(dones):                           # loop de saída quando o episódio termina
                     break              
                
