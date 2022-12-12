@@ -20,13 +20,13 @@ terminal:
 .PHONY: spawn 
 spawn:
 	@echo "Spawn model"
-	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion_rl spawn.launch"
+	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
 
 # === Start train docker ===
 .PHONY: start 
 start:
 	@echo "Starting training"
-	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion_rl start.launch"
+	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
 # === Delete port ===
 .PHONY: delete
