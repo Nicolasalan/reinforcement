@@ -88,19 +88,13 @@ class Env():
      
      def check_scan_range(self, scan, num_scan_ranges):
           scan_range = []
-          cof = (len(scan.ranges) / (num_scan_ranges - 1))  # calcula o coeficiente de escala
-          for i in range(0, num_scan_ranges): 
-               n_i = math.ceil(i*cof - 1) # calcula o indice do scan
-               if n_i < 0: 
-                    n_i = 0 
-               if cof == 1:
-                    n_i = i 
-               if scan.ranges[n_i] == float('Inf'): 
-                    scan_range.append(3.5) 
-               elif np.isnan(scan.ranges[n_i]): 
-                    scan_range.append(0) 
+          for i in range(len(scan.ranges)):
+               if scan.ranges[i] == float('Inf'):
+                    scan_range.append(3.5)
+               elif np.isnan(scan.ranges[i]):
+                    scan_range.append(0)
                else:
-                    scan_range.append(scan.ranges[n_i]) 
+                    scan_range.append(scan.ranges[i])
           
           return scan_range
 
