@@ -101,8 +101,13 @@ class Agent():
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones = experiences
+
         print('Learning')
-        print(rewards, dones)
+
+        # transform to tensor
+        rewards = torch.Tensor(rewards).to(device)
+        dones = torch.Tensor(dones).to(device)
+
         rewards = torch.from_numpy(rewards).float().to(device)
         dones = torch.from_numpy(dones).float().to(device)
         # ---------------------------- update critic ---------------------------- #
