@@ -236,14 +236,9 @@ class Env():
           if distance <= self.threshold_target:
                target = True
 
-          print(scan_range, distance, yaw, thetas, diff, done, target)
-
           return scan_range, distance, yaw, thetas, diff, done, target
 
      def step(self, action):
-          #target = False
-          print("step")
-
           # Publish the robot action
           vel_cmd = Twist()
           vel_cmd.linear.x = action[0]
@@ -251,7 +246,6 @@ class Env():
           self.pub_cmd_vel.publish(vel_cmd)
 
           past = np.array([0., 0.])
-          print("step 3")
           data = None
           while data is None:
                try:
@@ -263,7 +257,6 @@ class Env():
           min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
           states = [i / 3.5 for i in min_laser] # normalizar os dados de entrada
 
-          print("step 4")
           for action in past: # adicionar a ação anterior ao estado
                states.append(action)
 
