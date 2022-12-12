@@ -27,17 +27,3 @@ spawn:
 start:
 	@echo "Starting training"
 	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion start.launch"
-
-# === Delete port ===
-.PHONY: delete
-delete:
-	@echo "Deleting port"
-	@sudo fuser -k 8080/tcp
-	@docker stop $(docker ps -a -q)
-
-# === Create network ===
-.PHONY: network
-network:
-	@echo "Creating network"
-	@sudo docker swarm init
-	@sudo docker network create -d overlay --attachable multihost
