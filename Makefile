@@ -1,4 +1,4 @@
-# === Build raspberry docker ===
+# === Build docker ===
 .PHONY: build
 build:
 	@echo "Building docker image"
