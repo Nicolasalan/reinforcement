@@ -3,7 +3,7 @@
   <!-- Spawn target sdf -->
   <include file="$(find motion)/launch/spawn_sdf.xml">
         <arg name="target" value="target" />
-        <arg name="x" value="1.0" />
+        <arg name="x" value="0.0" />
         <arg name="y" value="0.0" />
         <arg name="z" value="0.0" />
         <arg name="roll" value="0"/>
