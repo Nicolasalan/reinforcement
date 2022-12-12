@@ -117,13 +117,11 @@ class Env():
           else:
                yaw = yaw + 360
 
-          # Calculate distance to the goal from the robot
-          distance = np.linalg.norm(
-               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
-          )
+          distance = math.hypot(self.odom_x - self.goal_x, self.odom_y - self.goal_y)
 
           skew_x = self.goal_x - self.odom_x
           skew_y = self.goal_y - self.odom_y
+
           # Calculate the angle between robot and target
           if skew_x > 0 and skew_y > 0:
                theta = math.atan(skew_y / skew_x)
@@ -149,35 +147,7 @@ class Env():
                diff = round(diff, 2)
           else:
                diff = round(360 - diff, 2)
-          # Calculate the relative angle between the robots heading and heading toward the goal
-          #skew_x = self.goal_x - self.odom_x
-          #skew_y = self.goal_y - self.odom_y
-          #dot = skew_x * 1 + skew_y * 0
-          #mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2)) # magnitude do vetor do objetivo
-          #mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2)) # magnitude do vetor do robo
-          #beta = math.acos(dot / (mag1 * mag2)) # beta = angulo entre o vetor do robo e o vetor do objetivo
-          #if skew_y < 0:
-          #     if skew_x < 0:
-          #          beta = -beta
-          #     else:
-          #          beta = 0 - beta
-          #theta = beta - yaw 
-          #if theta > np.pi:
-          #     theta = np.pi - theta
-          #     theta = -np.pi - theta
-          #if theta < -np.pi:
-          #     theta = -np.pi - theta
-          #     theta = np.pi - theta
 
-          #thetas = round(math.degrees(theta), 2)
-
-          #diff = abs(thetas - yaw)
-
-          #if diff <= 180:
-          #     diff = round(diff, 2)
-          #else:
-          #     diff = round(360 - diff, 2)
-          
           scan_range = self.check_scan_range(scan, self.num_scan_ranges)
 
           if self.min_range > min(scan_range) > 0: # se o robô colidir com algum obstáculo
@@ -186,8 +156,9 @@ class Env():
           # Detect if the goal has been reached and give a large positive reward
           if distance <= self.threshold_target:
                target = True
-               # done = True
+
           print(scan_range, distance, yaw, thetas, diff, done, target)
+
           return scan_range, distance, yaw, thetas, diff, done, target
 
      def step(self, action):
@@ -219,7 +190,9 @@ class Env():
 
           states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
           reward = self.reward(done, target)
+
           print("step 5", states, reward, done, target)
+          
           return np.asarray(states), reward, done, target
 
      def reset(self):
@@ -300,9 +273,9 @@ class Env():
      @staticmethod
      def check_scan_range(scan, num_scan_ranges):
           scan_range = []
-          cof = (len(scan.ranges) / (num_scan_ranges - 1)) 
+          cof = (len(scan.ranges) / (num_scan_ranges - 1))  # calcula o coeficiente de escala
           for i in range(0, num_scan_ranges): 
-               n_i = math.ceil(i*cof - 1) 
+               n_i = math.ceil(i*cof - 1) # calcula o indice do scan
                if n_i < 0: 
                     n_i = 0 
                if cof == 1:
