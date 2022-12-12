@@ -21,11 +21,9 @@ RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 SHELL [ "/bin/bash" , "-c" ]
 
 # Setup minimal
-ARG DEBIAN_FRONTEND=noninteractive 
-
-# Setup minimal
 RUN apt-get update
 
+# Install dependencies
 RUN apt-get install -q -y --no-install-recommends \
   build-essential \
   apt-utils \
@@ -46,7 +44,7 @@ RUN apt-get install -q -y --no-install-recommends \
   wget \
   curl
 
-# Install dependencies
+# Install dependencies ros
 RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-joint-state-controller \
  && apt-get install -y ros-noetic-joint-state-publisher \
@@ -61,6 +59,7 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino
 
+# install pytorch
 RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 
 # create a catkin workspace
@@ -69,8 +68,10 @@ RUN mkdir -p /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace 
 
-COPY . /ws/src/motion
 # Copy the source files
+COPY . /ws/src/motion
+
+# Set the working directory
 WORKDIR /ws
 
 # Build the Catkin workspace
@@ -85,6 +86,7 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 # Install python dependencies
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
+# export model path
 RUN export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(find motion-rl)/models
 
 # cmd script
