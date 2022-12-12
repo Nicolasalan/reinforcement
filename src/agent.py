@@ -104,9 +104,9 @@ class Agent():
 
         print('Learning')
 
-        # transform to tensor
-        reward = torch.Tensor(rewards).to(device)
-        done = torch.Tensor(dones).to(device)
+        # transform to np.array
+        reward = np.array(rewards)
+        done = np.array(dones)
 
         rewards = torch.from_numpy(reward).float().to(device)
         dones = torch.from_numpy(done).float().to(device)
