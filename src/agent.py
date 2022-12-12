@@ -110,6 +110,9 @@ class Agent():
 
         rewards = torch.from_numpy(reward).float().to(device)
         dones = torch.from_numpy(done).float().to(device)
+
+        dones.unsqueeze_(1)
+        rewards.unsqueeze_(1)
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         actions_next = self.actor_target(next_states)
