@@ -70,8 +70,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                if np.any(dones):                           # loop de saída quando o episódio termina
                     break              
                
-          scores_window.append(score)                   # salvar pontuação média para o episódio
-          scores.append(score)                             # salva pontuação média na janela
+               scores_window.append(score)                   # salvar pontuação média para o episódio
+               scores.append(score)                             # salva pontuação média na janela
                
           print('\rEpisode {}\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)), end="") 
                
