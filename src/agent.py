@@ -103,22 +103,15 @@ class Agent():
         states, actions, rewards, next_states, dones = experiences
 
         print('Learning')
-
-        # transform to np.array
-        reward = np.array(rewards)
-        done = np.array(dones)
-
-        rewards = torch.from_numpy(reward).float().to(device)
-        dones = torch.from_numpy(done).float().to(device)
-
-        dones.unsqueeze_(1)
-        rewards.unsqueeze_(1)
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         actions_next = self.actor_target(next_states)
-        Q_targets_next = self.critic_target(next_states, actions_next)
+        target_Q1, target_Q2 = self.critic_target(next_states, actions_next)
+
+        # Select the minimal Q value from the 2 calculated values
+        target_Q = torch.min(target_Q1, target_Q2)
         # Compute Q targets for current states (y_i)
-        Q_targets = float(rewards) + (gamma * Q_targets_next * (1 - dones)).detach()
+        Q_targets = float(rewards) + (gamma * target_Q * (1 - dones)).detach()
         # Compute critic loss
         Q_expected = self.critic_local(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
