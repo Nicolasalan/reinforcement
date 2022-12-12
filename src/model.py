@@ -26,15 +26,16 @@ class Actor(nn.Module):
         """
         super(Actor, self).__init__()
         self.layer_1 = nn.Linear(state_dim, fc1_units)
+        self.bn1 = nn.BatchNorm1d(fc1_units)
         self.layer_2 = nn.Linear(fc1_units, fc2_units)
         self.layer_3 = nn.Linear(fc2_units, action_dim)
         self.tanh = nn.Tanh()
         self.reset_parameters()
 
     def reset_parameters(self):
-        self.fc1.weight.data.uniform_(*hidden_init(self.fc1)) # inicializar os pesos da camada de entrada com valores aleatórios
-        self.fc2.weight.data.uniform_(*hidden_init(self.fc2)) # inicializar os pesos da camada oculta com valores aleatórios
-        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+        self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1)) # inicializar os pesos da camada de entrada com valores aleatórios
+        self.layer_2.weight.data.uniform_(*hidden_init(self.layer_2)) # inicializar os pesos da camada oculta com valores aleatórios
+        self.layer_3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, s):
         """Build an actor (policy) network that maps states -> actions."""
@@ -59,6 +60,7 @@ class Critic(nn.Module):
         """
         super(Critic, self).__init__()
         self.layer_1 = nn.Linear(state_dim, fc1_units)
+        self.bn1 = nn.BatchNorm1d(fc1_units)
         self.layer_2_s = nn.Linear(fc1_units, fc2_units)
         self.layer_2_a = nn.Linear(action_dim, fc2_units)
         self.layer_3 = nn.Linear(fc2_units, 1)
@@ -70,9 +72,13 @@ class Critic(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        self.fc1.weight.data.uniform_(*hidden_init(self.fc1)) # inicializar os pesos da camada de entrada com valores aleatórios
-        self.fc2.weight.data.uniform_(*hidden_init(self.fc2)) # inicializar os pesos da camada oculta com valores aleatórios
-        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+        self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1)) 
+        self.layer_2_s.weight.data.uniform_(*hidden_init(self.layer_2_s)) 
+        self.layer_2_a.weight.data.uniform_(*hidden_init(self.layer_2_a)) 
+        self.layer_4.weight.data.uniform_(*hidden_init(self.layer_4)) 
+        self.layer_5_s.weight.data.uniform_(*hidden_init(self.layer_5_s)) 
+        self.layer_5_a.weight.data.uniform_(*hidden_init(self.layer_5_a)) 
+        self.layer_6.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
