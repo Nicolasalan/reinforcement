@@ -69,8 +69,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                print('rewards: ' + str(rewards))
                
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
-               for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
-                    agent.step(state, action, reward, next_state, done, t)
+               agent.step(states, actions, rewards, next_states, dones, t)
                print('next_states: ' + str(next_states))
                states = next_states
                scores += rewards
