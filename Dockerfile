@@ -85,5 +85,7 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 # Install python dependencies
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
+RUN export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(find motion-rl)/models
+
 # cmd script
-CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash && export GAZEBO_MODEL_PATH=/ws/src/motion/models && export GAZEBO_RESOURCE_PATH=/home/socialdroids/ws_socialdroids/src/3rd/aws-robomaker-bookstore-world/launch
+CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash
