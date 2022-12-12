@@ -111,7 +111,7 @@ class Agent():
         # Select the minimal Q value from the 2 calculated values
         target_Q = torch.min(target_Q1, target_Q2)
         # Compute Q targets for current states (y_i)
-        Q_targets = float(rewards) + (gamma * target_Q * (1 - dones)).detach()
+        Q_targets = float(rewards) + ((1 - dones) * gamma * target_Q).detach()
         # Compute critic loss
         Q_expected = self.critic_local(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
