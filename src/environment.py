@@ -46,16 +46,6 @@ class Env():
           self.diagonal = math.sqrt(2) * (3.6 + 3.8)
           self.goal_model = '/ws/src/motion/models/target.sdf'
 
-          #self.set_self_state = ModelState()
-          #self.set_self_state.model_name = "target"
-          #self.set_self_state.pose.position.x = 0.0
-          #self.set_self_state.pose.position.y = 0.0
-          #self.set_self_state.pose.position.z = 0.0
-          #self.set_self_state.pose.orientation.x = 0.0
-          #self.set_self_state.pose.orientation.y = 0.0
-          #self.set_self_state.pose.orientation.z = 0.0
-          #self.set_self_state.pose.orientation.w = 1.0
-
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
           self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1) # receber a posição do robô
@@ -119,10 +109,8 @@ class Env():
           self.odom_x = self.last_odom.pose.pose.position.x
           self.odom_y = self.last_odom.pose.pose.position.y
 
-          # Calculate distance to the goal from the robot
-          distance = np.linalg.norm(
-               [self.odom_x - self.goal_x, self.odom_y - self.goal_y]
-          )
+          distance = math.hypot(self.odom_x - self.goal_x, self.odom_y - self.goal_y)
+
           distance_rate = (self.past_distance - distance)
 
           reward = 500.*distance_rate
