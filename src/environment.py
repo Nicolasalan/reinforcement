@@ -191,7 +191,7 @@ class Env():
           return scan_range, distance, yaw, thetas, diff, done, target
 
      def step(self, action):
-          target = False
+          #target = False
           print("step")
 
           # Publish the robot action
@@ -204,12 +204,10 @@ class Env():
           print("step 3")
           data = None
           while data is None:
-               print(data)
                try:
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-                    print("Data received", data)
                except:
-                    print("Waiting for data", data)
+                    print("Waiting for data")
                     pass
           
           min_laser, distance, yaw, thetas, diff, done, target = self.state(data)
@@ -271,12 +269,10 @@ class Env():
           print("Unpausing physics")
           data = None
           while data is None:
-               print(data)
                try:
                     data = rospy.wait_for_message(param["topic_scan"], LaserScan, timeout=5)
-                    print("Data received", data)
                except:
-                    print("Waiting for data", data)
+                    print("Waiting for data")
                     pass
           
           print("Odom received")
