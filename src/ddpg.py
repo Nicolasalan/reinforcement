@@ -47,37 +47,30 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      """
      agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42)
 
-     scores_window = deque()                                # pontuações médias dos episódios mais recentes
-     scores = []                                            # lista de pontuações médias de cada episódio
-
-     print('Starting training')
-     print('scores_window: ' + str(scores_window))
-     print('scores: ' + str(scores))
+     scores_window = []                                    # pontuações médias dos episódios mais recentes
+     scores = 0                                       # lista de pontuações médias de cada episódio                                
 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
+          score = 0
           print('episode: ' + str(i_episode))
           agent.reset()                                     # redefinir ambiente
           states = env.reset()                              # obtém o estado atual de cada agente
-          print('states: ' + str(states))
 
           for t in range(max_t):# escolha uma ação para cada agente
                print('timestep: ' + str(t))
                action = agent.action(states) 
-               print('action: ' + str(action))
                actions = [(action[0] + 1) / 2, action[1]]
                next_states, rewards, dones, _ = env.step(actions) # envia todas as ações ao ambiente
-               print('rewards: ' + str(rewards))
                
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
                agent.step(states, actions, rewards, next_states, dones, t)
-               print('next_states: ' + str(next_states))
                states = next_states
-               scores += rewards
-               if np.any(dones):                            # loop de saída quando o episódio termina
+               score += rewards
+               if np.any(dones):                           # loop de saída quando o episódio termina
                     break              
                
-          scores_window.append(scores)                       # salvar pontuação média para o episódio
-          scores.append(scores)                              # salva pontuação média na janela
+          scores_window.append(score)                      # salvar pontuação média para o episódio
+          scores.append(score)                             # salva pontuação média na janela
                
           print('\rEpisode {}\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)), end="") 
                
