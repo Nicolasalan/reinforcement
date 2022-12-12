@@ -48,7 +48,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42)
 
      scores_window = []                                    # pontuações médias dos episódios mais recentes
-     scores = 0                                          # lista de pontuações médias de cada episódio                                
+     scores = []                                          # lista de pontuações médias de cada episódio                                
 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
           score = 0
