@@ -96,7 +96,7 @@ class Env():
      def odom_callback(self, od_data):
           self.last_odom = od_data
      
-     def check_scan_range(scan, num_scan_ranges):
+     def check_scan_range(self, scan, num_scan_ranges):
           scan_range = []
           cof = (len(scan.ranges) / (num_scan_ranges - 1))  # calcula o coeficiente de escala
           for i in range(0, num_scan_ranges): 
