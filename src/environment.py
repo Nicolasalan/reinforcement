@@ -128,8 +128,12 @@ class Env():
                     # randomiza o target pelo mundo
                     print("Randomizing target position")
 
-                    print(self.goals)
-                    x, y = random.choice(self.goals)
+                    points = self.goals
+                    x, y = 0, 0
+                    random = int(round(random.uniform(0, len(points))))
+                    for i in range(len(points)):
+                         if i == random:
+                              x, y = points[i][0], points[i][1] 
 
                     print("Goal x: ", x, "Goal y: ", y)
 
@@ -268,8 +272,12 @@ class Env():
                # randomiza o target pelo mundo
                print("Randomizing target position")
 
-               print(self.goals)
-               x, y = random.choice(self.goals)
+               points = self.goals
+               x, y = 0, 0
+               random = int(round(random.uniform(0, len(points))))
+               for i in range(len(points)):
+                    if i == random:
+                         x, y = points[i][0], points[i][1] 
 
                print("Goal x: ", x, "Goal y: ", y)
 
