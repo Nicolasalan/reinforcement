@@ -77,7 +77,7 @@ class Agent():
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
         #state = torch.from_numpy(state).float().to(device) 
-        state = torch.Tensor(state).to(device)
+        state = torch.Tensor(state.reshape(1, -1)).to(device)
         self.actor_local.eval()
         #with torch.no_grad():
         action = self.actor_local(state).cpu().data.numpy().flatten()
@@ -107,7 +107,7 @@ class Agent():
         actions_next = self.actor_target(next_states)
         Q_targets_next = self.critic_target(next_states, actions_next)
         # Compute Q targets for current states (y_i)
-        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones)).detach()
+        Q_targets = float(rewards) + (gamma * Q_targets_next * (1 - dones)).detach()
         # Compute critic loss
         Q_expected = self.critic_local(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)

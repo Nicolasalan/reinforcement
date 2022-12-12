@@ -263,8 +263,6 @@ class Env():
           states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
           reward = self.setReward(done, target)
 
-          print("step 5", states, reward, done, target)
-
           return np.asarray(states), reward, done, target
 
      def reset(self):
