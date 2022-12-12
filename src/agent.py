@@ -105,11 +105,11 @@ class Agent():
         print('Learning')
 
         # transform to tensor
-        rewards = torch.Tensor(rewards).to(device)
-        dones = torch.Tensor(dones).to(device)
+        reward = torch.Tensor(rewards).to(device)
+        done = torch.Tensor(dones).to(device)
 
-        rewards = torch.from_numpy(rewards).float().to(device)
-        dones = torch.from_numpy(dones).float().to(device)
+        rewards = torch.from_numpy(reward).float().to(device)
+        dones = torch.from_numpy(done).float().to(device)
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         actions_next = self.actor_target(next_states)
