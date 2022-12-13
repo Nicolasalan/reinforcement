@@ -89,10 +89,10 @@ class Agent():
 
         self.actor_local.eval()
         with torch.no_grad():
+            print('state: ', state)
+            print('state shape: ', state.shape)
+            print('state type: ', type(state))
             action = self.actor_local(state).cpu().data.numpy().flatten()
-            print('Action: ', action)
-            print('Action shape: ', action.shape)
-            print('Action type: ', type(action))
         self.actor_local.train()
 
         if add_noise:
