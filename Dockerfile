@@ -87,7 +87,7 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
 # export model path
-RUN export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(find motion-rl)/models
+RUN export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(find motion)/models
 
 # cmd script
 CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash
