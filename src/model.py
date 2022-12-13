@@ -28,6 +28,7 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
+        state = state.view(-1, 156)
         state = F.relu(self.layer_1(state))
         state = F.relu(self.layer_2(state))
         a = self.tanh(self.layer_3(state))
