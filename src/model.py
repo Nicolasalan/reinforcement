@@ -9,7 +9,7 @@ import torch.nn.functional as F
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_dim, action_dim, fc1_units=800, fc2_units=600, batch_size=156):
+    def __init__(self, state_dim, action_dim, fc1_units=800, fc2_units=600):
         """Initialize parameters and build model.
         Params
         ======

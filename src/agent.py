@@ -76,8 +76,9 @@ class Agent():
 
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
-        # Reshape the state tensor to match the expected dimensions of the model
-        state = torch.Tensor(state.reshape(1, -1)).to(device)
+        batch_size = state.shape[0]
+        state_dim = state.shape[1]
+        state = torch.Tensor(state.reshape(batch_size, state_dim)).to(device)
 
         self.actor_local.eval()
         with torch.no_grad():
