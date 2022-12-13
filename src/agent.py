@@ -86,7 +86,7 @@ class Agent():
         state_dim = state.shape[1]
 
         state = torch.Tensor(state.reshape(batch_size, state_dim)).to(device)
-
+        print('State: ', state)
         self.actor_local.eval()
         with torch.no_grad():
             action = self.actor_local(state).cpu().data.numpy().flatten()
