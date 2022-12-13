@@ -20,7 +20,6 @@ class Actor(nn.Module):
             fc2_units (int): Number of nodes in second hidden layer
         """
         super(Actor, self).__init__()
-        self.layer_1 = nn.Linear(batch_size, fc1_units)
         self.layer_1 = nn.Linear(state_dim, fc1_units)
         self.bn1 = nn.BatchNorm1d(fc1_units)
         self.layer_2 = nn.Linear(fc1_units, fc2_units)
@@ -29,7 +28,6 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-        state = state.transpose(0, 1)
         state = F.relu(self.layer_1(state))
         state = F.relu(self.layer_2(state))
         a = self.tanh(self.layer_3(state))

@@ -76,14 +76,17 @@ class Agent():
 
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
-        #state = torch.from_numpy(state).float().to(device) 
+        # Reshape the state tensor to match the expected dimensions of the model
         state = torch.Tensor(state.reshape(1, -1)).to(device)
+
         self.actor_local.eval()
         with torch.no_grad():
             action = self.actor_local(state).cpu().data.numpy().flatten()
         self.actor_local.train()
+
         if add_noise:
             action += self.epsilon * self.noise.sample()
+
         return np.clip(np.random.normal(action), -1, 1)
 
     def reset(self):
