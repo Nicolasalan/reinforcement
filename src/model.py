@@ -27,7 +27,8 @@ class Actor(nn.Module):
         """
         super(Actor, self).__init__()
 
-        self.state_input = torch.nn.functional.placeholder(torch.float32, [None, state_dim]) # transform to tensor
+        self.state_input = torch.Tensor(state_dim)
+        self.state_input.resize_([None, state_dim])
 
         self.seed = torch.manual_seed(seed)
         self.layer_1 = nn.Linear(state_dim, fc1_units)
