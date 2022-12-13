@@ -111,10 +111,12 @@ class Agent():
         # Select the minimal Q value from the 2 calculated values
         target_Q = torch.min(target_Q1, target_Q2)
         target_Q = torch.stack(target_Q)
-
+        print(target_Q.shape)
         # Compute Q targets for current states (y_i)
         Q_targets = float(rewards) + ((1 - dones) * gamma * target_Q).detach()
         # Compute critic loss
+        print("states shape: ", states.shape)
+        print("actions shape: ", actions.shape)
         Q_expected = self.critic_local(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
         # Minimize the loss
@@ -123,6 +125,7 @@ class Agent():
         # normailize the gradient
         torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1) 
         self.critic_optimizer.step()
+        print("critic loss: ", critic_loss)
 
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
