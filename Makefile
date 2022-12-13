@@ -19,7 +19,7 @@ clean:
 .PHONY: terminal
 terminal:
 	@echo "Terminal docker"
-	@sudo docker run -it --net=host motion-rl bash
+	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-rl bash
 
 # === Spawn model ===
 .PHONY: spawn 
@@ -32,5 +32,3 @@ spawn:
 start:
 	@echo "Starting training"
 	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-rl bash -c "source devel/setup.bash && roslaunch motion start.launch"
-
-
