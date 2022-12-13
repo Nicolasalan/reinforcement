@@ -1,3 +1,8 @@
+# setup
+DOCKER_ENV_VARS=
+	--volume="${PWD}:/ws/src/motion" \
+	--ipc=host 
+
 # === Build docker ===
 .PHONY: build
 build:
@@ -16,8 +21,16 @@ terminal:
 	@echo "Terminal docker"
 	@sudo docker run -it --net=host motion-rl bash
 
+# === Spawn model ===
+.PHONY: spawn 
+spawn:
+	@echo "Spawn model"
+	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
+
 # === Start train docker ===
 .PHONY: start 
 start:
 	@echo "Starting training"
-	@sudo docker run -it --net=host motion-rl bash -c "source devel/setup.bash && roslaunch motion start.launch"
+	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-rl bash -c "source devel/setup.bash && roslaunch motion start.launch"
+
+
