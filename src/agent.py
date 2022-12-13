@@ -61,7 +61,7 @@ class Agent():
         self.noise = OUNoise(action_size, random_seed)
 
         # Replay memory
-        self.memory = ReplayBuffer(action_size, int(param["BUFFER_SIZE"]), int(param["BATCH_SIZE"]), random_seed)
+        self.memory = ReplayBuffer(int(param["BUFFER_SIZE"]), int(param["BATCH_SIZE"]), random_seed)
     
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
