@@ -2,3 +2,6 @@ pyyaml
 matplotlib
 numpy
 squaternion
+tornado
+simplejpeg
+rospkg
