@@ -65,7 +65,7 @@ RUN pip3 install torch torchvision torchaudio --extra-index-url https://download
 RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
- && catkin_init_workspace 
+ && catkin_init_workspace \
  && git clone -b main https://github.com/dheera/rosboard.git
 
 # Copy the source files
