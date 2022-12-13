@@ -63,7 +63,6 @@ class Critic(nn.Module):
         self.layer_2_s = nn.Linear(fc1_units, fc2_units)
         self.layer_2_a = nn.Linear(action_dim, fc2_units)
         self.layer_3 = nn.Linear(fc2_units, 1)
-        self.reset_parameters()
 
         self.seed = torch.manual_seed(seed)
         self.layer_4 = nn.Linear(state_dim, fc1_units)
@@ -71,18 +70,6 @@ class Critic(nn.Module):
         self.layer_5_s = nn.Linear(fc1_units, fc2_units)
         self.layer_5_a = nn.Linear(action_dim, fc2_units)
         self.layer_6 = nn.Linear(fc2_units, 1)
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1))
-        self.layer_2_s.weight.data.uniform_(*hidden_init(self.layer_2_s))
-        self.layer_2_a.weight.data.uniform_(*hidden_init(self.layer_2_a))
-        self.layer_3.weight.data.uniform_(-3e-3, 3e-3)
-
-        self.layer_4.weight.data.uniform_(*hidden_init(self.layer_4))
-        self.layer_5_s.weight.data.uniform_(*hidden_init(self.layer_5_s))
-        self.layer_5_a.weight.data.uniform_(*hidden_init(self.layer_5_a))
-        self.layer_6.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
