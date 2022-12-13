@@ -38,4 +38,4 @@ start:
 .PHONY: rosboard
 rosboard:
 	@echo "Starting rosboard"
-	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-rl bash -c "/ws/src/rosboard && ./run"
+	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-rl bash -c "source /opt/ros/noetic/setup.bash && ./ws/src/rosboard/run"
