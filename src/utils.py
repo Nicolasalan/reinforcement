@@ -77,3 +77,15 @@ def random_goal(goals):
                x, y = points[i][0], points[i][1] 
      
      return x, y
+
+def check_scan_range(self, scan):
+     scan_range = []
+     for i in range(len(scan.ranges)):
+          if scan.ranges[i] == float('Inf'):
+               scan_range.append(3.5)
+          elif np.isnan(scan.ranges[i]):
+               scan_range.append(0)
+          else:
+               scan_range.append(scan.ranges[i])
+     
+     return scan_range

@@ -18,6 +18,9 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel
 from gazebo_msgs.msg import ModelState
 from squaternion import Quaternion
 
+# importar utilitarios
+from utils import *
+
 # folder to load config file
 CONFIG_PATH = "/ws/src/motion/config/"
 
@@ -33,17 +36,18 @@ param = load_config("main_config.yaml")
 class Env():
      def __init__(self):
 
+          # definir o estado inicial
           self.min_range = param["min_range"]
+          self.goal_model = param["goal_model"]
+          self.threshold_target = param["threshold_target"] # distância de chegada
+          self.goals = path_goal()
 
+          # inicializar variaveis globais
           self.last_odom = None
           self.odom_x = 0
           self.odom_y = 0
-
           self.goal_x = 1
           self.goal_y = 0.0
-
-          self.diagonal = math.sqrt(2) * (3.6 + 3.8)
-          self.goal_model = '/ws/src/motion/models/target.sdf'
 
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10) # publicar a velocidade do robô
@@ -51,7 +55,6 @@ class Env():
 
           ##### servicos do ROS #####
           self.reset_proxy = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
-          #self.reset_proxy = rospy.ServiceProxy("/gazebo/reset_world", Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause_proxy = rospy.ServiceProxy('gazebo/unpause_physics', Empty)
           self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
@@ -59,45 +62,11 @@ class Env():
           self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
-          self.past_distance = 0.0
 
-          # definir o estado inicial
-          self.threshold_target = param["threshold_target"] # distância de chegada
-
-          self.goals = []
-          self.goals_id = 0
-          list = []
-
-          with open(param["waypoints"]) as f:
-               data = yaml.safe_load(f)
-               for i in data:
-                    list.append(i['position'])
-
-               for i in list:
-                    str_x = str(i[0]).strip('[]')
-                    str_y = str(i[1]).strip('[]')
-                    x = float(str_x)
-                    y = float(str_y)
-                    # add x and y to goals
-                    self.goals.append((x, y))
-
-     # funcao para pegar a posicao do robo por meio do topico '/odom' 
      def odom_callback(self, od_data):
           self.last_odom = od_data
-     
-     def check_scan_range(self, scan):
-          scan_range = []
-          for i in range(len(scan.ranges)):
-               if scan.ranges[i] == float('Inf'):
-                    scan_range.append(3.5)
-               elif np.isnan(scan.ranges[i]):
-                    scan_range.append(0)
-               else:
-                    scan_range.append(scan.ranges[i])
-          
-          return scan_range
 
-     def setReward(self, done, target):
+     def reward(self, done, target):
           # Calculate robot heading from odometry data
           self.odom_x = self.last_odom.pose.pose.position.x
           self.odom_y = self.last_odom.pose.pose.position.y
@@ -245,7 +214,7 @@ class Env():
                states.append(action)
 
           states = states + [distance / self.diagonal, yaw / 360, thetas / 360, diff / 180]
-          reward = self.setReward(done, target)
+          reward = self.reward(done, target)
 
           return np.asarray(states), reward, done, target
 

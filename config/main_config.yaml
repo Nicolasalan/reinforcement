@@ -10,6 +10,7 @@ action_angular_max: 0.6  # rad/s
 state_dim: 16
 action_dim: 2 
 waypoints: '/ws/src/motion/config/waypoints.yaml'
+goal_model: '/ws/src/motion/models/target.sdf'
 
 # parameters for the model
 BUFFER_SIZE: 1000000    # replay buffer size
