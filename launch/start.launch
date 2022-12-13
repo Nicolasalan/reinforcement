@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-  <!-- Spawn target sdf -->
-  <include file="$(find motion)/launch/spawn_sdf.xml">
-        <arg name="target" value="target" />
-        <arg name="x" value="0.0" />
-        <arg name="y" value="0.0" />
-        <arg name="z" value="0.0" />
-        <arg name="roll" value="0"/>
-        <arg name="pitch" value="0"/>
-        <arg name="yaw" value="0.0" />
-        <arg name="sdf_target_file" value="$(find motion)/models/target.sdf" />
-  </include>
-  
   <!-- Starting -->
   <node name="planner" pkg="motion" type="ddpg.py" output="screen"/>
   
