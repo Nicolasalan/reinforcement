@@ -3,8 +3,7 @@
 import numpy as np
 import random
 import torch
-from collections import namedtuple, deque
-
+from collections import deque
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
