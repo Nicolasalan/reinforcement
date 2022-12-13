@@ -30,17 +30,17 @@ class ReplayBuffer:
           """Randomly sample a batch of experiences from memory."""
           experiences = random.sample(self.memory, k=self.batch_size)
 
-          states = np.asarray([data[0] for data in experiences])
-          actions = np.asarray([data[1] for data in experiences])
-          rewards = np.asarray([data[2] for data in experiences])
-          next_states = np.asarray([data[3] for data in experiences])
-          dones = np.asarray([data[4] for data in experiences])
+          states = torch.Tensor([data[0] for data in experiences]).to(device)
+          actions = torch.Tensor([data[1] for data in experiences]).to(device)
+          rewards = torch.Tensor([data[2] for data in experiences]).to(device)
+          next_states = torch.Tensor([data[3] for data in experiences]).to(device)
+          dones = torch.Tensor([data[4] for data in experiences]).to(device)
 
           return (states, actions, rewards, next_states, dones)
 
      def erase(self):
           """Erase the memory."""
-          self.memory = deque(maxlen=self.buffer_size)
+          self.memory = deque(maxlen=self.batch_size)
 
      def __len__(self):
           """Return the current size of internal memory."""

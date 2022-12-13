@@ -86,21 +86,15 @@ class Env():
      def odom_callback(self, od_data):
           self.last_odom = od_data
      
-     def check_scan_range(self, scan, num_scan_ranges):
+     def check_scan_range(self, scan):
           scan_range = []
-          cof = (len(scan.ranges) / (num_scan_ranges - 1))
-          for i in range(0, num_scan_ranges):
-               n_i = math.ceil(i*cof - 1)
-          if n_i < 0:
-               n_i = 0
-          if cof == 1:
-               n_i = i
-          if scan.ranges[n_i] == float('Inf'):
-               scan_range.append(3.5)
-          elif np.isnan(scan.ranges[n_i]):
-               scan_range.append(0)
-          else:
-               scan_range.append(scan.ranges[n_i])
+          for i in range(len(scan.ranges)):
+               if scan.ranges[i] == float('Inf'):
+                    scan_range.append(3.5)
+               elif np.isnan(scan.ranges[i]):
+                    scan_range.append(0)
+               else:
+                    scan_range.append(scan.ranges[i])
           
           return scan_range
 
@@ -219,7 +213,7 @@ class Env():
           else:
                diff = round(360 - diff, 2)
 
-          scan_range = self.check_scan_range(scan, self.num_scan_ranges)
+          scan_range = self.check_scan_range(scan)
 
           if self.min_range > min(scan_range) > 0: # se o robô colidir com algum obstáculo
                done = True
@@ -237,7 +231,6 @@ class Env():
           vel_cmd.angular.z = action[1]
           self.pub_cmd_vel.publish(vel_cmd)
 
-          past = np.array([0., 0.])
           data = None
           while data is None:
                try:
