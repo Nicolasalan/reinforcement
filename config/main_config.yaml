@@ -4,7 +4,6 @@ topic_cmd: 'cmd_vel'
 topic_odom: 'odom'
 topic_scan: 'base_scan_front'
 threshold_target: 0.1
-num_scan_ranges: 10 
 min_range: 0.1
 action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s

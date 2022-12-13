@@ -33,7 +33,6 @@ param = load_config("main_config.yaml")
 class Env():
      def __init__(self):
 
-          self.num_scan_ranges = param["num_scan_ranges"]
           self.min_range = param["min_range"]
 
           self.last_odom = None
