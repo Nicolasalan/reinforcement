@@ -9,7 +9,7 @@ import torch.nn.functional as F
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_dim, action_dim, fc1_units=800, fc2_units=600):
+    def __init__(self, state_dim, action_dim, fc1_units=800, fc2_units=600, batch_size=156):
         """Initialize parameters and build model.
         Params
         ======
@@ -20,6 +20,7 @@ class Actor(nn.Module):
             fc2_units (int): Number of nodes in second hidden layer
         """
         super(Actor, self).__init__()
+        self.layer_1 = nn.Linear(batch_size, fc1_units)
         self.layer_1 = nn.Linear(state_dim, fc1_units)
         self.bn1 = nn.BatchNorm1d(fc1_units)
         self.layer_2 = nn.Linear(fc1_units, fc2_units)
@@ -28,7 +29,7 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-        state = state.view(-1, 156)
+        state = state.transpose(0, 1)
         state = F.relu(self.layer_1(state))
         state = F.relu(self.layer_2(state))
         a = self.tanh(self.layer_3(state))
