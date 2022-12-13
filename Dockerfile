@@ -52,7 +52,6 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-robot-state-controller \
  && apt-get install -y ros-noetic-xacro \ 
  && apt-get install -y ros-noetic-smach-ros \
- && apt-get install -y ros-noetic-teleop-twist-keyboard \
  && apt-get install -y ros-noetic-gazebo-ros \
  && apt-get install -y ros-noetic-gazebo-ros-control \
  && apt-get install -y ros-noetic-rplidar-ros \
@@ -67,6 +66,7 @@ RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace 
+ && git clone -b main https://github.com/dheera/rosboard.git
 
 # Copy the source files
 COPY . /ws/src/motion
