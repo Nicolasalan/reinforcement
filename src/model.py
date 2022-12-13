@@ -27,6 +27,7 @@ class Actor(nn.Module):
         """
         super(Actor, self).__init__()
 
+        print(state_dim, action_dim)
         self.state_input = torch.Size([None, state_dim])
 
         self.seed = torch.manual_seed(seed)
