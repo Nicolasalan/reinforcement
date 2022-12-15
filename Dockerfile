@@ -89,5 +89,5 @@ RUN cd /ws/src/motion && pip3 install -r requirements.txt
 # export model path
 RUN export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(find motion)/models
 
-# cmd script
+# command to run on container start
 CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash

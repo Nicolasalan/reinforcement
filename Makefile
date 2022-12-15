@@ -33,7 +33,6 @@ start:
 	@echo "Starting training"
 	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-rl bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
-
 # === Start Rosboard docker ===
 .PHONY: rosboard
 rosboard:
