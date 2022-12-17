@@ -4,22 +4,21 @@
 import os
 import rospy
 import numpy as np
-import random
 import yaml
 import math
 import time
 
 # importar mensagens do ROS
-from geometry_msgs.msg import Twist, Pose, Point, Quaternion
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
-from std_srvs.srv import Empty
-from gazebo_msgs.srv import SpawnModel, DeleteModel
 from gazebo_msgs.msg import ModelState
+
+from std_srvs.srv import Empty
 from squaternion import Quaternion
 
 # importar utilitarios
-from utils import angles, distance_to_goal, random_goal, path_goal
+from utils.Extension import *
 
 # folder to load config file
 CONFIG_PATH = "/ws/src/motion/config/"
@@ -37,7 +36,6 @@ class Env():
      def __init__(self):
 
           # definir o estado inicial
-          self.collision_dist = param["collision_dist"]
           self.goal_model = param["goal_model"]
           self.goal_reached_dist = param["goal_reached_dist"]
           self.environment_dim = param["environment_dim"]
@@ -56,7 +54,7 @@ class Env():
           ##### publicacoes e assinaturas do ROS #####
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
           self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1)
-          self.scan = rospy.Subscriber(param["scan"], LaserScan, self.scan_callback)
+          self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
 
           ##### servicos do ROS #####
           self.reset = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
@@ -90,11 +88,12 @@ class Env():
           vel_cmd = Twist()
           vel_cmd.linear.x = action[0]
           vel_cmd.angular.z = action[1]
-          self.vel_pub.publish(vel_cmd)
+          self.pub_cmd_vel.publish(vel_cmd)
 
           rospy.wait_for_service("/gazebo/unpause_physics")
           try:
                self.unpause()
+
           except (rospy.ServiceException) as e:
                print("/gazebo/unpause_physics service call failed")
 
@@ -103,13 +102,13 @@ class Env():
 
           rospy.wait_for_service("/gazebo/pause_physics")
           try:
-               pass
                self.pause()
+
           except (rospy.ServiceException) as e:
                print("/gazebo/pause_physics service call failed")
 
-          # read velodyne laser state
-          done, collision, min_laser = self.observe_collision(self.scan_data)
+          # read scan laser state
+          done, collision, min_laser = observe_collision(self.scan_data)
           v_state = []
           v_state[:] = self.scan_data[:]
           laser_state = [v_state]
@@ -139,7 +138,7 @@ class Env():
 
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(laser_state, robot_state)
-          reward = self.get_reward(target, collision, action, min_laser)
+          reward = get_reward(target, collision, action, min_laser)
           return state, reward, done, target
 
      def reset(self):
@@ -152,20 +151,31 @@ class Env():
           except rospy.ServiceException as e:
                print("/gazebo/reset_simulation service call failed")
 
-          # set a random goal in empty space in environment
-          goal = self.goals
-          self.goal_x, self.goal_y = random_goal(goal)
+          angle = np.random.uniform(-np.pi, np.pi)
+          quaternion = Quaternion.from_euler(0.0, 0.0, angle)
 
-          box_state = ModelState()
-          box_state.model_name = "target"
-          box_state.pose.position.x = self.goal_x
-          box_state.pose.position.y = self.goal_y
-          box_state.pose.orientation.x = 0.0
-          box_state.pose.orientation.y = 0.0
-          box_state.pose.orientation.z = 0.0
-          box_state.pose.orientation.w = 1.0
-          self.state.publish(box_state)
-          print("Target randomized")
+          # set a random robot in empty space in environment
+          path = self.goals
+          x, y = 0.0, 0.0
+          
+          while True:
+               x, y = random_goal(path)
+               _x, _y = change_goal(path, self.odom_x, self.odom_y)
+               check = check_pose(x, y, _x, _y)
+               if check == True:
+                    break
+
+          robot = ModelState()
+          robot.model_name = param["robot"]
+          robot.pose.position.x = x
+          robot.pose.position.y = y
+          robot.pose.orientation.x = quaternion.x
+          robot.pose.orientation.y = quaternion.y
+          robot.pose.orientation.z = quaternion.z
+          robot.pose.orientation.w = quaternion.w
+          self.state.publish(robot)
+
+          self.goal_x, self.goal_y = _x, _y
                
           rospy.wait_for_service("/gazebo/unpause_physics")
           try:
@@ -195,28 +205,3 @@ class Env():
           robot_state = [distance, theta, 0.0, 0.0]
           state = np.append(laser_state, robot_state)
           return state
-
-     @staticmethod
-     def get_reward(self, target, collision, action, min_laser):
-          if target:
-               return 100.0
-          elif collision:
-               return -100.0
-          else:
-               r3 = lambda x: 1 - x if x < 1 else 0.0
-               return action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2
-
-     @staticmethod
-     def observe_collision(self, laser_data):
-          # Detect a collision from laser data
-          min_laser = min(laser_data)
-          if min_laser < self.collision_dist:
-               return True, True, min_laser
-          return False, False, min_laser
-
-     @staticmethod
-     def change_goal(self):
-          # Place a new goal and check if its location is not on one of the obstacles
-          self.goal_x = self.odom_x + random.uniform(self.upper, self.lower)
-          self.goal_y = self.odom_y + random.uniform(self.upper, self.lower)
-     
