@@ -3,14 +3,17 @@
 topic_cmd: 'cmd_vel'
 topic_odom: 'odom'
 topic_scan: 'base_scan_front'
-threshold_target: 0.1
-min_range: 0.1
+goal_reached_dist: 0.2
+collision_dist: 0.1
 action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
 state_dim: 16
 action_dim: 2 
+time_delta: 0.1
+
 waypoints: '/ws/src/motion/config/waypoints.yaml'
 goal_model: '/ws/src/motion/models/target.sdf'
+
 
 # parameters for the model
 BUFFER_SIZE: 1000000    # replay buffer size

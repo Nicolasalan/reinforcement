@@ -19,7 +19,7 @@ def load_config(config_name):
 
 param = load_config("main_config.yaml")
 
-def angles(odom_x, odom_y, angle, goal_x, goal_y):
+def angles(odom_x, odom_y, goal_x, goal_y, angle):
      # Calculate the relative angle between the robots heading and heading toward the goal
      skew_x = goal_x - odom_x
      skew_y = goal_y - odom_y
@@ -42,7 +42,7 @@ def angles(odom_x, odom_y, angle, goal_x, goal_y):
 
      return theta
 
-def distance(odom_x, odom_y, goal_x, goal_y):
+def distance_to_goal(odom_x, odom_y, goal_x, goal_y):
      # Calculate the distance between the robot and the goal
      distance = np.linalg.norm([odom_x - goal_x, odom_y - goal_y])
 
@@ -77,15 +77,3 @@ def random_goal(goals):
                x, y = points[i][0], points[i][1] 
      
      return x, y
-
-def check_scan_range(self, scan):
-     scan_range = []
-     for i in range(len(scan.ranges)):
-          if scan.ranges[i] == float('Inf'):
-               scan_range.append(3.5)
-          elif np.isnan(scan.ranges[i]):
-               scan_range.append(0)
-          else:
-               scan_range.append(scan.ranges[i])
-     
-     return scan_range
