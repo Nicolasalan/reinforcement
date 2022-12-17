@@ -213,4 +213,10 @@ class Env():
           if min_laser < self.collision_dist:
                return True, True, min_laser
           return False, False, min_laser
+
+     @staticmethod
+     def change_goal(self):
+          # Place a new goal and check if its location is not on one of the obstacles
+          self.goal_x = self.odom_x + random.uniform(self.upper, self.lower)
+          self.goal_y = self.odom_y + random.uniform(self.upper, self.lower)
      
