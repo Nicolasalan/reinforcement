@@ -7,7 +7,7 @@ DOCKER_ENV_VARS=
 .PHONY: build
 build:
 	@echo "Building docker image"
-	@sudo docker build -t motion-rl  . 
+	@sudo docker build -t motion-docker  . 
 
 # === Clean docker ===
 .PHONY: clean
