@@ -67,7 +67,10 @@ RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace \
- && git clone -b main https://github.com/dheera/rosboard.git
+ && git clone -b main https://github.com/dheera/rosboard.git \
+ && git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git \
+ && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git
+
 
 # Copy the source files
 COPY . /ws/src/motion
@@ -87,8 +90,5 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 # Install python dependencies
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
-# export model path
-RUN export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:$(find motion)/models
-
 # command to run on container start
-CMD source ~/ws/install/setup.bash --extend && source devel/setup.bash
+ENTRYPOINT [ "/ws/src/motion/entrypoint.sh" ]

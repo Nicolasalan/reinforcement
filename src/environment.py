@@ -61,7 +61,7 @@ class Env():
           self.reset = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
-          self.state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
+          self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
 
           self.gaps = [[-np.pi / 2, -np.pi / 2 + np.pi / self.environment_dim]]
           for m in range(self.environment_dim - 1):
@@ -77,7 +77,6 @@ class Env():
           self.last_odom = od_data
 
      def scan_callback(self, scan):
-          #rospy.loginfo(scan)
           data = scan.ranges
           self.scan_data = np.ones(self.environment_dim) * 10
           for point in data:
@@ -186,7 +185,7 @@ class Env():
           robot.pose.orientation.y = quaternion.y
           robot.pose.orientation.z = quaternion.z
           robot.pose.orientation.w = quaternion.w
-          self.state.publish(robot)
+          self.set_state.publish(robot)
 
           self.goal_x, self.goal_y = _x, _y
                

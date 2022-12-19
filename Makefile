@@ -18,37 +18,44 @@ clean:
 .PHONY: terminal
 terminal:
 	@echo "Terminal docker ..."
-	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash
+	@sudo docker run -it --net=ros-network ${DOCKER_ENV_VARS} motion-docker bash
 
-# === Spawn model ===
-.PHONY: spawn 
-spawn:
-	@echo "Spawn model ..."
-	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
+# === setup model ===
+.PHONY: setup 
+setup:
+	@echo "Setup world ..."
+	@sudo docker run -it --net=ros-network ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
 
 # === Start train docker ===
 .PHONY: start 
 start:
 	@echo "Starting training ..."
-	@sudo docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
+	@sudo docker run -it --net=ros-network ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
 # === Start Rosboard docker ===
 .PHONY: rosboard
 rosboard:
 	@echo "Starting rosboard ..."
 	@echo "Access http://localhost:8888"
-	@sudo docker run -it ${DOCKER_ENV_VARS} motion-docker bash -c "source /opt/ros/noetic/setup.bash && cd src/rosboard && ./run"
+	@sudo docker run -it --net=ros-network -p 8888:8888 ${DOCKER_ENV_VARS} motion-docker bash -c "source /opt/ros/noetic/setup.bash && cd src/rosboard && ./run"
 
 # === Delete port ===
 .PHONY: delete-port
 delete-port:
-	@echo "Deleting port"
+	@echo "Deleting port ..."
 	@sudo fuser -k 8080/tcp
 	@docker stop $(docker ps -a -q)
 
 # === Create network ===
 .PHONY: network
 network:
-	@echo "Creating network"
-	@sudo docker swarm init
-	@sudo docker network create -d overlay --attachable multihost
+	@echo "Creating network ..."
+	@docker swarm init --force-new-cluster
+	@sudo docker swarm leave 
+	@sudo docker network create -d overlay --attachable ros-network
+
+# === Delete network ===
+.PHONY: delete-network
+delete-network:
+	@echo "Deleting network ..."
+	@sudo docker network rm ros-network
