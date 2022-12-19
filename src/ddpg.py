@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from collections import deque
 from agent import Agent
-from environment2 import Env
+from environment import Env
 
 import rospy
 import numpy as np
@@ -25,7 +25,7 @@ def load_config(config_name):
 
 param = load_config("main_config.yaml")
 
-state_dim = param["state_dim"]
+state_dim = param["environment_dim"] + param["robot_dim"]
 action_dim = param["action_dim"]
 action_linear_max = param["action_linear_max"]
 action_angular_max = param["action_angular_max"]
@@ -33,7 +33,6 @@ action_angular_max = param["action_angular_max"]
 print('State Dimensions: ' + str(state_dim))
 print('Action Dimensions: ' + str(action_dim))
 print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular_max) + ' rad/s')
-
 
 def ddpg(n_episodes, print_every, max_t, score_solved):
      print('Starting DDPG')
@@ -51,23 +50,21 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      scores = []                                          # lista de pontuações médias de cada episódio                                
 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
-          score = 0
+          score = 0.0
           print('episode: ' + str(i_episode))
           agent.reset()                                     # redefinir ambiente
           states = env.reset()                              # obtém o estado atual de cada agente
+          done = False
 
-          for t in range(max_t):# escolha uma ação para cada agente
-               print('timestep: ' + str(t))
-               action = agent.action(states) 
+          for t in range(max_t):                            
+               action = agent.action(np.array(states)) # escolha uma ação para cada agente
                actions = [(action[0] + 1) / 2, action[1]]
-               next_states, rewards, dones, _ = env.step(actions) # envia todas as ações ao ambiente
-               
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
-               agent.step(states, actions, rewards, next_states, dones, t)
-               states = next_states
+               states, rewards, done, _ = env.step(actions) # envia todas as ações ao ambiente 
+          
                score += rewards
                print('reward: ' + str(rewards))
-               if np.any(dones):                           # loop de saída quando o episódio termina
+               if np.any(done):                           # loop de saída quando o episódio termina
                     break              
                
                scores_window.append(score)                   # salvar pontuação média para o episódio

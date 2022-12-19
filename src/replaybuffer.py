@@ -32,8 +32,8 @@ class ReplayBuffer:
 
           states = torch.Tensor([data[0] for data in experiences]).to(device)
           actions = torch.Tensor([data[1] for data in experiences]).to(device)
-          rewards = torch.Tensor([data[2] for data in experiences]).to(device)
-          next_states = torch.Tensor([data[3] for data in experiences]).to(device)
+          rewards = torch.Tensor([data[2] for data in experiences]).to(device).reshape(-1, 1)
+          next_states = torch.Tensor([data[3] for data in experiences]).to(device).reshape(-1, 1)
           dones = torch.Tensor([data[4] for data in experiences]).to(device)
 
           return (states, actions, rewards, next_states, dones)

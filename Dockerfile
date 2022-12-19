@@ -1,22 +1,21 @@
 # Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
-#FROM nvidia/cuda:11.3.1-base-ubuntu20.04
-FROM osrf/ros:noetic-desktop-full
+FROM nvidia/cuda:11.4.2-base-ubuntu20.04
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
-#RUN apt-get update && apt-get install -y locales lsb-release
-#RUN dpkg-reconfigure locales
+RUN apt-get update && apt-get install -y locales lsb-release
+RUN dpkg-reconfigure locales
 
 # Install ROS Noetic
-#RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-#RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-#RUN apt-get update \
-# && apt-get install -y --no-install-recommends ros-noetic-desktop-full
-#RUN apt-get install -y --no-install-recommends python3-rosdep
-#RUN rosdep init \
-# && rosdep fix-permissions \
-# && rosdep update
-#RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ros-noetic-desktop-full
+RUN apt-get install -y --no-install-recommends python3-rosdep
+RUN rosdep init \
+ && rosdep fix-permissions \
+ && rosdep update
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 
 # Change the default shell to Bash
 SHELL [ "/bin/bash" , "-c" ]
@@ -43,7 +42,8 @@ RUN apt-get install -q -y --no-install-recommends \
   python3-rosdistro \
   python3-rospkg \
   wget \
-  curl
+  curl \
+  vim
 
 # Install dependencies ros
 RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
