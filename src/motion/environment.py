@@ -189,7 +189,7 @@ class Env():
           # ================== SET RANDOM ANGLE ================== #
           angle = np.random.uniform(-np.pi, np.pi)
           quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-          rospy.loginfo('Set Random Angle             => Angle:' + str(angle) + ' Quaternion: ' + str(quaternion.x) + ' ' + str(quaternion.y) + ' ' + str(quaternion.z))
+          rospy.loginfo('Set Random Angle             => Angle: ' + str(angle) + ' Quaternion: ' + str(quaternion.x) + ' ' + str(quaternion.y) + ' ' + str(quaternion.z))
 
           # ================== SET RANDOM POSITION ================== #
           path = self.goals

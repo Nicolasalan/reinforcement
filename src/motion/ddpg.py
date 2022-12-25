@@ -46,7 +46,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      env = Env()
 
      scores_window = []                                    # pontuações médias dos episódios mais recentes
-     scores = []                                          # lista de pontuações médias de cada episódio                                
+     scores = []                                           # lista de pontuações médias de cada episódio                                
 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
           rospy.loginfo('Episode: ' + str(i_episode))
@@ -69,18 +69,18 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
           
                states = next_states
                score += rewards
-               if np.any(done):                           # loop de saída quando o episódio termina
+               if np.any(done):                                 # loop de saída quando o episódio termina
                     break              
                
-               scores_window.append(score)                   # salvar pontuação média para o episódio
+               scores_window.append(score)                      # salvar pontuação média para o episódio
                scores.append(score)                             # salva pontuação média na janela
                
-          rospy.loginfo('\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)), end="") 
+          rospy.loginfo('Average Score                => Score:' + str(np.mean(scores_window))) 
                
           if i_episode % print_every == 0:
-               print('\rEpisode {}\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)))
+               rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
           if np.mean(scores_window) >= score_solved:
-               print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)))
+               rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
                torch.save(agent.actor_local.state_dict(), 'actor_checkpoint.pth')
                torch.save(agent.critic_local.state_dict(), 'critic_checkpoint.pth')
                break
