@@ -1,11 +1,12 @@
 
 #! /usr/bin/env python3
 
+from geometry_msgs.msg import Twist
 import numpy as np
 import math
-import random
 import yaml
 import os
+import rospy
 
 # folder to load config file
 CONFIG_PATH = "/ws/src/motion/config/"
@@ -20,10 +21,12 @@ def load_config(config_name):
 param = load_config("main_config.yaml")
 
 class Extension():
-     def __init__(self):
-
-          self.path_waypoints = param["waypoints"]
-          self.collision_dist = param["collision_dist"]
+     def __init__(self):       
+          rospy.init_node('test_node', anonymous=True)  
+          self.vel_publisher = rospy.Publisher(param["topic_cmd"], Twist, queue_size=1)
+          self.cmd = Twist()
+          self.ctrl_c = False
+          self.rate = rospy.Rate(1)
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
           # Calculate the relative angle between the robots heading and heading toward the goal
@@ -54,12 +57,12 @@ class Extension():
 
           return distance
 
-     def path_goal(self):
+     def path_goal(self, path_waypoints):
           # Load the waypoints from the yaml file
           goals = []
           list = []
 
-          with open(self.path_waypoints) as f:
+          with open(path_waypoints) as f:
                data = yaml.safe_load(f)
                for i in data:
                     list.append(i['position'])
@@ -77,7 +80,7 @@ class Extension():
           # Select a random goal from the list of waypoints
           points = goals
           x, y = 0, 0
-          rand = int(round(random.uniform(0, len(points))))
+          rand = int(round(np.random.uniform(0, len(points))))
           for i in range(len(points)):
                if i == rand:
                     x, y = points[i][0], points[i][1] 
@@ -93,10 +96,10 @@ class Extension():
                r3 = lambda x: 1 - x if x < 1 else 0.0
                return action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2
 
-     def observe_collision(self, laser_data):
+     def observe_collision(self, laser_data, collision_dist):
           # Detect a collision from laser data
           min_laser = min(laser_data)
-          if min_laser < self.collision_dist:
+          if min_laser < collision_dist:
                return True, True, min_laser
           return False, False, min_laser
 
@@ -104,7 +107,7 @@ class Extension():
           # Select a random goal from the list of waypoints
           points = goals
           x, y = 0, 0
-          rand = int(round(random.uniform(0, len(points))))
+          rand = int(round(np.random.uniform(0, len(points))))
           for i in range(len(points)):
                if i == rand:
                     _x, _y = points[i][0], points[i][1] 
@@ -119,4 +122,45 @@ class Extension():
                return False
           else:
                return True
-          
+
+     def array_gaps(self, environment_dim):
+          gaps = [[-np.pi / 2, -np.pi / 2 + np.pi / environment_dim]]
+          for m in range(environment_dim - 1):
+               gaps.append(
+                    [gaps[m][1], gaps[m][1] + np.pi / environment_dim]
+               )
+
+          return gaps
+
+     def scan_rang(self, environment_dim, gaps, data):
+          scan_data = np.ones(environment_dim) * 10
+          for point in data:
+               dot = point * 1
+               mag1 = math.sqrt(point ** 2)
+               mag2 = 1
+               beta = math.acos(dot / (mag1 * mag2)) * np.sign(0)
+               dist = math.sqrt(point ** 2)
+
+               for j in range(len(gaps)):
+                    if gaps[j][0] <= beta < gaps[j][1]:
+                         scan_data[j] = min(scan_data[j], dist)
+                         break
+
+          return scan_data
+
+     def shutdownhook(self):
+          rospy.is_shutdown()
+
+     def publish_cmd_vel(self):
+          """
+          This is because publishing in topics sometimes fails the first time you publish.
+          In continuous publishing systems, this is no big deal, but in systems that publish only
+          once, it IS very important.
+          """
+          while not self.ctrl_c:
+               connections = self.vel_publisher.get_num_connections()
+               if connections > 0:
+                    self.vel_publisher.publish(self.cmd)
+                    break
+               else:
+                    self.rate.sleep()

@@ -2,7 +2,6 @@
      <!-- Launch World -->
      <include file="$(find aws_robomaker_bookstore_world)/launch/bookstore.launch"/>
           <arg name="gui" default="false"/>
-
        
      <!-- Launch Robot -->
      <include file="$(find hera_description)/launch/load_description.launch">

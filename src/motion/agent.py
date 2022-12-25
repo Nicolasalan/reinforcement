@@ -12,6 +12,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import yaml
 import os
+import rospy
 
 # folder to load config file
 CONFIG_PATH = "/ws/src/motion/config/"
@@ -39,7 +40,6 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
-        print('Initializing agent')
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
@@ -65,23 +65,26 @@ class Agent():
     
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
+ 
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > param["BATCH_SIZE"] and timestep % float(param["LEARN_EVERY"]) == 0:
+        if len(self.memory) > param["BATCH_SIZE"] and 20.0 % float(param["LEARN_EVERY"]) == 0.0:
+                 
+            rospy.logwarn('Agent Learning               => Agent Learning ...')
+            rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
+
             for _ in range(param["LEARN_NUM"]):
                 experiences = self.memory.sample()
                 self.learn(experiences, float(param["GAMMA"]))
-
+            
+            rospy.loginfo('Get Target Q                 => Calculate Target Q ...')
+        
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
         # Convert the state variable to a PyTorch tensor
-        print('State: ', type(state))
-        state = state.astype(np.float64)
-
         state = torch.Tensor(state.reshape(1, -1)).to(device)
-        #state = torch.Tensor(state.tolist()).to(device)
         self.actor_local.eval()
         with torch.no_grad():
             action = self.actor_local(state).cpu().data.numpy().flatten()
@@ -89,7 +92,7 @@ class Agent():
 
         if add_noise:
             action += self.epsilon * self.noise.sample()
-
+    
         return np.clip(np.random.normal(action), -1, 1)
 
     def reset(self):
@@ -105,24 +108,22 @@ class Agent():
         ======
             experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
             gamma (float): discount factor
-        """
+        """         
         states, actions, rewards, next_states, dones = experiences
 
-        print('Learning')
         # ---------------------------- update critic ---------------------------- #
         # Get predicted next-state actions and Q values from target models
         actions_next = self.actor_target(next_states)
-        target_Q1, target_Q2 = self.critic_target(next_states, actions_next)
 
+        target_Q1, target_Q2 = self.critic_target(next_states, actions_next)
         # Select the minimal Q value from the 2 calculated values
         target_Q = torch.min(target_Q1, target_Q2)
-        target_Q = torch.stack(target_Q)
-
         # Compute Q targets for current states (y_i)
-        Q_targets = float(rewards) + ((1 - dones) * gamma * target_Q).detach()
+        Q_targets = rewards + ((1 - dones) * gamma * target_Q).detach()
         # Compute critic loss
-        Q_expected = self.critic_local(states, actions)
-        critic_loss = F.mse_loss(Q_expected, Q_targets)
+        Q1_expected, Q2_expected = self.critic_local(states, actions)
+
+        critic_loss = F.mse_loss(Q1_expected, Q_targets) + F.mse_loss(Q2_expected, Q_targets)
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
@@ -133,7 +134,8 @@ class Agent():
         # ---------------------------- update actor ---------------------------- #
         # Compute actor loss
         actions_pred = self.actor_local(states)
-        actor_loss = -self.critic_local(states, actions_pred).mean()
+        actor_loss, _ = self.critic_local(states, actions_pred)
+        actor_loss = - actor_loss.mean()
         # Minimize the loss
         self.actor_optimizer.zero_grad()
         actor_loss.backward()

@@ -35,9 +35,7 @@ print('Action Dimensions: ' + str(action_dim))
 print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular_max) + ' rad/s')
 
 def ddpg(n_episodes, print_every, max_t, score_solved):
-     print('Starting DDPG')
-     rospy.init_node('baseline-rl', anonymous=True)
-     env = Env()
+     print('Starting DDPG ...')
      """
      Parâmetros
      ======
@@ -45,32 +43,39 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
          max_t (int): número máximo de timesteps por episódio
      """
      agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42)
+     env = Env()
 
      scores_window = []                                    # pontuações médias dos episódios mais recentes
      scores = []                                          # lista de pontuações médias de cada episódio                                
 
      for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
-          score = 0.0
-          print('episode: ' + str(i_episode))
-          agent.reset()                                     # redefinir ambiente
-          states = env.reset()                              # obtém o estado atual de cada agente
+          rospy.loginfo('Episode: ' + str(i_episode))
+
+          score = 0.0                
           done = False
 
+          agent.reset()                                     # redefinir ambiente     
+          states = env.reset_env()                          # obtém o estado atual de cada agente
+
           for t in range(max_t):                            
-               action = agent.action(np.array(states)) # escolha uma ação para cada agente
+               action = agent.action(states) # escolha uma ação para cada agente'
                actions = [(action[0] + 1) / 2, action[1]]
+
                # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
-               states, rewards, done, _ = env.step(actions) # envia todas as ações ao ambiente 
+               next_states, rewards, dones, _ = env.step_env(actions) # envia todas as ações ao ambiente 
+
+               # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
+               agent.step(states, actions, rewards, next_states, dones, t)
           
+               states = next_states
                score += rewards
-               print('reward: ' + str(rewards))
                if np.any(done):                           # loop de saída quando o episódio termina
                     break              
                
                scores_window.append(score)                   # salvar pontuação média para o episódio
                scores.append(score)                             # salva pontuação média na janela
                
-          print('\rEpisode {}\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)), end="") 
+          rospy.loginfo('\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)), end="") 
                
           if i_episode % print_every == 0:
                print('\rEpisode {}\tAverage Score: {:.4f}'.format(i_episode, np.mean(scores_window)))

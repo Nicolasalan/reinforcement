@@ -5,6 +5,9 @@ import random
 import torch
 from collections import deque
 
+# importar utilitarios
+from utils import Extension
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class ReplayBuffer:
@@ -20,6 +23,7 @@ class ReplayBuffer:
           self.memory = deque(maxlen=buffer_size)  # internal memory (deque)
           self.batch_size = batch_size
           self.seed = random.seed(seed)
+          self.util = Extension()
      
      def add(self, state, action, reward, next_state, done):
           """Add a new experience to memory."""
@@ -28,19 +32,27 @@ class ReplayBuffer:
 
      def sample(self):
           """Randomly sample a batch of experiences from memory."""
-          experiences = random.sample(self.memory, k=self.batch_size)
+          batch = []
 
-          states = torch.Tensor([data[0] for data in experiences]).to(device)
-          actions = torch.Tensor([data[1] for data in experiences]).to(device)
-          rewards = torch.Tensor([data[2] for data in experiences]).to(device).reshape(-1, 1)
-          next_states = torch.Tensor([data[3] for data in experiences]).to(device).reshape(-1, 1)
-          dones = torch.Tensor([data[4] for data in experiences]).to(device)
+          batch = random.sample(self.memory, k=self.batch_size)
+        
+          batch_state       = np.array([_[0] for _ in batch])
+          batch_action      = np.array([_[1] for _ in batch])
+          batch_rewards     = np.array([_[2] for _ in batch]).reshape(-1, 1)
+          batch_next_states = np.array([_[3] for _ in batch])
+          batch_dones       = np.array([_[4] for _ in batch]).reshape(-1, 1)
+
+          states = torch.Tensor(batch_state).to(device)
+          actions = torch.Tensor(batch_action).to(device)
+          rewards = torch.Tensor(batch_rewards).to(device)
+          next_states = torch.Tensor(batch_next_states).to(device)
+          dones = torch.Tensor(batch_dones).to(device)
 
           return (states, actions, rewards, next_states, dones)
 
      def erase(self):
           """Erase the memory."""
-          self.memory = deque(maxlen=self.batch_size)
+          self.memory = self.memory.clear()
 
      def __len__(self):
           """Return the current size of internal memory."""

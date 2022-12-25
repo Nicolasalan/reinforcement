@@ -29,14 +29,19 @@ class Actor(nn.Module):
 
         self.seed = torch.manual_seed(seed)
         self.layer_1 = nn.Linear(state_dim, fc1_units)
-        self.bn1 = nn.BatchNorm1d(fc1_units)
         self.layer_2 = nn.Linear(fc1_units, fc2_units)
         self.layer_3 = nn.Linear(fc2_units, action_dim)
         self.tanh = nn.Tanh()
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1)) 
+        self.layer_2.weight.data.uniform_(*hidden_init(self.layer_2)) 
+        self.layer_3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
-        state = F.relu(self.bn1(self.layer_1(state)))
+        state = F.relu(self.layer_1(state))
         state = F.relu(self.layer_2(state))
         a = self.tanh(self.layer_3(state))
         return a
@@ -69,7 +74,7 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        s1 = F.relu(self.bn1(self.layer_1(state)))
+        s1 = F.relu(self.layer_1(state))
         self.layer_2_s(s1)
         self.layer_2_a(action)
         s11 = torch.mm(s1, self.layer_2_s.weight.data.t())
