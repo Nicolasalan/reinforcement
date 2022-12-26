@@ -43,7 +43,7 @@ RUN apt-get install -q -y --no-install-recommends \
   python3-rospkg \
   wget \
   curl \
-  vim
+  vim 
 
 # Install dependencies ros
 RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \

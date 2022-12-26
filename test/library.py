@@ -140,11 +140,5 @@ class TestLibrary(unittest.TestCase):
         self.assertEquals(resp[0], 10.0, "10.0!=10.0")
         self.rc.shutdownhook()
 
-    def test_(self):
-          
-        resp = self.rc.scan_rang(30, self.gaps, self.scan_data)
-        self.assertEquals(resp[0], 10.0, "10.0!=10.0")
-        self.rc.shutdownhook()
-
 if __name__ == '__main__':
     rosunit.unitrun(PKG, NAME, TestLibrary)
