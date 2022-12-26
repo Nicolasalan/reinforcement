@@ -15,7 +15,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, l1=800, l2=600, dropout_p=0.5):
+    def __init__(self, state_dim, action_dim, seed, lstm_dim=128, l1=800, l2=600, dropout_p=0.5):
         """Initialize parameters and build model.
         Params
         ======
@@ -26,7 +26,8 @@ class Actor(nn.Module):
         super(Actor, self).__init__()
 
         self.seed = torch.manual_seed(seed)
-        self.layer_1 = nn.Linear(state_dim, l1)
+        self.lstm = nn.LSTM(state_dim, lstm_dim, batch_first=True)
+        self.layer_1 = nn.Linear(lstm_dim, l1)
         self.layer_2 = nn.Linear(l1, l2)
         self.layer_3 = nn.Linear(l2, action_dim)
         self.tanh = nn.Tanh()
@@ -41,6 +42,10 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
+        state = state.unsqueeze(1)
+        lstm_output, _ = self.lstm(state)
+        state = lstm_output[:, -1, :]  
+
         state = F.relu(self.layer_1(state))
         state = self.batch_norm(state)
         state = F.relu(self.layer_2(state))
@@ -51,7 +56,7 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, l1=800, l2=600):
+    def __init__(self, state_dim, action_dim, seed, lstm_dim=128, l1=800, l2=600, dropout_p=0.5):
         """Initialize parameters and build model.
         Params
         ======
@@ -61,24 +66,32 @@ class Critic(nn.Module):
         """
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
-        self.layer_1 = nn.Linear(state_dim, l1)
+        self.lstm = nn.LSTM(state_dim, lstm_dim, batch_first=True)
+
+        self.layer_1 = nn.Linear(lstm_dim, l1)
         self.layer_2_s = nn.Linear(l1, l2)
         self.layer_2_a = nn.Linear(action_dim, l2)
         self.layer_3 = nn.Linear(l2, 1)
+        self.batch_norm_1 = nn.BatchNorm1d(l1)  
+        self.dropout_1 = nn.Dropout(dropout_p)  
+        self.reset_parameters_q1()
 
         self.seed = torch.manual_seed(seed)
-        self.layer_4 = nn.Linear(state_dim, l1)
+        self.layer_4 = nn.Linear(lstm_dim, l1)
         self.layer_5_s = nn.Linear(l1, l2)
         self.layer_5_a = nn.Linear(action_dim, l2)
         self.layer_6 = nn.Linear(l2, 1)
-        self.reset_parameters()
+        self.batch_norm_2 = nn.BatchNorm1d(l1)  
+        self.dropout_2 = nn.Dropout(dropout_p)  
+        self.reset_parameters_q2()
 
-    def reset_parameters(self):
+    def reset_parameters_q1(self):
         self.layer_1.weight.data.uniform_(*hidden_init(self.layer_1)) 
         self.layer_2_s.weight.data.uniform_(*hidden_init(self.layer_2_s)) 
         self.layer_2_a.weight.data.uniform_(*hidden_init(self.layer_2_a)) 
         self.layer_3.weight.data.uniform_(-3e-3, 3e-3)
 
+    def reset_parameters_q2(self):
         self.layer_4.weight.data.uniform_(*hidden_init(self.layer_4)) 
         self.layer_5_s.weight.data.uniform_(*hidden_init(self.layer_5_s)) 
         self.layer_5_a.weight.data.uniform_(*hidden_init(self.layer_5_a)) 
@@ -86,7 +99,13 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
+        state = state.unsqueeze(1)
+        lstm_output, _ = self.lstm(state)
+        state = lstm_output[:, -1, :] 
+
         s1 = F.relu(self.layer_1(state))
+        self.batch_norm_1(s1)  
+        self.dropout_1(s1)  
         self.layer_2_s(s1)
         self.layer_2_a(action)
         s11 = torch.mm(s1, self.layer_2_s.weight.data.t())
@@ -95,6 +114,8 @@ class Critic(nn.Module):
         q1 = self.layer_3(s1)
 
         s2 = F.relu(self.layer_4(state))
+        self.batch_norm_2(s2)  
+        self.dropout_2(s2)  
         self.layer_5_s(s2)
         self.layer_5_a(action)
         s21 = torch.mm(s2, self.layer_5_s.weight.data.t())
@@ -102,3 +123,5 @@ class Critic(nn.Module):
         s2 = F.relu(s21 + s22 + self.layer_5_a.bias.data)
         q2 = self.layer_6(s2)
         return q1, q2
+
+

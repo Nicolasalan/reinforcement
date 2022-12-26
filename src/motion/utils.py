@@ -124,7 +124,7 @@ class Extension():
           """Select a random goal from the list of waypoints."""
 
           points = goals
-          x, y = 0, 0
+          _x, _y = 0.0, 0.0
           rand = int(round(np.random.uniform(0, len(points))))
           for i in range(len(points)):
                if i == rand:
