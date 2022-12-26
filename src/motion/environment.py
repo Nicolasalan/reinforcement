@@ -9,7 +9,6 @@ import math
 import time
 import tf
 
-# importar mensagens do ROS
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
@@ -18,7 +17,6 @@ from gazebo_msgs.msg import ModelState
 from std_srvs.srv import Empty
 from squaternion import Quaternion
 
-# importar utilitarios
 from utils import Extension
 
 # folder to load config file

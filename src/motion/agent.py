@@ -99,8 +99,14 @@ class Agent():
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
 
             for _ in range(param["LEARN_NUM"]):
-                experiences = self.memory.sample()
-                self.learn(experiences, float(param["GAMMA"]))
+                # Sample a batch of experiences from the replay buffer
+                experiences, priorities, idxs = self.memory.sample()
+                # Compute the loss and update the priorities
+                loss = self.learn(experiences, float(param["GAMMA"]))
+                loss_numpy = loss.detach().numpy()
+                new_priorities = np.abs(loss_numpy) + 1e-5
+                print(idxs, new_priorities)
+                self.memory.update_priorities(idxs, new_priorities)
             
             rospy.loginfo('Get Target Q                 => Calculate Target Q ...')
         
@@ -170,7 +176,9 @@ class Agent():
 
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(param["EPSILON_DECAY"])
-        self.noise.reset()               
+        self.noise.reset()  
+
+        return critic_loss      
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
