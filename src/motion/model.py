@@ -15,7 +15,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, l1=800, l2=600):
+    def __init__(self, state_dim, action_dim, seed, l1=800, l2=600, dropout_p=0.5):
         """Initialize parameters and build model.
         Params
         ======
@@ -30,6 +30,8 @@ class Actor(nn.Module):
         self.layer_2 = nn.Linear(l1, l2)
         self.layer_3 = nn.Linear(l2, action_dim)
         self.tanh = nn.Tanh()
+        self.batch_norm = nn.BatchNorm1d(l1)  
+        self.dropout = nn.Dropout(dropout_p)  
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -40,7 +42,9 @@ class Actor(nn.Module):
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
         state = F.relu(self.layer_1(state))
+        state = self.batch_norm(state)
         state = F.relu(self.layer_2(state))
+        state = self.dropout(state)
         a = self.tanh(self.layer_3(state))
         return a
 

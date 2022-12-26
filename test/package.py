@@ -127,13 +127,11 @@ class TestPackage(unittest.TestCase):
           except ImportError:
                self.fail("Could not import ray")
 
-     def test_pandas_import(self):
-          try:
-               import pandas
-          except ImportError:
-               self.fail("Could not import pandas")
-     
-               
+     #def test_pandas_import(self):
+     #     try:
+     #          import pandas
+     #     except ImportError:
+     #          self.fail("Could not import pandas")           
 
 if __name__ == '__main__':
     rosunit.unitrun(PKG, NAME, TestPackage)

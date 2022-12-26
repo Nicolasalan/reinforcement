@@ -14,8 +14,8 @@ import yaml
 import os
 import rospy
 
-import ray
-from ray import tune
+#import ray
+#from ray import tune
 
 # folder to load config file
 CONFIG_PATH = "/ws/src/motion/config/"
@@ -43,24 +43,25 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
+        # TODO: raytune
         # Initialize Ray
-        ray.init()
+        #ray.init()
 
         # Define the search space for hyperparameter optimization
-        config = {
-            'lr': tune.uniform(0.001, 0.1),
-            'l1': tune.uniform(32, 800),
-            'l2': tune.uniform(32, 800),
-            'gamma': tune.uniform(0.7, 0.99),
-            'exploration': tune.uniform(0.1, 0.5),
-            'tau': tune.uniform(0.001, 0.1),
-            'batch_size': tune.quniform(16, 128, 16),
-            'beta': tune.uniform(0.5, 0.9),
-            'weight_decay': tune.uniform(0.0, 0.001),
-            'momentum': tune.uniform(0.0, 0.9),
-            'epsilon': tune.uniform(0.0, 1.0),
-            'epsilon_decay': tune.uniform(0.99, 0.999)
-        }
+        #config = {
+        #    'lr': tune.uniform(0.001, 0.1),
+        #    'l1': tune.uniform(32, 800),
+        #    'l2': tune.uniform(32, 800),
+        #    'gamma': tune.uniform(0.7, 0.99),
+        #    'exploration': tune.uniform(0.1, 0.5),
+        #    'tau': tune.uniform(0.001, 0.1),
+        #    'batch_size': tune.quniform(16, 128, 16),
+        #    'beta': tune.uniform(0.5, 0.9),
+        #    'weight_decay': tune.uniform(0.0, 0.001),
+        #    'momentum': tune.uniform(0.0, 0.9),
+        #    'epsilon': tune.uniform(0.0, 1.0),
+        #    'epsilon_decay': tune.uniform(0.99, 0.999)
+        #}
 
         self.state_size = state_size
         self.action_size = action_size
@@ -68,16 +69,16 @@ class Agent():
         self.epsilon = param["EPSILON"]
 
         # Actor Network (w/ Target Network)
-        self.actor_local = Actor(state_size, action_size, random_seed, config['l1'], config['l2']).to(device)
-        self.actor_target = Actor(state_size, action_size, random_seed, config['l1'], config['l2']).to(device)
+        self.actor_local = Actor(state_size, action_size, random_seed).to(device)
+        self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=config['lr'], weight_decay=0.0)
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=param['LR_ACTOR'], weight_decay=0.0)
 
         # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size, action_size, random_seed, config['l1'], config['l2']).to(device)
-        self.critic_target = Critic(state_size, action_size, random_seed, config['l1'], config['l2']).to(device)
+        self.critic_local = Critic(state_size, action_size, random_seed).to(device)
+        self.critic_target = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=config['lr'], weight_decay=0.0)
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=param['LR_CRITIC'], weight_decay=0.0)
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
