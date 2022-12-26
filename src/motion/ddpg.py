@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 from agent import Agent
 from environment import Env
+from utils import Extension
 
 import rospy
 import numpy as np
@@ -30,52 +31,48 @@ action_dim = param["action_dim"]
 action_linear_max = param["action_linear_max"]
 action_angular_max = param["action_angular_max"]
 
-print('State Dimensions: ' + str(state_dim))
-print('Action Dimensions: ' + str(action_dim))
-print('Action Max: ' + str(action_linear_max) + ' m/s and ' + str(action_angular_max) + ' rad/s')
+log = Extension()
 
 def ddpg(n_episodes, print_every, max_t, score_solved):
      print('Starting DDPG ...')
      """
-     Parâmetros
+     parameters
      ======
-         n_episodes (int): número máximo de episódios de treinamento
-         max_t (int): número máximo de timesteps por episódio
+          n_episodes (int): maximum number of training episodes
+          max_t(int): maximum number of timesteps per episode
      """
+     log.view_parameter()
      agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42)
      env = Env()
 
-     scores_window = []                                    # pontuações médias dos episódios mais recentes
-     scores = []                                           # lista de pontuações médias de cada episódio                                
+     scores_window = []                                               # average scores of the most recent episodes
+     scores = []                                                      # list of average scores of each episode                               
 
-     for i_episode in range(1, n_episodes+1):               # inicializar pontuação para cada agente
+     for i_episode in range(1, n_episodes+1):                         # initialize score for each agent
           rospy.loginfo('Episode: ' + str(i_episode))
 
           score = 0.0                
           done = False
 
-          agent.reset()                                     # redefinir ambiente     
-          states = env.reset_env()                          # obtém o estado atual de cada agente
+          agent.reset()                                               # reset environment    
+          states = env.reset_env()                                    # get the current state of each agent
 
           for t in range(max_t):                            
-               action = agent.action(states) # escolha uma ação para cada agente'
+               action = agent.action(states)                          # choose an action for each agent
                actions = [(action[0] + 1) / 2, action[1]]
 
-               # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
-               next_states, rewards, dones, _ = env.step_env(actions) # envia todas as ações ao ambiente 
+               next_states, rewards, dones, _ = env.step_env(actions) # send all actions to the environment
 
-               # salva a experiência no buffer de repetição, executa a etapa de aprendizado em um intervalo definido
+               # save the experiment in the replay buffer, run the learning step at a defined interval
                agent.step(states, actions, rewards, next_states, dones, t)
           
                states = next_states
                score += rewards
-               if np.any(done):                                 # loop de saída quando o episódio termina
+               if np.any(done):                                       # exit loop when episode ends
                     break              
                
-               scores_window.append(score)                      # salvar pontuação média para o episódio
-               scores.append(score)                             # salva pontuação média na janela
-               
-          rospy.loginfo('Average Score                => Score:' + str(np.mean(scores_window))) 
+               scores_window.append(score)                            # save average score for the episode
+               scores.append(score)                                   # save average score in the window
                
           if i_episode % print_every == 0:
                rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
@@ -88,6 +85,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      return scores
 
 if __name__ == '__main__':
+     """Start training."""
+     
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_T"]

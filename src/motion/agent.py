@@ -83,7 +83,7 @@ class Agent():
         
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
-        # Convert the state variable to a PyTorch tensor
+
         state = torch.Tensor(state.reshape(1, -1)).to(device)
         self.actor_local.eval()
         with torch.no_grad():

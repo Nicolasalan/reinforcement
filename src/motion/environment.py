@@ -36,7 +36,7 @@ param = load_config("main_config.yaml")
 class Env():
      def __init__(self):
 
-          # definir o estado inicial 
+          # set the initial state
           self.goal_model = param["goal_model"]
           self.goal_reached_dist = param["goal_reached_dist"]
           self.environment_dim = param["environment_dim"]
@@ -44,7 +44,7 @@ class Env():
           self.collision_dist = param["collision_dist"]
           self.util = Extension()
 
-          # inicializar variaveis globais
+          # initialize global variables
           self.odom_x = 0.0
           self.odom_y = 0.0
           self.goal_x = 0.0
@@ -55,12 +55,12 @@ class Env():
           self.goals = self.util.path_goal(self.path_waypoints)
           self.pose = None
 
-          ##### publicacoes e assinaturas do ROS #####
+          # ROS publications and subscriptions
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
           self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=1)
           self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
 
-          ##### servicos do ROS #####
+          # ROS services 
           self.reset = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
@@ -69,14 +69,37 @@ class Env():
           self.gaps = self.util.array_gaps(self.environment_dim)
 
      def odom_callback(self, odom_msg):
+          """
+          Processes an odometry message and updates the current pose of the robot.
+          ======
+          Params:
+               odom_msg (Odometry): An odometry message containing the current pose of the robot.
+               pose (Pose): The current pose of the robot, represented as a Pose object.
+          """
           self.pose = odom_msg
      
      def scan_callback(self, scan):
+          """
+          Sensor scan message that contains range data from a laser range finder
+          ======
+          Params:
+               scan (LaserScan): list of range measurements, one for each beam in the scan.
+               scan_data (array): A list of range measurements.
+          """
           data = scan.ranges
           self.scan_data = self.util.scan_rang(self.environment_dim, self.gaps, data)
 
-     # Perform an action and read a new state
      def step_env(self, action):
+          """
+          Traverse the environment in a robot simulation
+          ======
+          Params:
+               action (array): linear and angular speeds based on action values
+               state (array): array with robot states (leisure, speed, distance and theta)
+               reward (gloat): agent reward function
+               done (bool): check if it collided with an object
+               target (bool): check if you reached the target
+          """
 
           rospy.logwarn('Step Environment             => Stepping environment ...')
           target = False
@@ -88,7 +111,7 @@ class Env():
                vel_cmd.linear.x = action[0]
                vel_cmd.angular.z = action[1]
                self.pub_cmd_vel.publish(vel_cmd)
-               rospy.loginfo('Publish Action               => Linear:' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
+               rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -108,8 +131,7 @@ class Env():
           except:
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
-          # ================== READ SCAN DATA ==================
-          # read scan laser state
+          # ================== READ SCAN DATA ================== #
           try:
                done, collision, min_laser = self.util.observe_collision(self.scan_data, self.collision_dist)
                v_state = []
@@ -124,7 +146,7 @@ class Env():
                min_laser = 0
                laser_state = [np.ones(self.environment_dim) * 10]
 
-          # ================== READ ODOM DATA ==================
+          # ================== READ ODOM DATA ================== #
           try:
                # Calculate robot heading from odometry data
                self.odom_x = self.pose.pose.pose.position.x
@@ -138,6 +160,7 @@ class Env():
                     self.pose.pose.pose.orientation.y,
                     self.pose.pose.pose.orientation.z,
                )
+               # calcule yaw
                euler = tf.transformations.euler_from_quaternion(quaternion)
                angle = round(euler[2], 4)
 
@@ -152,7 +175,6 @@ class Env():
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Calculate distance to the goal from the robot
           distance = self.util.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
-
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.util.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
@@ -164,7 +186,7 @@ class Env():
                target = True
                done = True
 
-          rospy.loginfo('Check (Collided or arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
+          rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
 
           # ================== SET STATE ================== #
           robot_state = [distance, theta, action[0], action[1]]
@@ -175,6 +197,12 @@ class Env():
           return state, reward, done, target
 
      def reset_env(self):
+          """
+          Resets the environment to a new position and sets the initial robot states
+          ======
+          Params:
+               state (array): array with robot states (leisure, speed, distance and theta)
+          """
 
           # ================== RESET ENVIRONMENT ================== #
           rospy.logwarn("Reset Environment            => Resetting environment ...")
@@ -189,7 +217,7 @@ class Env():
           # ================== SET RANDOM ANGLE ================== #
           angle = np.random.uniform(-np.pi, np.pi)
           quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-          rospy.loginfo('Set Random Angle             => Angle: ' + str(angle) + ' Quaternion: ' + str(quaternion.x) + ' ' + str(quaternion.y) + ' ' + str(quaternion.z))
+          rospy.loginfo('Set Random Angle             => Angle: ' + str(angle) + ' Quaternion: (' + str(quaternion.x) + ', ' + str(quaternion.y) + ', ' + str(quaternion.z) + ')')
 
           # ================== SET RANDOM POSITION ================== #
           path = self.goals
@@ -202,7 +230,7 @@ class Env():
                if check == True:
                     break
                     
-          rospy.loginfo('Set Random Position          => Goal: ' + str(x) + ' ' + str(y) + ' Robot: ' + str(self.odom_x) + ' ' + str(self.odom_y))
+          rospy.loginfo('Set Random Position          => Goal: (' + str(x) + ', ' + str(y) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
 
           # ================== SET RANDOM GOAL MODEL ================== #
           try:
@@ -247,7 +275,6 @@ class Env():
           # ==================CALCULATE DISTANCE AND ANGLE ================== #
           # Calculate distance to the goal from the robot
           distance = self.util.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
-
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.util.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 

@@ -39,6 +39,7 @@ class TestROS(unittest.TestCase):
           self.rc = Extension()
           self.success = False
           self.rate = rospy.Rate(1)
+
           # Create service proxies
           self.reset = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
@@ -51,6 +52,7 @@ class TestROS(unittest.TestCase):
           self.success = msg.angular.z and msg.angular.z == 1  
 
      def test_publish_cmd_vel(self):
+          # Test function for the publish_cmd_vel function.
           test_sub = rospy.Subscriber(param["topic_cmd"], Twist, self.callback)
           self.rc.cmd.angular.z = 1
           self.rc.publish_cmd_vel()
