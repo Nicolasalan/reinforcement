@@ -17,6 +17,8 @@ class TestLibrary(unittest.TestCase):
 
     def setUp(self):
         self.rc = Extension()
+         
+        # examples of data entries
         self.path_goals = [(-0.486865, 6.297588), (-1.036671, 5.001958), (-1.581001, 6.032743), (-1.972984, 5.123956), 
             (-2.759404, 6.201657), (-2.999777, 4.887653), (-3.68207, 6.087976), (-3.676394, 5.217483)]
         self.scan_data = (6.936707019805908, 5.523979187011719, 5.137536525726318, 4.584518909454346, 4.104661464691162, 
@@ -26,7 +28,6 @@ class TestLibrary(unittest.TestCase):
         self.gaps = [[-1.5707963267948966, -1.4660765716752369], [-1.4660765716752369, -1.3613568165555772], 
             [-1.3613568165555772, -1.2566370614359175], [-1.2566370614359175, -1.1519173063162578]]
         self.environment = 30
-
 
     """
     Test: Angle of the robot in relation to the target
@@ -135,6 +136,12 @@ class TestLibrary(unittest.TestCase):
     """ 
     def test_scan_rang(self):
      
+        resp = self.rc.scan_rang(30, self.gaps, self.scan_data)
+        self.assertEquals(resp[0], 10.0, "10.0!=10.0")
+        self.rc.shutdownhook()
+
+    def test_(self):
+          
         resp = self.rc.scan_rang(30, self.gaps, self.scan_data)
         self.assertEquals(resp[0], 10.0, "10.0!=10.0")
         self.rc.shutdownhook()

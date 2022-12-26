@@ -83,6 +83,7 @@ class Agent():
         
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
+        print(state)
 
         state = torch.Tensor(state.reshape(1, -1)).to(device)
         self.actor_local.eval()
@@ -92,7 +93,7 @@ class Agent():
 
         if add_noise:
             action += self.epsilon * self.noise.sample()
-    
+        print(np.clip(np.random.normal(action), -1, 1))
         return np.clip(np.random.normal(action), -1, 1)
 
     def reset(self):

@@ -24,7 +24,7 @@ class Extension():
      def __init__(self):       
           rospy.init_node('test_node', anonymous=True)  
           self.vel_publisher = rospy.Publisher(param["topic_cmd"], Twist, queue_size=1)
-          self.cmd = Twist()
+          self.cmd_vel = Twist()
           self.ctrl_c = False
           self.rate = rospy.Rate(1)
           self.state_dim = param["environment_dim"] + param["robot_dim"]
@@ -177,13 +177,13 @@ class Extension():
 
           rospy.is_shutdown()
 
-     def publish_cmd_vel(self):
+     def publish_cmd_vel(self): 
           """Publishes a command velocity message to control the robot's movement."""
 
           while not self.ctrl_c:
                connections = self.vel_publisher.get_num_connections()
                if connections > 0:
-                    self.vel_publisher.publish(self.cmd)
+                    self.vel_publisher.publish(self.cmd_vel)
                     break
                else:
                     self.rate.sleep()

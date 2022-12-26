@@ -47,10 +47,10 @@ test-ros:
 	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py"
 
 # === Test Learning ===
-.PHONY: test-learning
-test-learning:
+.PHONY: test-package
+test-package:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/learning.py"
+	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/package.py"
 
 # === Test Full ===
 .PHONY: test-full

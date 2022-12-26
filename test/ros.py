@@ -46,20 +46,18 @@ class TestROS(unittest.TestCase):
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
 
-
      def callback(self, msg):
-          print(rospy.get_caller_id(), "Angular Speed: %s" % msg.angular.z)
-          self.success = msg.angular.z and msg.angular.z == 1  
+          self.success = msg.angular.z and msg.angular.z == 1
 
      def test_publish_cmd_vel(self):
-          # Test function for the publish_cmd_vel function.
-          test_sub = rospy.Subscriber(param["topic_cmd"], Twist, self.callback)
-          self.rc.cmd.angular.z = 1
+          # Test function for the publish_cmd_vel function.   
+          test_sub = rospy.Subscriber("/cmd_vel", Twist, self.callback)
+          self.rc.cmd_vel.angular.z = 1
           self.rc.publish_cmd_vel()
-          timeout_t = time.time() + 1.0  # 1 seconds
+          timeout_t = time.time() + 1.0  # 10 seconds
           while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-               time.sleep(1.0)
-          self.assert_(self.success, "Failed to publish cmd_vel message")
+               time.sleep(0.1)
+          self.assert_(self.success)
 
      def test_subscribe_odom(self):
           # Try to receive a message from the /odom topic
@@ -93,8 +91,7 @@ class TestROS(unittest.TestCase):
           # Check that the service call was successful
           self.assertTrue(success, "Failed to unpause physics")
 
-     # TODO: Fix this test
-
+     # TODO: model, map
 
 if __name__ == '__main__':
     rostest.rosrun(PKG, NAME, TestROS)
