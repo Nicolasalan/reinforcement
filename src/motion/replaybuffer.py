@@ -5,14 +5,12 @@ import random
 import torch
 from collections import deque
 
-from utils import SumTree
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class ReplayBuffer:
      """Fixed-size buffer to store experience tuples."""
 
-     def __init__(self, buffer_size, batch_size, seed, alpha=0.6):
+     def __init__(self, buffer_size, batch_size, seed):
           """Initialize a ReplayBuffer object.
           Params
           ======
@@ -22,39 +20,31 @@ class ReplayBuffer:
           self.memory = deque(maxlen=buffer_size)
           self.batch_size = batch_size
           self.seed = random.seed(seed)
-          self.sum_tree = SumTree(buffer_size)
-          self.alpha = alpha
-          self.max_priority = 1.0
+          self.n = 4
      
      def add(self, state, action, reward, next_state, done):
           """Add a new experience to memory."""
+          n_step_return = reward
+          for i in range(1, self.n+1):
+               if i < len(self.memory):
+                    _, _, r, _, _ = self.memory[-i]
+                    n_step_return += r
+               
           experience = (state, action, reward, next_state, done)
           self.memory.append(experience) 
-          self.sum_tree.add(self.max_priority, experience)
-          self.max_priority = max(self.max_priority, self.max_priority * self.alpha)
 
      def sample(self):
           """Prioritized experience replay experience sampling."""
-          batch = []
-          priorities = []
-          priorities_sum = self.sum_tree.total()
-          for i in range(self.batch_size):
-               priority = random.uniform(0, priorities_sum)
-               idx, data, priority = self.sum_tree.get(priority)
-               batch.append(data)
-               priorities.append(priority)
 
-          # Normalize the sample priorities
-          priorities = np.array(priorities)
-          priorities = priorities / priorities_sum
-          priorities = priorities ** (1.0 / self.alpha)
-          priorities = priorities / np.max(priorities)
-        
+          # Sample a batch of experiences
+          batch = random.sample(self.memory, k=self.batch_size)
+
           # Convert the batch to a numpy array
           batch_state       = np.array([_[0] for _ in batch])
           batch_action      = np.array([_[1] for _ in batch])
           batch_rewards     = np.array([_[2] for _ in batch]).reshape(-1, 1)
           batch_next_states = np.array([_[3] for _ in batch])
+          batch_n_step_returns = np.array([_[4] for _ in batch]).reshape(-1, 1)
           batch_dones       = np.array([_[4] for _ in batch]).reshape(-1, 1)
 
           # Convert the batch to a torch tensor
@@ -62,17 +52,11 @@ class ReplayBuffer:
           actions = torch.Tensor(batch_action).to(device)
           rewards = torch.Tensor(batch_rewards).to(device)
           next_states = torch.Tensor(batch_next_states).to(device)
+          n_step_returns = torch.Tensor(batch_n_step_returns).to(device)
           dones = torch.Tensor(batch_dones).to(device)
 
-          return (states, actions, rewards, next_states, dones), priorities, [idx]
+          return (states, actions, rewards, next_states, n_step_returns, dones)
 
-     def update_priorities(self, idxs, priorities):
-          """Update the priorities of the samples at the given idxs."""
-          for i in range(len(idxs)):
-               idx = idxs[i]
-               priority = priorities[i]
-               self.sum_tree.update(idx, priority)
-     
      def erase(self):
           """Erase the memory."""
           self.memory = self.memory.clear()

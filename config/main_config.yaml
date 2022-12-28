@@ -1,13 +1,14 @@
 
-# parameters ros
+# ==== parameters ros ==== #
 topic_cmd: '/cmd_vel'
 topic_odom: '/odom'
 topic_scan: '/base_scan_front'
 robot: 'hera_full'
 
-# parameters for the environment
+# ==== parameters for the environment ==== #
 goal_reached_dist: 0.2
 collision_dist: 0.1
+orientation_threshold: 0.1
 environment_dim: 20
 robot_dim: 4
 action_dim: 2
@@ -15,15 +16,14 @@ action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
 time_delta: 0.1
 
-# path to the model
+# ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/waypoints.yaml'
 goal_model: '/ws/src/motion/models/target.sdf'
 
-# parameters for the model
+# ==== parameters for the model ==== #
 BUFFER_SIZE: 1000000    # replay buffer size
-BATCH_SIZE: 40        # minibatch size
-GAMMA: 0.99             # discount factor 
-TAU: 0.001              # for soft update of target parameters 
+BATCH_SIZE: 40          # minibatch size
+TAU: 0.001              # for soft update of target parameters
 LR_ACTOR: 0.001         # learning rate of the actor 
 LR_CRITIC: 0.001        # learning rate of the critic 
 WEIGHT_DECAY: 0         # L2 weight decay
@@ -34,7 +34,13 @@ LEARN_NUM: 10           # number of learning passes
 EPSILON: 1.0            # explore->exploit noise process added to act step #######
 EPSILON_DECAY: 0.000001 # decay rate for noise process 
 
-N_EPISODES: 2000        # maximum number of training episodes
+N_EPISODES: 200000      # maximum number of training episodes
 PRINT_EVERY: 10         # print results every n episodes
-MAX_T: 2             # maximum number of timesteps per episode
-SCORE_SOLVED: 1000      # minimum score to be considered solved
+MAX_T: 2                # maximum number of timesteps per episode
+SCORE_SOLVED: 1000000   # minimum score to be considered solved
+
+POLICY_FREQ: 2          # frequency of delayed policy updates
+POLICY_NOISE: 0.2       # std of Gaussian noise added to target policy during critic update
+CLIP_PARAM: 0.5         # clipping parameter for TD3 policy updates
+MAX_ACTION: 1           # maximum action magnitude
+DISCOUNT: 0.9999        # discount factor

@@ -34,7 +34,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class Agent():
     """Interacts with and learns from the environment."""
     
-    def __init__(self, state_size, action_size, random_seed):
+    def __init__(self, state_size, action_size, random_seed, n=1):
         """Initialize an Agent object.
          
         Params
@@ -43,42 +43,27 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
-        # TODO: raytune
-        # Initialize Ray
-        #ray.init()
-
-        # Define the search space for hyperparameter optimization
-        #config = {
-        #    'lr': tune.uniform(0.001, 0.1),
-        #    'l1': tune.uniform(32, 800),
-        #    'l2': tune.uniform(32, 800),
-        #    'gamma': tune.uniform(0.7, 0.99),
-        #    'exploration': tune.uniform(0.1, 0.5),
-        #    'tau': tune.uniform(0.001, 0.1),
-        #    'batch_size': tune.quniform(16, 128, 16),
-        #    'beta': tune.uniform(0.5, 0.9),
-        #    'weight_decay': tune.uniform(0.0, 0.001),
-        #    'momentum': tune.uniform(0.0, 0.9),
-        #    'epsilon': tune.uniform(0.0, 1.0),
-        #    'epsilon_decay': tune.uniform(0.99, 0.999)
-        #}
 
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
+        self.tau = param["TAU"]
         self.epsilon = param["EPSILON"]
+        self.clip_param= param["CLIP_PARAM"]
+        self.max_action = param["MAX_ACTION"]
+        self.discount_factor = param["DISCOUNT"]
 
-        # Actor Network (w/ Target Network)
+        # Actor Network (w/ Network)
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=param['LR_ACTOR'], weight_decay=0.0)
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=param['LR_ACTOR'])
 
-        # Critic Network (w/ Target Network)
+        # Critic Network (w/ Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=param['LR_CRITIC'], weight_decay=0.0)
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=param['LR_CRITIC'], weight_decay=param['WEIGHT_DECAY'])
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -93,22 +78,19 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > param["BATCH_SIZE"] and 20.0 % float(param["LEARN_EVERY"]) == 0.0:
+        if len(self.memory) > param["BATCH_SIZE"] and timestep % float(param["LEARN_EVERY"]) == 0.0:
                  
             rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
 
             for _ in range(param["LEARN_NUM"]):
                 # Sample a batch of experiences from the replay buffer
-                experiences, priorities, idxs = self.memory.sample()
+                experiences = self.memory.sample()
                 # Compute the loss and update the priorities
-                loss = self.learn(experiences, float(param["GAMMA"]))
+                loss = self.learn(experiences, timestep, param["POLICY_NOISE"], param["POLICY_FREQ"])
                 loss_numpy = loss.detach().numpy()
-                new_priorities = np.abs(loss_numpy) + 1e-5
-                print(idxs, new_priorities)
-                self.memory.update_priorities(idxs, new_priorities)
             
-            rospy.loginfo('Get Target Q                 => Calculate Target Q ...')
+            rospy.loginfo('Calculate Loss               => Loss: ' + str(loss_numpy))
         
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -127,28 +109,13 @@ class Agent():
     def reset(self):
         self.noise.reset()
 
-    def learn(self, experiences, gamma):
-        """Update policy and value parameters using given batch of experience tuples.
-        Q_targets = r + γ * critic_target(next_state, actor_target(next_state))
-        where:
-            actor_target(state) -> action
-            critic_target(state, action) -> Q-value
-        Params
-        ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
-            gamma (float): discount factor
-        """         
-        states, actions, rewards, next_states, dones = experiences
+    def learn(self, experiences, timestep, policy_noise, policy_freq):
+        states, actions, rewards, next_states, n_step_returns, dones = experiences
 
         # ---------------------------- update critic ---------------------------- #
-        # Get predicted next-state actions and Q values from target models
-        actions_next = self.actor_target(next_states)
 
-        target_Q1, target_Q2 = self.critic_target(next_states, actions_next)
-        # Select the minimal Q value from the 2 calculated values
-        target_Q = torch.min(target_Q1, target_Q2)
-        # Compute Q targets for current states (y_i)
-        Q_targets = rewards + ((1 - dones) * gamma * target_Q).detach()
+        # Compute Q targets for current states (y_i) using the n-step returns
+        Q_targets = n_step_returns 
         # Compute critic loss
         Q1_expected, Q2_expected = self.critic_local(states, actions)
 
@@ -161,24 +128,36 @@ class Agent():
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
-        # Compute actor loss
-        actions_pred = self.actor_local(states)
-        actor_loss, _ = self.critic_local(states, actions_pred)
-        actor_loss = - actor_loss.mean()
-        # Minimize the loss
-        self.actor_optimizer.zero_grad()
-        actor_loss.backward()
-        self.actor_optimizer.step()
+        if timestep % policy_freq == 0:
+            # Compute actor loss
+            actions_pred = self.actor_local(states)
+            actor_loss, _ = self.critic_local(states, actions_pred)
+            actor_loss = - actor_loss.mean()
+            # Minimize the loss
+            self.actor_optimizer.zero_grad()
+            actor_loss.backward()
+            self.actor_optimizer.step()
 
-        # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic_local, self.critic_target, float(param["TAU"]))
-        self.soft_update(self.actor_local, self.actor_target, float(param["TAU"])) 
+            # Use the newly updated actor to generate target actions and add noise
+            noise = (torch.randn_like(actions) * policy_noise).clamp(-self.clip_param, self.clip_param)
+            target_actions = (self.actor_target(next_states) + noise).clamp(-self.max_action, self.max_action)
+
+            # Compute the minimum of the two Q values for the target actions
+            target_Q1, target_Q2 = self.critic_target(next_states, target_actions)
+            target_Q = torch.min(target_Q1, target_Q2)
+
+            # Compute the target n-step return
+            n_step_return = (self.discount_factor ** timestep) * target_Q * (1 - dones)
+            n_step_return += rewards
+
+            # Update the critic target networks
+            self.soft_update(self.critic_local, self.critic_target, self.tau)
 
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(param["EPSILON_DECAY"])
         self.noise.reset()  
 
-        return critic_loss      
+        return critic_loss    
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
@@ -191,4 +170,3 @@ class Agent():
         """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
-        

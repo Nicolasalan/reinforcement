@@ -46,7 +46,10 @@ class Extension():
           dot = skew_x * 1 + skew_y * 0
           mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
           mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          beta = math.acos(dot / (mag1 * mag2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
           if skew_y < 0:
                if skew_x < 0:
                     beta = -beta
@@ -188,6 +191,17 @@ class Extension():
                else:
                     self.rate.sleep()
 
+     def publish_cmd_vel(self): 
+          """Publishes a command velocity message to control the robot's movement."""
+
+          while not self.ctrl_c:
+               connections = self.vel_publisher.get_num_connections()
+               if connections > 0:
+                    self.vel_publisher.publish(self.cmd_vel)
+                    break
+               else:
+                    self.rate.sleep()
+
      def view_parameter(self):
           """visualization of parameters."""
 
@@ -208,53 +222,3 @@ class Extension():
           rospy.loginfo('Goal Achieved Distance: ' + str(self.goal_reached_dist))
           rospy.loginfo('Collision Distance: ' + str(self.collision_dist))
           print()
-
-
-class SumTree:
-     def __init__(self, capacity):
-          self.capacity = capacity
-          self.tree = np.zeros(2 * capacity - 1)
-          self.data = np.zeros(capacity, dtype=object)
-          self.write = 0
-          self.n_entries = 0
-
-     def _propagate(self, idx, change):
-          parent = (idx - 1) // 2
-          self.tree[parent] += change
-          if parent != 0:
-               self._propagate(parent, change)
-
-     def _retrieve(self, idx, s):
-          left = 2 * idx + 1
-          right = left + 1
-
-          if left >= len(self.tree):
-               return idx
-
-          if s <= self.tree[left]:
-               return self._retrieve(left, s)
-          else:
-               return self._retrieve(right, s-self.tree[left])
-
-     def total(self):
-          return self.tree[0]
-
-     def add(self, p, data):
-          idx = self.write + self.capacity - 1
-          self.data[self.write] = data
-          self.update(idx, p)
-          self.write += 1
-          if self.write >= self.capacity:
-               self.write = 0
-          if self.n_entries < self.capacity:
-               self.n_entries += 1
-
-     def update(self, idx, p):
-          change = p - self.tree[idx]
-          self.tree[idx] = p
-          self._propagate(idx, change)
-
-     def get(self, s):
-          idx = self._retrieve(0, s)
-          data_idx = idx - self.capacity + 1
-          return (idx, self.data[data_idx], self.tree[idx])

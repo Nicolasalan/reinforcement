@@ -1,6 +1,7 @@
 # setup
 DOCKER_ENV_VARS= \
-	--volume="$(PWD):/ws/src/motion":rw
+	--volume="$(PWD):/ws/src/motion":rw \
+	--volume="$(PWD)/src/motion/checkpoints:/ws/src/motion/src/motion/checkpoints":rw 
 
 COMMAND="source devel/setup.bash && roslaunch motion bringup.launch"
 

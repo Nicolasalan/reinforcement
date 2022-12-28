@@ -40,6 +40,7 @@ class Env():
           self.environment_dim = param["environment_dim"]
           self.time_delta = param["time_delta"]
           self.collision_dist = param["collision_dist"]
+          self.orientation_threshold = param["orientation_threshold"]
           self.util = Extension()
 
           # initialize global variables
@@ -52,6 +53,7 @@ class Env():
           self.path_waypoints = param["waypoints"]
           self.goals = self.util.path_goal(self.path_waypoints)
           self.pose = None
+          self.goal_orientation = 0.0
 
           # ROS publications and subscriptions
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
@@ -139,8 +141,8 @@ class Env():
           
           except:
                rospy.logerr('Read Scan Data              => Error reading scan data')
-               done = True
-               collision = True
+               done = False
+               collision = False
                min_laser = 0
                laser_state = [np.ones(self.environment_dim) * 10]
 
@@ -158,7 +160,7 @@ class Env():
                     self.pose.pose.pose.orientation.y,
                     self.pose.pose.pose.orientation.z,
                )
-               # calcule yaw
+               # calcule yaw angle
                euler = tf.transformations.euler_from_quaternion(quaternion)
                angle = round(euler[2], 4)
 
@@ -170,7 +172,7 @@ class Env():
                self.odom_y = 1.0
                angle = 0.0
 
-          # ================== CALCULATE DISTANCE AND ANGLE ================== #
+          # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
           distance = self.util.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
@@ -178,9 +180,16 @@ class Env():
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
+          # ================== ORIENTATION GOAL ================== #
+
+          # Calculate difference between current orientation and target orientation
+          orientation_diff = abs(angle - self.goal_orientation)
+
+          rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
+
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
-          if distance < self.goal_reached_dist:
+          if distance < self.goal_reached_dist and orientation_diff < self.orientation_threshold:
                target = True
                done = True
 
@@ -210,14 +219,25 @@ class Env():
                self.reset()
 
           except:
-               rospy.logerr('Reset Simulation            => Failed service call failed')
+               rospy.logerr('Reset Simulation           => Failed service call failed')
 
           # ================== SET RANDOM ANGLE ================== #
           angle = np.random.uniform(-np.pi, np.pi)
           quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-          rospy.loginfo('Set Random Angle             => Angle: ' + str(angle) + ' Quaternion: (' + str(quaternion.x) + ', ' + str(quaternion.y) + ', ' + str(quaternion.z) + ')')
+          rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
+
+          # ================== SET RANDOM ORIENTATION ================== #
+          try:
+               self.goal_orientation = np.random.uniform(-np.pi, np.pi)
+
+               rospy.loginfo('Set Random Angle Target      => Angle: ' + str(angle))
+          
+          except:
+               rospy.logerr('Set Random Orientation      => Error setting random orientation')
+               self.goal_orientation = 0.0
 
           # ================== SET RANDOM POSITION ================== #
+          
           path = self.goals
           x, y = 0.0, 0.0
 

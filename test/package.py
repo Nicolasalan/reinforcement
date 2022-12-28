@@ -119,19 +119,7 @@ class TestPackage(unittest.TestCase):
           try:
                from std_srvs.srv import Empty
           except ImportError:
-               self.fail("Could not import std_srvs")
-     
-     def test_ray_import(self):
-          try:
-               import ray
-          except ImportError:
-               self.fail("Could not import ray")
-
-     #def test_pandas_import(self):
-     #     try:
-     #          import pandas
-     #     except ImportError:
-     #          self.fail("Could not import pandas")           
+               self.fail("Could not import std_srvs")       
 
 if __name__ == '__main__':
     rosunit.unitrun(PKG, NAME, TestPackage)

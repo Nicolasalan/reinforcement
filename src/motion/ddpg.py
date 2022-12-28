@@ -33,6 +33,11 @@ action_angular_max = param["action_angular_max"]
 
 log = Extension()
 
+script_dir = os.path.dirname(os.path.realpath(__file__))
+checkpoints_dir = os.path.join(script_dir, 'checkpoints')
+if not os.path.exists(checkpoints_dir):
+    os.makedirs(checkpoints_dir)
+
 def ddpg(n_episodes, print_every, max_t, score_solved):
      print('Starting DDPG ...')
      """
@@ -46,7 +51,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
      env = Env()
 
      scores_window = []                                               # average scores of the most recent episodes
-     scores = []                                                      # list of average scores of each episode                               
+     scores = []                                                      # list of average scores of each episode                     
 
      for i_episode in range(1, n_episodes+1):                         # initialize score for each agent
           rospy.loginfo('Episode: ' + str(i_episode))
@@ -76,10 +81,10 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                
           if i_episode % print_every == 0:
                rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
-          if np.mean(scores_window) >= score_solved:
+          if np.mean(scores_window) >= param["SCORE_SOLVED"]:
                rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
-               torch.save(agent.actor_local.state_dict(), 'actor_checkpoint.pth')
-               torch.save(agent.critic_local.state_dict(), 'critic_checkpoint.pth')
+               torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
+               torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
                break
 
      return scores
