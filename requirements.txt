@@ -5,5 +5,5 @@ squaternion
 tornado
 simplejpeg
 rospkg
-ray
+#ray
 #pandas

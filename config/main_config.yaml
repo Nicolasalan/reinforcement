@@ -1,8 +1,8 @@
 
 # ==== parameters ros ==== #
-topic_cmd: '/cmd_vel'
-topic_odom: '/odom'
-topic_scan: '/base_scan_front'
+topic_cmd: 'cmd_vel'
+topic_odom: 'odom'
+topic_scan: 'base_scan_front'
 robot: 'hera_full'
 
 # ==== parameters for the environment ==== #
@@ -35,8 +35,8 @@ EPSILON: 1.0            # explore->exploit noise process added to act step #####
 EPSILON_DECAY: 0.000001 # decay rate for noise process 
 
 N_EPISODES: 200000      # maximum number of training episodes
-PRINT_EVERY: 10         # print results every n episodes
-MAX_T: 2                # maximum number of timesteps per episode
+PRINT_EVERY: 100        # print results every n episodes
+MAX_T: 150              # maximum number of timesteps per episode
 SCORE_SOLVED: 1000000   # minimum score to be considered solved
 
 POLICY_FREQ: 2          # frequency of delayed policy updates

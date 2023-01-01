@@ -66,10 +66,10 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                action = agent.action(states)                          # choose an action for each agent
                actions = [(action[0] + 1) / 2, action[1]]
 
-               next_states, rewards, dones, _ = env.step_env(actions) # send all actions to the environment
+               next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
                # save the experiment in the replay buffer, run the learning step at a defined interval
-               agent.step(states, actions, rewards, next_states, dones, t)
+               agent.step(states, actions, rewards, next_states, done, t)
           
                states = next_states
                score += rewards
@@ -81,6 +81,11 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                
           if i_episode % print_every == 0:
                rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
+          
+          if i_episode % 1000 == 0:
+               torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
+               torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
+
           if np.mean(scores_window) >= param["SCORE_SOLVED"]:
                rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
                torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))

@@ -5,6 +5,8 @@ DOCKER_ENV_VARS= \
 
 COMMAND="source devel/setup.bash && roslaunch motion bringup.launch"
 
+LOCAL: False
+
 # === Build docker ===
 .PHONY: build
 build:
