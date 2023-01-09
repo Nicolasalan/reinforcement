@@ -90,5 +90,10 @@ RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc
 # Install python dependencies
 RUN cd /ws/src/motion && pip3 install -r requirements.txt
 
+# Remove display warnings
+RUN mkdir /tmp/runtime-root
+ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
+ENV NO_AT_BRIDGE 1
+
 # command to run on container start
 ENTRYPOINT [ "/ws/src/motion/entrypoint.sh" ]

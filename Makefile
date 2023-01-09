@@ -1,7 +1,14 @@
 # setup
 DOCKER_ENV_VARS= \
 	--volume="$(PWD):/ws/src/motion":rw \
-	--volume="$(PWD)/src/motion/checkpoints:/ws/src/motion/src/motion/checkpoints":rw 
+	--volume="$(PWD)/src/motion/checkpoints:/ws/src/motion/src/motion/checkpoints":rw \
+	--volume="/tmp/.X11-unix:/tmp/.X11-unix" \
+	--volume="${HOME}/.Xauthority:/root/.Xauthority:rw" \
+	--env="DISPLAY=${DISPLAY}" \
+	--env="QT_X11_NO_MITSHM=1" \
+	--ipc=host \
+	--privileged 
+	
 
 COMMAND="source devel/setup.bash && roslaunch motion bringup.launch"
 
