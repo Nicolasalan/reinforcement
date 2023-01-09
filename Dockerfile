@@ -71,7 +71,6 @@ RUN mkdir -p /ws/src \
  && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git \
  && git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git
 
-
 # Copy the source files
 COPY . /ws/src/motion
 

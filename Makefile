@@ -7,10 +7,15 @@ DOCKER_ENV_VARS= \
 	--env="DISPLAY=${DISPLAY}" \
 	--env="QT_X11_NO_MITSHM=1" \
 	--ipc=host \
-	--privileged 
-	
+	--privileged 	
 
 COMMAND="source devel/setup.bash && roslaunch motion bringup.launch"
+
+define xhost_activate
+	@echo "Enabling local xhost sharing:"
+	@echo "  Display: ${DISPLAY}"
+	@xhost local:root
+endef
 
 LOCAL: False
 
