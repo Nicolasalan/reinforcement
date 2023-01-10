@@ -304,7 +304,7 @@ class Env():
           # ================== GET STATE SCAN ================== #
           try:
                v_state = []
-               v_state[:] = self.scan_data[:]
+               v_state[:] = self.data[:]
                laser_state = [v_state]
 
                rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(laser_state)))
