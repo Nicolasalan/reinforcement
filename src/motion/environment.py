@@ -53,6 +53,7 @@ class Env():
           self.path_waypoints = param["waypoints"]
           self.goals = self.util.path_goal(self.path_waypoints)
           self.pose = None
+          self.orientation = None
           self.goal_orientation = 0.0
 
           # ROS publications and subscriptions
@@ -77,6 +78,7 @@ class Env():
                pose (Pose): The current pose of the robot, represented as a Pose object.
           """
           self.pose = odom_msg.pose.pose
+          self.orientation = self.pose.orientation
      
      def scan_callback(self, scan):
           """
@@ -151,14 +153,14 @@ class Env():
                # Calculate robot heading from odometry data
                self.odom_x = self.pose.position.x
                self.odom_y = self.pose.position.y
-               orientation = self.pose.orientation
+               
                
                # Calculate robot heading from odometry data
                quaternion = Quaternion(
-                    self.pose.orientation.w,
-                    self.pose.orientation.x,
-                    self.pose.orientation.y,
-                    self.pose.orientation.z,
+                    self.orientation.w,
+                    self.orientation.x,
+                    self.orientation.y,
+                    self.orientation.z,
                )
                # calcule yaw angle
                euler = tf.transformations.euler_from_quaternion(quaternion)
