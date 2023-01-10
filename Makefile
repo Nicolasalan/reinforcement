@@ -6,8 +6,8 @@ DOCKER_ENV_VARS= \
 	--volume="$(shell pwd):/ws/src/motion":rw \
 	--volume="$(shell pwd)/src/motion/checkpoints:/ws/src/motion/src/motion/checkpoints":rw \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix" \
-	--volume="$(shell HOME)/.Xauthority:/root/.Xauthority:rw" \
-	--env="DISPLAY=$(shell DISPLAY)" \
+	--volume="${HOME}/.Xauthority:/root/.Xauthority:rw" \
+	--env="DISPLAY=${DISPLAY}" \
 	--env="QT_X11_NO_MITSHM=1" \
 	--ipc=host \
 	--privileged 	
