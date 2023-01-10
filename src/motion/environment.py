@@ -233,7 +233,7 @@ class Env():
           try:
                self.goal_orientation = np.random.uniform(-np.pi, np.pi)
 
-               rospy.loginfo('Set Random Angle Target      => Angle: ' + str(angle))
+               rospy.loginfo('Set Random Angle Target      => Angle: ' + str(self.goal_orientation))
           
           except:
                rospy.logerr('Set Random Orientation      => Error setting random orientation')
@@ -256,7 +256,7 @@ class Env():
           # ================== SET RANDOM GOAL MODEL ================== #
           try:
                robot = ModelState()
-               robot.model_name = param["robot"]
+               robot.model_name = "target"
                robot.pose.position.x = x
                robot.pose.position.y = y
                robot.pose.orientation.x = quaternion.x

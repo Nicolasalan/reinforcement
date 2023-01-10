@@ -174,6 +174,20 @@ class Extension():
 
           return scan_data
 
+     def range(self,  scan):
+          """Returns an array of the minimum distances from the laser scan data"""
+
+          scan_range = []
+          for i in range(len(scan.ranges)):
+               if scan.ranges[i] == float('Inf'):
+                    scan_range.append(3.5)
+               elif np.isnan(scan.ranges[i]):
+                    scan_range.append(0)
+               else:
+                    scan_range.append(scan.ranges[i])
+
+          return np.array(scan_range)
+
      def shutdownhook(self):
           """Shutdown hook for the node."""
 
