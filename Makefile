@@ -47,7 +47,7 @@ setup:
 # === Spawn model ===
 .PHONY: spawn 
 spawn:
-	@echo "Spawn world ..."
+	@echo "Spawn Model ..."
 	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
 
 # === Start train docker ===

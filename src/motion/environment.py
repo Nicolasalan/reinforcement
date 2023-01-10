@@ -154,7 +154,6 @@ class Env():
                self.odom_x = self.pose.position.x
                self.odom_y = self.pose.position.y
                
-               
                # Calculate robot heading from odometry data
                quaternion = Quaternion(
                     self.orientation.w,
@@ -163,8 +162,10 @@ class Env():
                     self.orientation.z,
                )
                # calcule yaw angle
+
                euler = tf.transformations.euler_from_quaternion(quaternion)
                angle = round(euler[2], 4)
+               print("Quaternion: ", quaternion, " Euler: ", euler)
 
                rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
@@ -183,15 +184,15 @@ class Env():
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
-
+          # TODO:
           # Calculate difference between current orientation and target orientation
-          orientation_diff = abs(angle - self.goal_orientation)
+          #orientation_diff = abs(angle - self.goal_orientation)
 
-          rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
+          #rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
 
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
-          if distance < self.goal_reached_dist and orientation_diff < self.orientation_threshold:
+          if distance < self.goal_reached_dist: #and orientation_diff < self.orientation_threshold:
                target = True
                done = True
 
