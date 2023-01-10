@@ -40,6 +40,7 @@ class Env():
           self.environment_dim = param["environment_dim"]
           self.time_delta = param["time_delta"]
           self.collision_dist = param["collision_dist"]
+          self.robot = param["robot"]
           self.orientation_threshold = param["orientation_threshold"]
           self.util = Extension()
 
@@ -253,10 +254,10 @@ class Env():
                     
           rospy.loginfo('Set Random Position          => Goal: (' + str(x) + ', ' + str(y) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
 
-          # ================== SET RANDOM GOAL MODEL ================== #
+          # ================== SET RANDOM ROBOT MODEL ================== #
           try:
                robot = ModelState()
-               robot.model_name = "target"
+               robot.model_name = self.robot
                robot.pose.position.x = x
                robot.pose.position.y = y
                robot.pose.position.z = 0.0
@@ -264,11 +265,25 @@ class Env():
                robot.pose.orientation.y = quaternion.y
                robot.pose.orientation.z = quaternion.z
                robot.pose.orientation.w = quaternion.w
+          
+          except:
+               rospy.logerr('Set Random Robot Model       => Error setting random robot model')
+
+          # ================== SET RANDOM GOAL MODEL ================== #
+          try:
+               robot = ModelState()
+               robot.model_name = "target"
+               robot.pose.position.x = _x
+               robot.pose.position.y = _y
+               robot.pose.position.z = 0.0
+               robot.pose.orientation.x = 0.0
+               robot.pose.orientation.y = 0.0
+               robot.pose.orientation.z = 0.0
+               robot.pose.orientation.w = 1.0
                self.goal_x, self.goal_y = _x, _y
           
           except:
                rospy.logerr('Set Random Goal Model       => Error setting random goal model')
-
           # ================== UNPAUSE SIMULATION ================== #
           rospy.wait_for_service("/gazebo/unpause_physics")
           try:
