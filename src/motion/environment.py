@@ -164,7 +164,7 @@ class Env():
                # calcule yaw angle
 
                euler = tf.transformations.euler_from_quaternion(quaternion)
-               angle = round(euler[2], 4)
+               angle = euler[2]
                print("Quaternion: ", quaternion, " Euler: ", euler)
 
                rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
@@ -259,6 +259,7 @@ class Env():
                robot.model_name = "target"
                robot.pose.position.x = x
                robot.pose.position.y = y
+               robot.pose.position.z = 0.0
                robot.pose.orientation.x = quaternion.x
                robot.pose.orientation.y = quaternion.y
                robot.pose.orientation.z = quaternion.z
