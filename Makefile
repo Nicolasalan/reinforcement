@@ -1,3 +1,6 @@
+LOCAL: False
+VISUALIZE: False
+
 # setup
 DOCKER_ENV_VARS= \
 	--volume="$(PWD):/ws/src/motion":rw \
@@ -16,8 +19,6 @@ define xhost_activate
 	@echo "  Display: ${DISPLAY}"
 	@xhost local:root
 endef
-
-LOCAL: False
 
 # === Build docker ===
 .PHONY: build
@@ -42,6 +43,12 @@ terminal:
 setup:
 	@echo "Setup world ..."
 	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c ${COMMAND}
+
+# === Spawn model ===
+.PHONY: spawn 
+spawn:
+	@echo "Spawn world ..."
+	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
 
 # === Start train docker ===
 .PHONY: start 

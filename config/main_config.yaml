@@ -9,7 +9,7 @@ robot: 'hera_full'
 goal_reached_dist: 0.2
 collision_dist: 0.1
 orientation_threshold: 0.1
-environment_dim: 20
+environment_dim: 150
 robot_dim: 4
 action_dim: 2
 action_linear_max: 0.3  # m/s

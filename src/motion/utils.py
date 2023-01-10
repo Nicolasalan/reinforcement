@@ -34,7 +34,6 @@ class Extension():
           self.cmd = param["topic_cmd"]
           self.odom = param["topic_odom"]
           self.scan = param["topic_scan"]
-          self.robot = param["robot"]
           self.goal_reached_dist = param["goal_reached_dist"]
           self.collision_dist = param["collision_dist"]   
 
