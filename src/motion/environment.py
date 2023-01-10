@@ -50,7 +50,8 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.scan_data = np.ones(self.environment_dim) * 10
+          #self.scan_data = np.ones(self.environment_dim) * 10
+          self.data = None
           self.path_waypoints = param["waypoints"]
           self.goals = self.util.path_goal(self.path_waypoints)
           self.pose = None
@@ -90,7 +91,8 @@ class Env():
                scan_data (array): A list of range measurements.
           """
           data = scan.ranges
-          self.scan_data = self.util.scan_rang(self.environment_dim, self.gaps, data)
+          #self.scan_data = self.util.scan_rang(self.environment_dim, self.gaps, data)
+          self.data = self.util.range(scan)
 
      def step_env(self, action):
           """
@@ -136,9 +138,9 @@ class Env():
 
           # ================== READ SCAN DATA ================== #
           try:
-               done, collision, min_laser = self.util.observe_collision(self.scan_data, self.collision_dist)
+               done, collision, min_laser = self.util.observe_collision(self.data, self.collision_dist)
                v_state = []
-               v_state[:] = self.scan_data[:]
+               v_state[:] = self.data[:]
                laser_state = [v_state]
                rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
