@@ -23,6 +23,7 @@ class Env():
      def __init__(self, CONFIG_PATH):
 
           self.useful = Extension(CONFIG_PATH)
+          rospy.init_node("gym", anonymous=True)
 
           # Function to load yaml configuration file
           param = self.useful.load_config("main_config.yaml")
@@ -42,13 +43,11 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.angle = 0.0
-
           #self.scan_data = np.ones(self.environment_dim) * 10
           self.path_waypoints = param["waypoints"]
           self.goals = self.useful.path_goal(self.path_waypoints)
-          self.pose = Pose()
           self.data = None
+          self.last_odom = None
           self.orientation = None
           self.goal_orientation = 0.0
 
@@ -64,6 +63,7 @@ class Env():
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
+          #rospy.sleep(1)
 
      def odom_callback(self, msg):
           """
@@ -73,25 +73,7 @@ class Env():
                odom_msg (Odometry): An odometry message containing the current pose of the robot.
                pose (Pose): The current pose of the robot, represented as a Pose object.
           """
-          try:
-               self.odom_x = msg.pose.pose.position.x
-               self.odom_y = msg.pose.pose.position.y
-
-               quaternion = (
-                    msg.pose.pose.orientation.x,
-                    msg.pose.pose.orientation.y,
-                    msg.pose.pose.orientation.z,
-                    msg.pose.pose.orientation.w
-               )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               self.angle = math.degrees(yaw)
-
-          except:
-               rospy.logfatal('Read Odom Data              => Error reading odometry data')
-               self.odom_x = 1.0
-               self.odom_y = 1.0
-               self.angle = 0.0
+          self.last_odom = msg.pose.pose
 
      def scan_callback(self, scan):
           """
@@ -163,20 +145,37 @@ class Env():
                laser_state = [np.ones(self.environment_dim) * 10]
 
           # ================== READ ODOM DATA ================== #
-               
-          rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(self.angle))
+          try:
+               self.odom_x = self.last_odom.position.x
+               self.odom_y = self.last_odom.position.y
 
+               quaternion = (
+                    self.last_odom.orientation.x,
+                    self.last_odom.orientation.y,
+                    self.last_odom.orientation.z,
+                    self.last_odom.orientation.w
+               )
+               euler = tf.transformations.euler_from_quaternion(quaternion)
+               yaw = euler[2]
+               angle = math.degrees(yaw)
+               rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
+
+          except:
+               rospy.logfatal('Read Odom Data              => Error reading odometry data')
+               self.odom_x = 0.0
+               self.odom_y = 0.0
+               angle = 0.0
           # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
-          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, self.angle)
+          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation
-          orientation_diff = abs(self.angle - self.goal_orientation)
+          orientation_diff = abs(angle - self.goal_orientation)
 
           rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
 

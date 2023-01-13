@@ -62,17 +62,17 @@ test-library:
 	@echo "Testing ..."
 	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/library.py"
 
-# === Test Topics ===
-.PHONY: test-topics
-test-topics:
+# === Test ROS ===
+.PHONY: test-ros
+test-ros:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/topics.py"
+	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py"
 
-# === Test Services ===
-.PHONY: test-services
-test-services:
+# === Test Simulation ===
+.PHONY: test-sim
+test-sim:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/services.py"
+	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/sim.py"
 
 # === Test Learning ===
 .PHONY: test-package
