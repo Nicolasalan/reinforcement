@@ -49,6 +49,7 @@ class Env():
           self.goals = self.useful.path_goal(self.path_waypoints)
           self.pose = None
           self.data = None
+          self.last_odom = None
           self.orientation = None
           self.goal_orientation = 0.0
 
@@ -73,8 +74,9 @@ class Env():
                odom_msg (Odometry): An odometry message containing the current pose of the robot.
                pose (Pose): The current pose of the robot, represented as a Pose object.
           """
-          self.pose = odom_msg.pose.pose
-          self.orientation = self.pose.orientation
+          self.last_odom = odom_msg
+          #self.pose = odom_msg.pose.pose
+          #self.orientation = self.pose.orientation
 
      def scan_callback(self, scan):
           """
@@ -148,21 +150,19 @@ class Env():
           # ================== READ ODOM DATA ================== #
           try:
                # Calculate robot heading from odometry data
-               self.odom_x = self.pose.position.x
-               self.odom_y = self.pose.position.y
+               self.odom_x = self.last_odom.pose.pose.position.x
+               self.odom_y = self.last_odom.pose.pose.position.y
                
                # Calculate robot heading from odometry data
                quaternion = Quaternion(
-                    self.orientation.w,
-                    self.orientation.x,
-                    self.orientation.y,
-                    self.orientation.z,
+                    self.last_odom.pose.pose.orientation.w,
+                    self.last_odom.pose.pose.orientation.x,
+                    self.last_odom.pose.pose.orientation.y,
+               self.last_odom.pose.pose.orientation.z,
                )
                # calcule yaw angle
-
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               angle = euler[2]
-               print("Quaternion: ", quaternion, " Euler: ", euler)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
 
                rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
