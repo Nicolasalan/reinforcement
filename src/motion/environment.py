@@ -261,6 +261,7 @@ class Env():
                set_robot.pose.orientation.y = quaternion.y
                set_robot.pose.orientation.z = quaternion.z
                set_robot.pose.orientation.w = quaternion.w
+               self.set_state.publish(set_robot)
           
           except:
                rospy.logerr('Set Random Robot Model       => Error setting random robot model')
@@ -278,6 +279,7 @@ class Env():
                set_target.pose.orientation.y = 0.0
                set_target.pose.orientation.z = 0.0
                set_target.pose.orientation.w = 1.0
+               self.set_state.publish(set_target)
                self.goal_x, self.goal_y = _x, _y
           
           except:
