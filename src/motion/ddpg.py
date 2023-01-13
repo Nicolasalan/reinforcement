@@ -2,43 +2,22 @@
 
 import torch
 import numpy as np
-import matplotlib.pyplot as plt
 
-from collections import deque
 from agent import Agent
 from environment import Env
 from utils import Extension
+import psutil
 
 import rospy
 import numpy as np
 import os
-import yaml
-
-# folder to load config file
-CONFIG_PATH = "/ws/src/motion/config/"
-
-# Function to load yaml configuration file
-def load_config(config_name):
-    with open(os.path.join(CONFIG_PATH, config_name)) as file:
-        param = yaml.safe_load(file)
-
-    return param
-
-param = load_config("main_config.yaml")
-
-state_dim = param["environment_dim"] + param["robot_dim"]
-action_dim = param["action_dim"]
-action_linear_max = param["action_linear_max"]
-action_angular_max = param["action_angular_max"]
-
-log = Extension()
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved):
+def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
      print('Starting DDPG ...')
      """
      parameters
@@ -46,9 +25,12 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
           n_episodes (int): maximum number of training episodes
           max_t(int): maximum number of timesteps per episode
      """
-     log.view_parameter()
-     agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42)
-     env = Env()
+
+     state_dim = param["environment_dim"] + param["robot_dim"]
+     action_dim = param["action_dim"]
+
+     agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+     env = Env(CONFIG_PATH)
 
      scores_window = []                                               # average scores of the most recent episodes
      scores = []                                                      # list of average scores of each episode                     
@@ -77,8 +59,11 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                     break              
                
                scores_window.append(score)                            # save average score for the episode
-               scores.append(score)                                   # save average score in the window
-               
+               scores.append(score)                                   # save average score in the window     
+          
+          cpu_usage = psutil.cpu_percent()
+          rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+          
           if i_episode % print_every == 0:
                rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
           
@@ -86,7 +71,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
                torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 
-          if np.mean(scores_window) >= param["SCORE_SOLVED"]:
+          if np.mean(scores_window) >= score_solved:
                rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
                torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
                torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
@@ -97,9 +82,15 @@ def ddpg(n_episodes, print_every, max_t, score_solved):
 if __name__ == '__main__':
      """Start training."""
      
+     # folder to load config file        
+     CONFIG_PATH = rospy.get_param('config_path')  
+     useful = Extension(CONFIG_PATH)
+
+     param = useful.load_config("main_config.yaml")
+
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_T"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved)
+     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH)

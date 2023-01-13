@@ -119,7 +119,13 @@ class TestPackage(unittest.TestCase):
           try:
                from std_srvs.srv import Empty
           except ImportError:
-               self.fail("Could not import std_srvs")       
+               self.fail("Could not import std_srvs")      
+
+     def test_psutil_import(self):
+          try:
+               import psutil
+          except ImportError:
+               self.fail("Could not import psutil")  
 
 if __name__ == '__main__':
     rosunit.unitrun(PKG, NAME, TestPackage)

@@ -8,21 +8,13 @@ import yaml
 import os
 import rospy
 
-# folder to load config file
-CONFIG_PATH = "/ws/src/motion/config/"
-
-# Function to load yaml configuration file
-def load_config(config_name):
-    with open(os.path.join(CONFIG_PATH, config_name)) as file:
-        param = yaml.safe_load(file)
-
-    return param
-
-param = load_config("main_config.yaml")
-
 class Extension():
-     def __init__(self):       
-          rospy.init_node('test_node', anonymous=True)  
+     def __init__(self, CONFIG_PATH):       
+          rospy.init_node('test_node', anonymous=True) 
+
+          self.CONFIG_PATH = CONFIG_PATH
+          param = self.load_config("main_config.yaml")
+
           self.vel_publisher = rospy.Publisher(param["topic_cmd"], Twist, queue_size=1)
           self.cmd_vel = Twist()
           self.ctrl_c = False
@@ -215,23 +207,8 @@ class Extension():
                else:
                     self.rate.sleep()
 
-     def view_parameter(self):
-          """visualization of parameters."""
+     def load_config(self, config_name):
+          with open(os.path.join(self.CONFIG_PATH, config_name)) as file:
+               param = yaml.safe_load(file)
 
-          print("\033[92m# ===== Training parameters: ===== #\033[0m")
-
-          rospy.loginfo('State Dimensions: ' + str(self.state_dim))
-          rospy.loginfo('Action Dimensions: ' + str(self.action_dim))
-          rospy.loginfo('Action Max: ' + str(self.action_linear_max) + ' m/s and ' + str(self.action_angular_max) + ' rad/s')
-
-          print("\033[92m# ===== ROS parameters: ===== #\033[0m")
-
-          rospy.loginfo('Topic cmd: ' + self.cmd)
-          rospy.loginfo('Topic odom: ' + self.odom)
-          rospy.loginfo('Topic scan: ' + self.scan)
-
-          print("\033[92m# ===== Env parameters: ===== #\033[0m")
-
-          rospy.loginfo('Goal Achieved Distance: ' + str(self.goal_reached_dist))
-          rospy.loginfo('Collision Distance: ' + str(self.collision_dist))
-          print()
+          return param

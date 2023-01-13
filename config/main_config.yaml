@@ -1,4 +1,3 @@
-
 # ==== parameters ros ==== #
 topic_cmd: 'cmd_vel'
 topic_odom: 'odom'
@@ -7,18 +6,20 @@ robot: 'buzz'
 
 # ==== parameters for the environment ==== #
 goal_reached_dist: 0.2
-collision_dist: 0.1
-orientation_threshold: 0.1
-environment_dim: 150
-robot_dim: 4
-action_dim: 2
+collision_dist: 0.1 
+orientation_threshold: 0.1 
+environment_dim: 150 
+robot_dim: 4 # x, y, theta, linear velocity
+action_dim: 2 # angular and linear
 action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
-time_delta: 0.1
+time_delta: 0.1 # 10 Hz
+time_simulate: 2.0 # 2x time
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/waypoints.yaml'
 goal_model: '/ws/src/motion/models/target.sdf'
+config_path: '/ws/src/motion/config/'
 
 # ==== parameters for the model ==== #
 BUFFER_SIZE: 1000000    # replay buffer size

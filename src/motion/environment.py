@@ -8,31 +8,26 @@ import yaml
 import math
 import time
 import tf
+import csv
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
+from gazebo_msgs.srv import SetPhysicsProperties
 
 from std_srvs.srv import Empty
 from squaternion import Quaternion
 
 from utils import Extension
 
-# folder to load config file
-CONFIG_PATH = "/ws/src/motion/config/"
-
-# Function to load yaml configuration file
-def load_config(config_name):
-    with open(os.path.join(CONFIG_PATH, config_name)) as file:
-        param = yaml.safe_load(file)
-
-    return param
-
-param = load_config("main_config.yaml")
-
 class Env():
-     def __init__(self):
+     def __init__(self, CONFIG_PATH):
+
+          self.useful = Extension(CONFIG_PATH)
+
+          # Function to load yaml configuration file
+          param = self.useful.load_config("main_config.yaml")
 
           # set the initial state
           self.goal_model = param["goal_model"]
@@ -42,7 +37,6 @@ class Env():
           self.collision_dist = param["collision_dist"]
           self.robot = param["robot"]
           self.orientation_threshold = param["orientation_threshold"]
-          self.util = Extension()
 
           # initialize global variables
           self.odom_x = 0.0
@@ -51,10 +45,10 @@ class Env():
           self.goal_y = 0.0
 
           #self.scan_data = np.ones(self.environment_dim) * 10
-          self.data = None
           self.path_waypoints = param["waypoints"]
-          self.goals = self.util.path_goal(self.path_waypoints)
+          self.goals = self.useful.path_goal(self.path_waypoints)
           self.pose = None
+          self.data = None
           self.orientation = None
           self.goal_orientation = 0.0
 
@@ -69,7 +63,7 @@ class Env():
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
 
-          self.gaps = self.util.array_gaps(self.environment_dim)
+          self.gaps = self.useful.array_gaps(self.environment_dim)
 
      def odom_callback(self, odom_msg):
           """
@@ -81,7 +75,7 @@ class Env():
           """
           self.pose = odom_msg.pose.pose
           self.orientation = self.pose.orientation
-     
+
      def scan_callback(self, scan):
           """
           Sensor scan message that contains range data from a laser range finder
@@ -90,9 +84,9 @@ class Env():
                scan (LaserScan): list of range measurements, one for each beam in the scan.
                scan_data (array): A list of range measurements.
           """
-          data = scan.ranges
-          #self.scan_data = self.util.scan_rang(self.environment_dim, self.gaps, data)
-          self.data = self.util.range(scan)
+          #data = scan.ranges
+          #self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
+          self.data = self.useful.range(scan)
 
      def step_env(self, action):
           """
@@ -138,7 +132,7 @@ class Env():
 
           # ================== READ SCAN DATA ================== #
           try:
-               done, collision, min_laser = self.util.observe_collision(self.data, self.collision_dist)
+               done, collision, min_laser = self.useful.observe_collision(self.data, self.collision_dist)
                v_state = []
                v_state[:] = self.data[:]
                laser_state = [v_state]
@@ -173,16 +167,16 @@ class Env():
                rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
-               rospy.logerr('Read Odom Data              => Error reading odometry data')
+               rospy.logfatal('Read Odom Data              => Error reading odometry data')
                self.odom_x = 1.0
                self.odom_y = 1.0
                angle = 0.0
 
           # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
-          distance = self.util.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
+          distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
-          theta = self.util.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
+          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
@@ -204,7 +198,7 @@ class Env():
           # ================== SET STATE ================== #
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(laser_state, robot_state)
-          reward = self.util.get_reward(target, collision, action, min_laser)
+          reward = self.useful.get_reward(target, collision, action, min_laser)
 
           rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
           return state, reward, done, target
@@ -248,9 +242,9 @@ class Env():
           x, y = 0.0, 0.0
 
           while True:
-               x, y = self.util.random_goal(path)
-               _x, _y = self.util.change_goal(path, self.odom_x, self.odom_y)
-               check = self.util.check_pose(x, y, _x, _y)
+               x, y = self.useful.random_goal(path)
+               _x, _y = self.useful.change_goal(path, self.odom_x, self.odom_y)
+               check = self.useful.check_pose(x, y, _x, _y)
                if check == True:
                     break
                     
@@ -258,30 +252,32 @@ class Env():
 
           # ================== SET RANDOM ROBOT MODEL ================== #
           try:
-               robot = ModelState()
-               robot.model_name = self.robot
-               robot.pose.position.x = x
-               robot.pose.position.y = y
-               robot.pose.position.z = 0.0
-               robot.pose.orientation.x = quaternion.x
-               robot.pose.orientation.y = quaternion.y
-               robot.pose.orientation.z = quaternion.z
-               robot.pose.orientation.w = quaternion.w
+               set_robot = ModelState()
+               set_robot.model_name = self.robot
+               set_robot.pose.position.x = x
+               set_robot.pose.position.y = y
+               set_robot.pose.position.z = 0.0
+               set_robot.pose.orientation.x = quaternion.x
+               set_robot.pose.orientation.y = quaternion.y
+               set_robot.pose.orientation.z = quaternion.z
+               set_robot.pose.orientation.w = quaternion.w
           
           except:
                rospy.logerr('Set Random Robot Model       => Error setting random robot model')
 
           # ================== SET RANDOM GOAL MODEL ================== #
           try:
-               robot = ModelState()
-               robot.model_name = "target"
-               robot.pose.position.x = _x
-               robot.pose.position.y = _y
-               robot.pose.position.z = 0.0
-               robot.pose.orientation.x = 0.0
-               robot.pose.orientation.y = 0.0
-               robot.pose.orientation.z = 0.0
-               robot.pose.orientation.w = 1.0
+
+               #target_urdf = open(self.goal_model, "r").read()
+               set_target = ModelState()
+               set_target.model_name = "target"
+               set_target.pose.position.x = _x
+               set_target.pose.position.y = _y
+               set_target.pose.position.z = 0.0
+               set_target.pose.orientation.x = 0.0
+               set_target.pose.orientation.y = 0.0
+               set_target.pose.orientation.z = 0.0
+               set_target.pose.orientation.w = 1.0
                self.goal_x, self.goal_y = _x, _y
           
           except:
@@ -313,9 +309,9 @@ class Env():
 
           # ==================CALCULATE DISTANCE AND ANGLE ================== #
           # Calculate distance to the goal from the robot
-          distance = self.util.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
+          distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
-          theta = self.util.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
+          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 

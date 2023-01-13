@@ -8,7 +8,7 @@ from std_srvs.srv import Empty
 from gazebo_msgs.msg import ModelState 
 
 import unittest
-import rosunit
+import subprocess
 import rospy
 import rostest
 
@@ -22,7 +22,7 @@ NAME = 'ros'
 print("\033[92m\nROS Unit Tests\033[0m")
 
 # folder to load config file
-CONFIG_PATH = "/ws/src/motion/config/"
+CONFIG_PATH = rospy.get_param('~config_path')
 
 # Function to load yaml configuration file
 def load_config(config_name):

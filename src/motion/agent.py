@@ -10,31 +10,15 @@ from replaybuffer import ReplayBuffer
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-import yaml
-import os
 import rospy
-
-#import ray
-#from ray import tune
-
-# folder to load config file
-CONFIG_PATH = "/ws/src/motion/config/"
-
-# Function to load yaml configuration file
-def load_config(config_name):
-    with open(os.path.join(CONFIG_PATH, config_name)) as file:
-        param = yaml.safe_load(file)
-
-    return param
-
-param = load_config("main_config.yaml")
+from utils import Extension
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
     
-    def __init__(self, state_size, action_size, random_seed, n=1):
+    def __init__(self, state_size, action_size, random_seed, CONFIG_PATH):
         """Initialize an Agent object.
          
         Params
@@ -43,33 +27,36 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
+        useful = Extension(CONFIG_PATH)
+        # Function to load yaml configuration file
+        self.param = useful.load_config("main_config.yaml")
 
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
-        self.tau = param["TAU"]
-        self.epsilon = param["EPSILON"]
-        self.clip_param= param["CLIP_PARAM"]
-        self.max_action = param["MAX_ACTION"]
-        self.discount_factor = param["DISCOUNT"]
+        self.tau = self.param["TAU"]
+        self.epsilon = self.param["EPSILON"]
+        self.clip_param= self.param["CLIP_PARAM"]
+        self.max_action = self.param["MAX_ACTION"]
+        self.discount_factor = self.param["DISCOUNT"]
 
         # Actor Network (w/ Network)
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=param['LR_ACTOR'])
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.param['LR_ACTOR'])
 
         # Critic Network (w/ Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=param['LR_CRITIC'], weight_decay=param['WEIGHT_DECAY'])
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.param['LR_CRITIC'], weight_decay=self.param['WEIGHT_DECAY'])
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
 
         # Replay memory
-        self.memory = ReplayBuffer(int(param["BUFFER_SIZE"]), int(param["BATCH_SIZE"]), random_seed)
+        self.memory = ReplayBuffer(int(self.param["BUFFER_SIZE"]), int(self.param["BATCH_SIZE"]), random_seed)
     
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
@@ -78,16 +65,16 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > param["BATCH_SIZE"] and timestep % float(param["LEARN_EVERY"]) == 0.0:
+        if len(self.memory) > self.param["BATCH_SIZE"] and timestep % float(self.param["LEARN_EVERY"]) == 0.0:
                  
             rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
 
-            for _ in range(param["LEARN_NUM"]):
+            for _ in range(self.param["LEARN_NUM"]):
                 # Sample a batch of experiences from the replay buffer
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
-                loss = self.learn(experiences, timestep, param["POLICY_NOISE"], param["POLICY_FREQ"])
+                loss = self.learn(experiences, timestep, self.param["POLICY_NOISE"], self.param["POLICY_FREQ"])
                 loss_numpy = loss.detach().numpy()
             
             rospy.loginfo('Calculate Loss               => Loss: ' + str(loss_numpy))
@@ -154,7 +141,7 @@ class Agent():
             self.soft_update(self.critic_local, self.critic_target, self.tau)
 
         # ---------------------------- update noise ---------------------------- #
-        self.epsilon -= float(param["EPSILON_DECAY"])
+        self.epsilon -= float(self.param["EPSILON_DECAY"])
         self.noise.reset()  
 
         return critic_loss    
