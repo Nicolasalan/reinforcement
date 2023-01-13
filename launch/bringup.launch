@@ -8,11 +8,6 @@
           <arg name="robot_model" default="hera_full"/>
           <arg name="use_jsp_gui" default="false"/>
      </include>
-
-     <!-- check collision -->
-     <!--<node name="hera_check_collision" pkg="hera_description" type="hera_check_collision" output="screen">
-          <param name="robot_name" value="robot"/>
-     </node>-->
-
+     
      <include file="$(find motion)/launch/spawn.launch"/>
 </launch>

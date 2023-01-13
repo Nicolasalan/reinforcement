@@ -3,9 +3,7 @@
 from motion.utils import Extension
 import unittest
 import rosunit
-import rospy
 
-import yaml
 import os
 
 PKG = 'motion'
@@ -16,13 +14,17 @@ print("\033[92m\nLibrary Unit Tests\033[0m")
 class TestLibrary(unittest.TestCase):
 
     def setUp(self):
-        self.rc = Extension()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+        config_dir = os.path.join(parent_dir, 'config')
+
+        self.rc = Extension(config_dir)
          
         # examples of data entries
         self.path_goals = [(-0.486865, 6.297588), (-1.036671, 5.001958), (-1.581001, 6.032743), (-1.972984, 5.123956), 
             (-2.759404, 6.201657), (-2.999777, 4.887653), (-3.68207, 6.087976), (-3.676394, 5.217483)]
         self.scan_data = (6.936707019805908, 5.523979187011719, 5.137536525726318, 4.584518909454346, 4.104661464691162, 
-            4.121588230133057, 4.140231132507324, 4.16062593460083)
+            4.121588230133057, 4.140231132507324, 4.16062593460083)  
         self.scan = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  
             0.53439379, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.gaps = [[-1.5707963267948966, -1.4660765716752369], [-1.4660765716752369, -1.3613568165555772], 

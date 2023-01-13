@@ -269,7 +269,6 @@ class Env():
           # ================== SET RANDOM GOAL MODEL ================== #
           try:
 
-               #target_urdf = open(self.goal_model, "r").read()
                set_target = ModelState()
                set_target.model_name = "target"
                set_target.pose.position.x = _x
