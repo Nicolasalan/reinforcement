@@ -1,7 +1,7 @@
 # ==== parameters ros ==== #
-topic_cmd: 'cmd_vel'
-topic_odom: 'odom'
-topic_scan: 'base_scan_front'
+topic_cmd: '/cmd_vel'
+topic_odom: '/odom'
+topic_scan: '/base_scan_front'
 robot: 'robot'
 
 # ==== parameters for the environment ==== #
@@ -14,7 +14,7 @@ action_dim: 2 # angular and linear
 action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
-time_simulate: 2.0 # 2x time
+#time_simulate: 2.0 # 2x time
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/waypoints.yaml'

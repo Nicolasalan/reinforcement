@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 
 # importar bibliotecas comuns
-import os
 import rospy
 import numpy as np
-import yaml
 import math
-import time
 import tf
-import csv
+import time
 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Pose
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetPhysicsProperties
+from tf.transformations import euler_from_quaternion
 
 from std_srvs.srv import Empty
 from squaternion import Quaternion
@@ -44,12 +42,13 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
+          self.angle = 0.0
+
           #self.scan_data = np.ones(self.environment_dim) * 10
           self.path_waypoints = param["waypoints"]
           self.goals = self.useful.path_goal(self.path_waypoints)
-          self.pose = None
+          self.pose = Pose()
           self.data = None
-          self.last_odom = None
           self.orientation = None
           self.goal_orientation = 0.0
 
@@ -66,7 +65,7 @@ class Env():
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
 
-     def odom_callback(self, odom_msg):
+     def odom_callback(self, msg):
           """
           Processes an odometry message and updates the current pose of the robot.
           ======
@@ -74,9 +73,25 @@ class Env():
                odom_msg (Odometry): An odometry message containing the current pose of the robot.
                pose (Pose): The current pose of the robot, represented as a Pose object.
           """
-          self.last_odom = odom_msg
-          #self.pose = odom_msg.pose.pose
-          #self.orientation = self.pose.orientation
+          try:
+               self.odom_x = msg.pose.pose.position.x
+               self.odom_y = msg.pose.pose.position.y
+
+               quaternion = (
+                    msg.pose.pose.orientation.x,
+                    msg.pose.pose.orientation.y,
+                    msg.pose.pose.orientation.z,
+                    msg.pose.pose.orientation.w
+               )
+               euler = tf.transformations.euler_from_quaternion(quaternion)
+               yaw = euler[2]
+               self.angle = math.degrees(yaw)
+
+          except:
+               rospy.logfatal('Read Odom Data              => Error reading odometry data')
+               self.odom_x = 1.0
+               self.odom_y = 1.0
+               self.angle = 0.0
 
      def scan_callback(self, scan):
           """
@@ -148,48 +163,26 @@ class Env():
                laser_state = [np.ones(self.environment_dim) * 10]
 
           # ================== READ ODOM DATA ================== #
-          try:
-               # Calculate robot heading from odometry data
-               self.odom_x = self.last_odom.pose.pose.position.x
-               self.odom_y = self.last_odom.pose.pose.position.y
                
-               # Calculate robot heading from odometry data
-               quaternion = Quaternion(
-                    self.last_odom.pose.pose.orientation.w,
-                    self.last_odom.pose.pose.orientation.x,
-                    self.last_odom.pose.pose.orientation.y,
-               self.last_odom.pose.pose.orientation.z,
-               )
-               # calcule yaw angle
-               euler = quaternion.to_euler(degrees=False)
-               angle = round(euler[2], 4)
-
-               rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
-
-          except:
-               rospy.logfatal('Read Odom Data              => Error reading odometry data')
-               self.odom_x = 1.0
-               self.odom_y = 1.0
-               angle = 0.0
+          rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(self.angle))
 
           # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
-          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
+          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, self.angle)
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
-          # TODO:
           # Calculate difference between current orientation and target orientation
-          #orientation_diff = abs(angle - self.goal_orientation)
+          orientation_diff = abs(self.angle - self.goal_orientation)
 
-          #rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
+          rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
 
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
-          if distance < self.goal_reached_dist: #and orientation_diff < self.orientation_threshold:
+          if distance < self.goal_reached_dist and orientation_diff < self.orientation_threshold:
                target = True
                done = True
 
