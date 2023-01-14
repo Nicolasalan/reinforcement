@@ -10,7 +10,6 @@ import rospy
 
 class Extension():
      def __init__(self, CONFIG_PATH):       
-          #rospy.init_node('test_node', anonymous=True) 
 
           self.CONFIG_PATH = CONFIG_PATH
           param = self.load_config("main_config.yaml")
@@ -180,10 +179,10 @@ class Extension():
 
           return np.array(scan_range)
 
-     #def shutdownhook(self):
-     #     """Shutdown hook for the node."""
+     def shutdownhook(self):
+          """Shutdown hook for the node."""
 
-     #     rospy.is_shutdown()
+          rospy.is_shutdown()
 
      #def publish_cmd_vel(self): 
      #     """Publishes a command velocity message to control the robot's movement."""

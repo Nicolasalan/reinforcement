@@ -49,7 +49,6 @@ class Env():
           self.data = None
           self.last_odom = None
           self.orientation = None
-          self.goal_orientation = 0.0
 
           # ROS publications and subscriptions
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
@@ -63,7 +62,7 @@ class Env():
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
-          #rospy.sleep(1)
+          rospy.sleep(1)
 
      def odom_callback(self, msg):
           """
@@ -158,8 +157,9 @@ class Env():
                euler = tf.transformations.euler_from_quaternion(quaternion)
                yaw = euler[2]
                angle = math.degrees(yaw)
-               rospy.loginfo('Read Odom Data               => Odom X: ' + str(self.odom_x) + ' Odom Y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
+               rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
+               rospy.sleep(1)
           except:
                rospy.logfatal('Read Odom Data              => Error reading odometry data')
                self.odom_x = 0.0

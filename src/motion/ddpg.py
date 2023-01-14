@@ -48,20 +48,20 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
                action = agent.action(states)                          # choose an action for each agent
                actions = [(action[0] + 1) / 2, action[1]]
 
-               while not rospy.is_shutdown():
-                    next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    rospy.sleep(1)
+               next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
                # save the experiment in the replay buffer, run the learning step at a defined interval
                agent.step(states, actions, rewards, next_states, done, t)
-          
+               rospy.sleep(1)
+
                states = next_states
                score += rewards
                if np.any(done):                                       # exit loop when episode ends
                     break              
                
                scores_window.append(score)                            # save average score for the episode
-               scores.append(score)                                   # save average score in the window     
+               scores.append(score)                                   # save average score in the window  
+                                                
           cpu_usage = psutil.cpu_percent()
           rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
           
@@ -77,6 +77,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
                torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
                torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
                break
+     
+     rospy.spin()
 
      return scores
 
