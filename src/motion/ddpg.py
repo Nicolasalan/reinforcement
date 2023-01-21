@@ -52,7 +52,6 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
 
                # save the experiment in the replay buffer, run the learning step at a defined interval
                agent.step(states, actions, rewards, next_states, done, t)
-               rospy.sleep(1)
 
                states = next_states
                score += rewards
@@ -77,8 +76,6 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
                torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
                torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
                break
-     
-     rospy.spin()
 
      return scores
 

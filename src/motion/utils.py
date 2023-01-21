@@ -123,8 +123,8 @@ class Extension():
                if i == rand:
                     _x, _y = points[i][0], points[i][1] 
           
-          x = odom_x + _x
-          y = odom_y + _y
+          x = _x
+          y = _y
 
           return x, y
 

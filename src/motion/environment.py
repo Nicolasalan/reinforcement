@@ -56,7 +56,7 @@ class Env():
           self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
 
           # ROS services 
-          self.reset = rospy.ServiceProxy('gazebo/reset_simulation', Empty)
+          self.reset = rospy.ServiceProxy('gazebo/reset_world', Empty)
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
@@ -159,7 +159,6 @@ class Env():
                angle = math.degrees(yaw)
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
-               rospy.sleep(1)
           except:
                rospy.logfatal('Read Odom Data              => Error reading odometry data')
                self.odom_x = 0.0
