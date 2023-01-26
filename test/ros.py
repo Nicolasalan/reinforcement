@@ -1,20 +1,16 @@
 #! /usr/bin/env python3
 
-from motion.utils import Extension
+from motion.topics import Mensage
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
-from std_srvs.srv import Empty
-from gazebo_msgs.msg import ModelState 
 
 import unittest
-import subprocess
 import rospy
 import rostest
-
-import yaml
-import os
 import time
+
+import os
 
 PKG = 'motion'
 NAME = 'ros'
@@ -31,24 +27,24 @@ class TestROS(unittest.TestCase):
           # navigate to the config directory
           config_dir = os.path.join(parent_dir, 'config')
           
-          self.rc = Extension(config_dir)
+          self.rc = Mensage(config_dir)
           self.param = self.rc.load_config("main_config.yaml")
 
           self.success = False
           self.rate = rospy.Rate(1)
 
-     #def callback(self, msg):
-     #     self.success = msg.angular.z and msg.angular.z == 1
+     def callback(self, msg):
+          self.success = msg.angular.z and msg.angular.z == 1
 
-     #def test_publish_cmd_vel(self):
-     #     # Test function for the publish_cmd_vel function.   
-     #     test_sub = rospy.Subscriber("/cmd_vel", Twist, self.callback)
-     #     self.rc.cmd_vel.angular.z = 1
-     #     self.rc.publish_cmd_vel()
-     #     timeout_t = time.time() + 1.0  # 10 seconds
-     #     while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-     #          time.sleep(0.1)
-     #     self.assert_(self.success)
+     def test_publish_cmd_vel(self):
+          # Test function for the publish_cmd_vel function.   
+          test_sub = rospy.Subscriber("/cmd_vel", Twist, self.callback)
+          self.rc.cmd_vel.angular.z = 1
+          self.rc.publish_cmd_vel()
+          timeout_t = time.time() + 1.0  # 10 seconds
+          while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
+               time.sleep(0.1)
+          self.assert_(self.success)
 
      def test_subscribe_cmd_vel(self):
           # Try to receive a message from the /odom topic
