@@ -91,7 +91,7 @@ test-package:
 .PHONY: test-full
 test-full:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/library.py && python3 test/ros.py"
+	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
 
 # === Start Rosboard docker ===
 .PHONY: rosboard

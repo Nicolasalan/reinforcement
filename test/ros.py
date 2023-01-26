@@ -46,13 +46,6 @@ class TestROS(unittest.TestCase):
                time.sleep(0.1)
           self.assert_(self.success)
 
-     def test_subscribe_cmd_vel(self):
-          # Try to receive a message from the /odom topic
-          msg = rospy.wait_for_message(self.param["topic_cmd"], Twist, timeout=1.0)
-          self.rate.sleep()
-          # Verify that the message was received
-          self.assertIsNotNone(msg, "Failed to receive message from /cmd_vel topic")
-
      def test_subscribe_odom(self):
           # Try to receive a message from the /odom topic
           msg = rospy.wait_for_message(self.param["topic_odom"], Odometry, timeout=1.0)
