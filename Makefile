@@ -13,6 +13,7 @@ DOCKER_ENV_VARS= \
 	--privileged 	
 
 COMMAND="source devel/setup.bash && roslaunch motion bringup.launch"
+COMMAND_VIEW="source devel/setup.bash && roslaunch motion bringup.launch gui:=true"
 
 define xhost_activate
 	@echo "Enabling local xhost sharing:"
@@ -43,6 +44,12 @@ terminal:
 setup:
 	@echo "Setup world ..."
 	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c ${COMMAND}
+
+# === setup view ===
+.PHONY: view 
+view:
+	@echo "Setup View world ..."
+	@docker run -it --net=host ${DOCKER_ENV_VARS} motion-docker bash -c ${COMMAND_VIEW}
 
 # === Spawn model ===
 .PHONY: spawn 
