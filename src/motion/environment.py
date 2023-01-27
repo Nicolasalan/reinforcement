@@ -36,6 +36,8 @@ class Env():
           self.collision_dist = param["collision_dist"]
           self.robot = param["robot"]
           self.orientation_threshold = param["orientation_threshold"]
+          self.cmd_linear = param["action_linear_max"]
+          self.cmd_angular = param["action_angular_max"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -105,8 +107,8 @@ class Env():
           try:
                # Publish the robot action
                vel_cmd = Twist()
-               vel_cmd.linear.x = action[0]
-               vel_cmd.angular.z = action[1]
+               vel_cmd.linear.x = action[0] * self.cmd_linear
+               vel_cmd.angular.z = action[1] * self.cmd_angular
                self.pub_cmd_vel.publish(vel_cmd)
                rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
