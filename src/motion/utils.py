@@ -94,7 +94,7 @@ class Extension():
           
           return x, y
 
-     def get_reward(self, target, collision, action, min_laser):
+     def get_reward(self, target, collision, action, min_laser, current_distance, prev_action, initial_distance):
           """Agent reward function."""
 
           if target:
@@ -103,7 +103,9 @@ class Extension():
                return -100.0
           else:
                r3 = lambda x: 1 - x if x < 1 else 0.0
-               return action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2
+               smoothness_penalty = abs(math.degrees(math.atan2(action[1], action[0]) - math.atan2(prev_action[1], prev_action[0]))) 
+               return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) + ((initial_distance - current_distance) * 10) - smoothness_penalty
+
 
      def observe_collision(self, laser_data, collision_dist):
           """Detect a collision from laser data."""
@@ -113,7 +115,7 @@ class Extension():
                return True, True, min_laser
           return False, False, min_laser
 
-     def change_goal(self, goals, odom_x, odom_y):
+     def change_goal(self, goals):
           """Select a random goal from the list of waypoints."""
 
           points = goals
@@ -183,17 +185,6 @@ class Extension():
           """Shutdown hook for the node."""
 
           rospy.is_shutdown()
-
-     #def publish_cmd_vel(self): 
-     #     """Publishes a command velocity message to control the robot's movement."""
-
-     #     while not self.ctrl_c:
-     #          connections = self.vel_publisher.get_num_connections()
-     #          if connections > 0:
-     #               self.vel_publisher.publish(self.cmd_vel)
-     #               break
-     #          else:
-     #               self.rate.sleep()
 
      def load_config(self, config_name):
           with open(os.path.join(self.CONFIG_PATH, config_name)) as file:

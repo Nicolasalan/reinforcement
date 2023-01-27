@@ -1,4 +1,4 @@
-* Ajustar velocidade limite o parâmetro não serve pra nada 
+* Ajustar velocidade limite o parâmetro não serve pra nada - FEITO
 * Verificar o spawn do target 
 * Modo de visualização melhor pra treinamento, não dá pra ver nada, igual o yolov8 tipo carregamento 
 * Mostrar no tensorboard o uso de cpu
