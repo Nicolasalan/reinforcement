@@ -99,9 +99,9 @@ class Extension():
                return -100.0
           else:
                r3 = lambda x: 1 - x if x < 1 else 0.0
-               #smoothness_penalty = abs(math.degrees(math.atan2(action[1], action[0]) - math.atan2(prev_action[1], prev_action[0]))) 
+               smoothness_penalty = abs(math.degrees(math.atan2(action[1], action[0]) - math.atan2(prev_action[1], prev_action[0]))) 
                distance = (initial_distance - current_distance)
-               return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) + distance # - smoothness_penalty
+               return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) + distance - smoothness_penalty / 100
 
      def observe_collision(self, laser_data, collision_dist):
           """Detect a collision from laser data."""
