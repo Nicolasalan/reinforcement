@@ -148,11 +148,10 @@ class Env():
                v_state = []
                v_state[:] = self.scan_data[:]
                laser_state = [v_state]
-               # TODO
-               noisy_state = v_state + np.random.normal(0, self.noise_sigma, len(v_state))
-               noisy = []
-               noisy[:] = noisy_state[:]
-               #laser_state_noise = [noisy_state]
+
+               # add noise to the laser data
+               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               state_laser = [list(noisy_state)]
                
                rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
