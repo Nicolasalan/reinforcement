@@ -87,8 +87,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
-          agent.actor_local.load_state_dict(torch.load(checkpoints_dir + '/best_actor_model.pth'))
-          agent.critic_local.load_state_dict(torch.load(checkpoints_dir + '/best_critic_model.pth'))
+          agent.actor_local.load_state_dict(torch.load(param["model_actor"]))
+          agent.critic_local.load_state_dict(torch.load(param["model_critic"]))
 
           scores_window = []                                               # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode                     
