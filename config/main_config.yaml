@@ -15,6 +15,7 @@ action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
 time_simulate: 2.0 # 2x time
+noise_sigma: 0.5
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/waypoints.yaml'
@@ -26,7 +27,7 @@ model_actor: '/ws/src/motion/src/motion/checkpoints/actor_checkpoint.pth'
 model_critic: '/ws/src/motion/src/motion/checkpoints/actor_checkpoint.pth'
 
 # ==== parameters for the model ==== #
-CONTINUOUS: False       # continuous or trained
+CONTINUOUS: True       # continuous or trained
 BUFFER_SIZE: 1000000    # replay buffer size
 BATCH_SIZE: 40          # minibatch size
 TAU: 0.001              # for soft update of target parameters

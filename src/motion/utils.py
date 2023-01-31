@@ -14,10 +14,6 @@ class Extension():
           self.CONFIG_PATH = CONFIG_PATH
           param = self.load_config("main_config.yaml")
 
-          #self.vel_publisher = rospy.Publisher(param["topic_cmd"], Twist, queue_size=1)
-          #self.cmd_vel = Twist()
-          #self.ctrl_c = False
-          #self.rate = rospy.Rate(1)
           self.state_dim = param["environment_dim"] + param["robot_dim"]
           self.action_dim = param["action_dim"]
           self.action_linear_max = param["action_linear_max"]
@@ -103,9 +99,9 @@ class Extension():
                return -100.0
           else:
                r3 = lambda x: 1 - x if x < 1 else 0.0
-               smoothness_penalty = abs(math.degrees(math.atan2(action[1], action[0]) - math.atan2(prev_action[1], prev_action[0]))) 
-               return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) + ((initial_distance - current_distance) * 10) - smoothness_penalty
-
+               #smoothness_penalty = abs(math.degrees(math.atan2(action[1], action[0]) - math.atan2(prev_action[1], prev_action[0]))) 
+               distance = (initial_distance - current_distance)
+               return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) + distance # - smoothness_penalty
 
      def observe_collision(self, laser_data, collision_dist):
           """Detect a collision from laser data."""

@@ -19,7 +19,7 @@ import time
 PKG = 'motion'
 NAME = 'ros'
 
-print("\033[92m\nROS Unit Tests\033[0m")
+print("\033[92m\Simulation Unit Tests\033[0m")
 
 class TestROS(unittest.TestCase):
 

@@ -69,7 +69,6 @@ class Agent():
                  
             rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
-
             for _ in range(self.param["LEARN_NUM"]):
                 # Sample a batch of experiences from the replay buffer
                 experiences = self.memory.sample()

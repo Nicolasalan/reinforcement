@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# importar bibliotecas comuns
 import rospy
 import numpy as np
 import math
@@ -11,8 +10,6 @@ from geometry_msgs.msg import Twist, Pose
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
-from tf.transformations import euler_from_quaternion
-from gazebo_msgs.srv import SpawnModel, DeleteModel
 
 from std_srvs.srv import Empty
 from squaternion import Quaternion
@@ -29,9 +26,9 @@ class Env():
           param = self.useful.load_config("main_config.yaml")
 
           self.position = Pose()
-          self.goal_position = Pose()
-          self.goal_position.position.x = 0.
-          self.goal_position.position.y = 0.
+          #self.goal_position = Pose()
+          #self.goal_position.position.x = 0.
+          #self.goal_position.position.y = 0.
 
           # set the initial state
           self.goal_model = param["goal_model"]
@@ -43,6 +40,7 @@ class Env():
           self.orientation_threshold = param["orientation_threshold"]
           self.cmd_linear = param["action_linear_max"]
           self.cmd_angular = param["action_angular_max"]
+          self.noise_sigma = param["noise_sigma"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -50,15 +48,15 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.prev_action = None
+          self.prev_action = [0.0, 0.0]
           self.initial_distance = None
 
-          #self.scan_data = np.ones(self.environment_dim) * 10
+          self.scan_data = np.ones(self.environment_dim) * 10
           self.path_waypoints = param["waypoints"]
           self.goals = self.useful.path_goal(self.path_waypoints)
-          self.data = None
+          #self.data = None
           self.last_odom = None
-          self.orientation = None
+          #self.orientation = None
 
           # ROS publications and subscriptions
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
@@ -70,8 +68,6 @@ class Env():
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
-          self.goal = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-          self.del_model = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
           rospy.sleep(1)
@@ -95,6 +91,7 @@ class Env():
                scan_data (array): A list of range measurements.
           """
           data = scan.ranges
+          #noisy_data = data + np.random.normal(0, self.noise_sigma, data.shape)
           self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
           #self.data = self.useful.range(scan)
 
@@ -144,18 +141,26 @@ class Env():
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
           # ================== READ SCAN DATA ================== #
+          
+          done, collision, min_laser = self.useful.observe_collision(self.scan_data, self.collision_dist)
+
           try:
-               done, collision, min_laser = self.useful.observe_collision(self.data, self.collision_dist)
                v_state = []
                v_state[:] = self.scan_data[:]
                laser_state = [v_state]
+               # TODO
+               noisy_state = v_state + np.random.normal(0, self.noise_sigma, len(v_state))
+               noisy = []
+               noisy[:] = noisy_state[:]
+               #laser_state_noise = [noisy_state]
+               
                rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
                rospy.logerr('Read Scan Data              => Error reading scan data')
                done = False
                collision = False
-               min_laser = 0
+               min_laser = 0.0
                laser_state = [np.ones(self.environment_dim) * 10]
 
           # ================== READ ODOM DATA ================== #
@@ -179,6 +184,7 @@ class Env():
                self.odom_x = 0.0
                self.odom_y = 0.0
                angle = 0.0
+     
           # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
@@ -251,7 +257,7 @@ class Env():
 
           while True:
                x, y = self.useful.random_goal(path)
-               _x, _y = self.useful.change_goal(path, self.odom_x, self.odom_y)
+               _x, _y = self.useful.change_goal(path)
                check = self.useful.check_pose(x, y, _x, _y)
                if check == True:
                     break
@@ -274,23 +280,21 @@ class Env():
           except:
                rospy.logerr('Set Random Robot Model       => Error setting random robot model')
 
+          time.sleep(self.time_delta)
+
           # ================== SET RANDOM GOAL MODEL ================== #
-          rospy.wait_for_service('/gazebo/delete_model')
           try:
-               self.del_model('target')
-
-          except:
-               rospy.logerr('Delete Target Model         => Error deleting target model')
-
-          rospy.wait_for_service('/gazebo/spawn_sdf_model')
-          try:
-               goal_urdf = open(self.goal_model, "r").read()
-               target = SpawnModel
-               target.model_name = 'target' 
-               target.model_xml = goal_urdf
-               self.goal_position.position.x = _x
-               self.goal_position.position.y = _y
-               self.goal(target.model_name, target.model_xml, 'namespace', self.goal_position, 'world')
+               set_target = ModelState()
+               set_target.model_name = "target"
+               set_target.pose.position.x = _x
+               set_target.pose.position.y = _y
+               set_target.pose.position.z = 0.0
+               set_target.pose.orientation.x = 0.0
+               set_target.pose.orientation.y = 0.0
+               set_target.pose.orientation.z = 0.0
+               set_target.pose.orientation.w = 1.0
+               self.set_state.publish(set_target)
+               self.goal_x, self.goal_y = _x, _y
           
           except:
                rospy.logerr('Set Random Goal Model       => Error setting random goal model')
@@ -324,7 +328,6 @@ class Env():
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
-
           self.initial_distance = distance
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 

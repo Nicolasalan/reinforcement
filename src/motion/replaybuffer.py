@@ -40,12 +40,12 @@ class ReplayBuffer:
           batch = random.sample(self.memory, k=self.batch_size)
 
           # Convert the batch to a numpy array
-          batch_state       = np.array([_[0] for _ in batch])
-          batch_action      = np.array([_[1] for _ in batch])
-          batch_rewards     = np.array([_[2] for _ in batch]).reshape(-1, 1)
-          batch_next_states = np.array([_[3] for _ in batch])
+          batch_state          = np.array([_[0] for _ in batch])
+          batch_action         = np.array([_[1] for _ in batch])
+          batch_rewards        = np.array([_[2] for _ in batch]).reshape(-1, 1)
+          batch_next_states    = np.array([_[3] for _ in batch])
           batch_n_step_returns = np.array([_[4] for _ in batch]).reshape(-1, 1)
-          batch_dones       = np.array([_[4] for _ in batch]).reshape(-1, 1)
+          batch_dones          = np.array([_[4] for _ in batch]).reshape(-1, 1)
 
           # Convert the batch to a torch tensor
           states = torch.Tensor(batch_state).to(device)

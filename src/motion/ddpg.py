@@ -6,6 +6,7 @@ import numpy as np
 from agent import Agent
 from environment import Env
 from utils import Extension
+from tqdm import tqdm 
 import psutil
 
 import rospy
@@ -29,55 +30,112 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
      state_dim = param["environment_dim"] + param["robot_dim"]
      action_dim = param["action_dim"]
 
-     agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
-     env = Env(CONFIG_PATH)
-
-     scores_window = []                                               # average scores of the most recent episodes
-     scores = []                                                      # list of average scores of each episode                     
-
-     for i_episode in range(1, n_episodes+1):                         # initialize score for each agent
-          rospy.loginfo('Episode: ' + str(i_episode))
-
-          score = 0.0                
-          done = False
-
-          agent.reset()                                               # reset environment    
-          states = env.reset_env()                                    # get the current state of each agent
-
-          for t in range(max_t):                            
-               action = agent.action(states)                          # choose an action for each agent
-               actions = [(action[0] + 1) / 2, action[1]]
-
-               next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-
-               # save the experiment in the replay buffer, run the learning step at a defined interval
-               agent.step(states, actions, rewards, next_states, done, t)
-
-               states = next_states
-               score += rewards
-               if np.any(done):                                       # exit loop when episode ends
-                    break              
+     if param["CONTINUOUS"] == False:
                
-               scores_window.append(score)                            # save average score for the episode
-               scores.append(score)                                   # save average score in the window  
-                                                
-          cpu_usage = psutil.cpu_percent()
-          rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
-          
-          if i_episode % print_every == 0:
-               rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
-          
-          if i_episode % 1000 == 0:
-               torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
-               torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+          env = Env(CONFIG_PATH)
 
-          if np.mean(scores_window) >= score_solved:
-               rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
-               torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
-               torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
-               break
+          scores_window = []                                               # average scores of the most recent episodes
+          scores = []                                                      # list of average scores of each episode                     
 
-     return scores
+          for i_episode in range(n_episodes+1):                            # initialize score for each agent
+               rospy.loginfo('Episode: ' + str(i_episode))
+               score = 0.0                
+               done = False
+
+               agent.reset()                                               # reset environment    
+               states = env.reset_env()                                    # get the current state of each agent
+
+               for t in range(max_t):   
+                         
+                    action = agent.action(states)                          # choose an action for each agent
+                    actions = [(action[0] + 1) / 2, action[1]]
+
+                    next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
+
+                    # save the experiment in the replay buffer, run the learning step at a defined interval
+                    agent.step(states, actions, rewards, next_states, done, t)
+
+                    states = next_states
+                    score += rewards
+                    if np.any(done):                                       # exit loop when episode ends
+                         break              
+                    
+                    scores_window.append(score)                            # save average score for the episode
+                    scores.append(score)                                   # save average score in the window  
+                         
+               cpu_usage = psutil.cpu_percent()
+               rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+               
+               if i_episode % print_every == 0:
+                    rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
+               
+               if i_episode % 1000 == 0:
+                    torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
+                    torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
+
+               if np.mean(scores_window) >= score_solved:
+                    rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
+                    torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
+                    torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
+                    break
+
+          return scores
+
+     if param["CONTINUOUS"] == True:
+
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+          env = Env(CONFIG_PATH)
+
+          agent.actor_local.load_state_dict(torch.load(checkpoints_dir + '/best_actor_model.pth'))
+          agent.critic_local.load_state_dict(torch.load(checkpoints_dir + '/best_critic_model.pth'))
+
+          scores_window = []                                               # average scores of the most recent episodes
+          scores = []                                                      # list of average scores of each episode                     
+
+          for i_episode in range(n_episodes+1):                            # initialize score for each agent
+               rospy.loginfo('Episode: ' + str(i_episode))
+               score = 0.0                
+               done = False
+
+               agent.reset()                                               # reset environment    
+               states = env.reset_env()                                    # get the current state of each agent
+
+               for t in range(max_t):   
+                         
+                    action = agent.action(states)                          # choose an action for each agent
+                    actions = [(action[0] + 1) / 2, action[1]]
+
+                    next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
+
+                    # save the experiment in the replay buffer, run the learning step at a defined interval
+                    agent.step(states, actions, rewards, next_states, done, t)
+
+                    states = next_states
+                    score += rewards
+                    if np.any(done):                                       # exit loop when episode ends
+                         break              
+                    
+                    scores_window.append(score)                            # save average score for the episode
+                    scores.append(score)                                   # save average score in the window  
+                         
+               cpu_usage = psutil.cpu_percent()
+               rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+               
+               if i_episode % print_every == 0:
+                    rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
+               
+               if i_episode % 1000 == 0:
+                    torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
+                    torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
+
+               if np.mean(scores_window) >= score_solved:
+                    rospy.logwarn('Environment solved in ' + str(i_episode) + ' episodes!' + ' Average Score: ' + str(np.mean(scores_window)))
+                    torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
+                    torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
+                    break
+
+          return scores
 
 if __name__ == '__main__':
      """Start training."""
