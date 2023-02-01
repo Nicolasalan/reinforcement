@@ -199,7 +199,7 @@ class Extension():
           rospy.wait_for_service("gazebo/get_world_properties")
           get_world_properties = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
 
-          pose_mode = []
+          model_poses = []
 
           response = get_world_properties()
           model_names = response.model_names
@@ -214,11 +214,11 @@ class Extension():
                     x = response.pose.position.x
                     y = response.pose.position.y
                     z = response.pose.position.z
-                    pose_mode.append((x, y, z))
+                    model_poses.append((x, y, z))
                except rospy.ServiceException as e:
                     pass
 
-          models = list(zip(model_names, pose_mode))
+          models = list(zip(model_names, model_poses))
      
           np.random.shuffle(models)
 
