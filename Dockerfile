@@ -57,7 +57,8 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-gazebo-ros-control \
  && apt-get install -y ros-noetic-rplidar-ros \
  && apt-get install -y ros-noetic-driver-base \
- && apt-get install -y ros-noetic-rosserial-arduino
+ && apt-get install -y ros-noetic-rosserial-arduino 
+
 
 # install pytorch
 RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu

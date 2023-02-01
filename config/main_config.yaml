@@ -23,11 +23,11 @@ goal_model: '/ws/src/motion/models/target.sdf'
 config_path: '/ws/src/motion/config/'
 
 # path model saved
-model_actor: '/ws/src/motion/src/motion/checkpoints/actor_checkpoint.pth'
-model_critic: '/ws/src/motion/src/motion/checkpoints/actor_checkpoint.pth'
+model_actor: '/ws/src/motion/src/motion/checkpoints/best_actor_model.pth'
+model_critic: '/ws/src/motion/src/motion/checkpoints/best_critic_model.pth'
 
 # ==== parameters for the model ==== #
-CONTINUOUS: True       # continuous or trained
+CONTINUOUS: True        # continuous or trained
 BUFFER_SIZE: 1000000    # replay buffer size
 BATCH_SIZE: 40          # minibatch size
 TAU: 0.001              # for soft update of target parameters

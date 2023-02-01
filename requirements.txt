@@ -5,5 +5,3 @@ squaternion
 tornado
 simplejpeg
 rospkg
-tqdm
-psutil

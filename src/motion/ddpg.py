@@ -6,7 +6,6 @@ import numpy as np
 from agent import Agent
 from environment import Env
 from utils import Extension
-from tqdm import tqdm 
 import psutil
 
 import rospy

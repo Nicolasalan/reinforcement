@@ -25,7 +25,7 @@ endef
 .PHONY: build
 build:
 	@echo "Building docker image ..."
-	@sudo docker build -t motion-docker  . 
+	@docker login && docker build -t motion-docker  . 
 
 # === Clean docker ===
 .PHONY: clean

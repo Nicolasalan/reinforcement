@@ -10,6 +10,7 @@ from geometry_msgs.msg import Twist, Pose
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
+from gazebo_msgs.srv import SetLightProperties
 
 from std_srvs.srv import Empty
 from squaternion import Quaternion
@@ -68,6 +69,8 @@ class Env():
           self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
+          self.set_light_properties = rospy.ServiceProxy("/gazebo/set_light_properties", SetLightProperties)
+
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
           rospy.sleep(1)
@@ -147,12 +150,11 @@ class Env():
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
-               laser_state = [v_state]
 
                # add noise to the laser data
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = [list(noisy_state)]
-               
+
                rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
@@ -160,7 +162,7 @@ class Env():
                done = False
                collision = False
                min_laser = 0.0
-               laser_state = [np.ones(self.environment_dim) * 10]
+               state_laser = [np.ones(self.environment_dim) * 10]
 
           # ================== READ ODOM DATA ================== #
           try:
@@ -208,7 +210,7 @@ class Env():
 
           # ================== SET STATE ================== #
           robot_state = [distance, theta, action[0], action[1]]
-          state = np.append(laser_state, robot_state)
+          state = np.append(state_laser, robot_state)
           reward = self.useful.get_reward(target, collision, action, min_laser, distance, self.prev_action, self.initial_distance)
 
           self.initial_distance = distance
@@ -297,6 +299,7 @@ class Env():
           
           except:
                rospy.logerr('Set Random Goal Model       => Error setting random goal model')
+
           # ================== UNPAUSE SIMULATION ================== #
           rospy.wait_for_service("/gazebo/unpause_physics")
           try:
