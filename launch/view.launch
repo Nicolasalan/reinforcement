@@ -1,0 +1,13 @@
+<launch>
+     <!-- Launch World -->
+     <include file="$(find aws_robomaker_bookstore_world)/launch/view_bookstore.launch"/>
+          <arg name="gui" default="false"/>
+       
+     <!-- Launch Robot -->
+     <include file="$(find hera_description)/launch/load_description.launch">
+          <arg name="robot_model" default="hera_full"/>
+          <arg name="use_jsp_gui" default="false"/>
+     </include>
+     
+     <include file="$(find motion)/launch/spawn.launch"/>
+</launch>

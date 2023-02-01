@@ -5,7 +5,7 @@ topic_scan: 'base_scan_front'
 robot: 'robot'
 
 # ==== parameters for the environment ==== #
-goal_reached_dist: 0.2
+goal_reached_dist: 0.4
 collision_dist: 0.7
 orientation_threshold: 0.1 
 environment_dim: 150 
@@ -15,7 +15,7 @@ action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
 time_simulate: 2.0 # 2x time
-noise_sigma: 0.5
+noise_sigma: 0.5 
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/waypoints.yaml'
@@ -29,7 +29,7 @@ model_critic: '/ws/src/motion/src/motion/checkpoints/best_critic_model.pth'
 # ==== parameters for the model ==== #
 CONTINUOUS: True        # continuous or trained
 BUFFER_SIZE: 1000000    # replay buffer size
-BATCH_SIZE: 40          # minibatch size
+BATCH_SIZE: 128         # minibatch size
 TAU: 0.001              # for soft update of target parameters
 LR_ACTOR: 0.001         # learning rate of the actor 
 LR_CRITIC: 0.001        # learning rate of the critic 
