@@ -6,7 +6,7 @@ robot: 'robot'
 
 # ==== parameters for the environment ==== #
 goal_reached_dist: 0.4
-collision_dist: 0.7
+collision_dist: 0.3
 orientation_threshold: 0.1 
 environment_dim: 150 
 robot_dim: 4 # x, y, theta, linear velocity
