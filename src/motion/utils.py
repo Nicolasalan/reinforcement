@@ -1,12 +1,14 @@
 
 #! /usr/bin/env python3
 
-from geometry_msgs.msg import Twist
+from gazebo_msgs.srv import GetWorldProperties
+from gazebo_msgs.msg import ModelState
 import numpy as np
 import math
 import yaml
 import os
 import rospy
+import time
 
 class Extension():
      def __init__(self, CONFIG_PATH):       
@@ -22,7 +24,9 @@ class Extension():
           self.odom = param["topic_odom"]
           self.scan = param["topic_scan"]
           self.goal_reached_dist = param["goal_reached_dist"]
-          self.collision_dist = param["collision_dist"]   
+          self.collision_dist = param["collision_dist"] 
+          self.time_delta = param["time_delta"]  
+          self.dimentional_world = param["dimentional_world"]
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
           """Calculate the relative angle between the robots heading and heading toward the goal."""
@@ -187,3 +191,30 @@ class Extension():
                param = yaml.safe_load(file)
 
           return param
+
+     def get_models(self):
+          rospy.wait_for_service("gazebo/get_world_properties")
+          get_world_properties = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
+
+          response = get_world_properties()
+          model_names = response.model_names
+          return model_names
+
+     def randomize_object(self, model_name):
+
+          x = np.random.uniform(0, self.dimentional_world[0])
+          y = np.random.uniform(0, self.dimentional_world[1])
+
+          set_model = ModelState()
+          set_model.model_name = model_name
+          set_model.pose.position.x = x
+          set_model.pose.position.y = y
+          set_model.pose.position.z = 0.0
+          set_model.pose.orientation.x = 0.0
+          set_model.pose.orientation.y = 0.0
+          set_model.pose.orientation.z = 0.0
+          set_model.pose.orientation.w = 1.0
+          set_model.publish(set_model)
+
+          time.sleep(self.time_delta)
+

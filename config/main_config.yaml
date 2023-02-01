@@ -16,6 +16,7 @@ action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
 time_simulate: 2.0 # 2x time
 noise_sigma: 0.5 
+dimentional_world: [10, 10]
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/waypoints.yaml'

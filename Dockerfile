@@ -70,7 +70,8 @@ RUN mkdir -p /ws/src \
  && catkin_init_workspace \
  && git clone -b main https://github.com/dheera/rosboard.git \
  && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git \
- && git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git
+ && git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git \
+ && git clone -b main https://github.com/SharedSocialNavigation/gazebo-plugin-autonomous-actor.git
 
 # Copy the source files
 COPY . /ws/src/motion
