@@ -228,5 +228,7 @@ class Extension():
                state.model_name = model_name
                state.pose.position.x, state.pose.position.y, state.pose.position.z = position
                self.set_state.publish(state)
+          
+          time.sleep(self.time_delta)
 
 
