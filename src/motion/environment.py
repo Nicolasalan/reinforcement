@@ -24,7 +24,7 @@ class Env():
           rospy.init_node("gym", anonymous=True)
 
           # Function to load yaml configuration file
-          param = self.useful.load_config("main_config.yaml")
+          param = self.useful.load_config("config.yaml")
 
           self.position = Pose()
           #self.goal_position = Pose()
@@ -332,6 +332,8 @@ class Env():
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
           self.initial_distance = distance
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          print('========================================================================================================================')
+          self.useful.randomize_objects()
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]

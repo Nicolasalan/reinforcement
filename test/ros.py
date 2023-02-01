@@ -20,7 +20,7 @@ print("\033[92m\nROS Unit Tests\033[0m")
 class TestROS(unittest.TestCase):
 
      def setUp(self):
-          rospy.init_node('test_node', anonymous=True) 
+          rospy.init_node('test_ros_node', anonymous=True) 
           current_dir = os.path.dirname(os.path.abspath(__file__))
           # navigate to the parent directory
           parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
@@ -28,7 +28,7 @@ class TestROS(unittest.TestCase):
           config_dir = os.path.join(parent_dir, 'config')
           
           self.rc = Mensage(config_dir)
-          self.param = self.rc.load_config("main_config.yaml")
+          self.param = self.rc.load_config("config.yaml")
 
           self.success = False
           self.rate = rospy.Rate(1)

@@ -143,7 +143,7 @@ if __name__ == '__main__':
      CONFIG_PATH = rospy.get_param('config_path')  
      useful = Extension(CONFIG_PATH)
 
-     param = useful.load_config("main_config.yaml")
+     param = useful.load_config("config.yaml")
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 

@@ -1,6 +1,3 @@
-LOCAL: False
-VISUALIZE: TRUE
-
 DOCKER_ENV_VARS = \
 	--env="DISPLAY" \
 	--env="QT_X11_NO_MITSHM=1" 
@@ -67,32 +64,32 @@ start:
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
 # === Test Library ===
-.PHONY: test-library
-test-library:
+.PHONY: library
+library:
 	@echo "Testing ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/library.py"
 
 # === Test ROS ===
-.PHONY: test-ros
-test-ros:
+.PHONY: ros
+ros:
 	@echo "Testing ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py"
 
 # === Test Simulation ===
-.PHONY: test-sim
-test-sim:
+.PHONY: sim
+sim:
 	@echo "Testing ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/sim.py"
 
 # === Test Learning ===
-.PHONY: test-package
-test-package:
+.PHONY: package
+package:
 	@echo "Testing ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/package.py"
 
 # === Test Full ===
-.PHONY: test-full
-test-full:
+.PHONY: integration
+integration:
 	@echo "Testing ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
 

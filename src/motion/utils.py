@@ -1,7 +1,7 @@
 
 #! /usr/bin/env python3
 
-from gazebo_msgs.srv import GetWorldProperties
+from gazebo_msgs.srv import GetWorldProperties, GetModelState
 from gazebo_msgs.msg import ModelState
 import numpy as np
 import math
@@ -14,7 +14,11 @@ class Extension():
      def __init__(self, CONFIG_PATH):       
 
           self.CONFIG_PATH = CONFIG_PATH
-          param = self.load_config("main_config.yaml")
+          param = self.load_config("config.yaml")
+
+          self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
+          self.get_pose = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+          self.robot = param["robot"]
 
           self.state_dim = param["environment_dim"] + param["robot_dim"]
           self.action_dim = param["action_dim"]
@@ -26,7 +30,6 @@ class Extension():
           self.goal_reached_dist = param["goal_reached_dist"]
           self.collision_dist = param["collision_dist"] 
           self.time_delta = param["time_delta"]  
-          self.dimentional_world = param["dimentional_world"]
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
           """Calculate the relative angle between the robots heading and heading toward the goal."""
@@ -192,29 +195,38 @@ class Extension():
 
           return param
 
-     def get_models(self):
+     def randomize_objects(self):
           rospy.wait_for_service("gazebo/get_world_properties")
           get_world_properties = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
 
+          pose_mode = []
+
           response = get_world_properties()
           model_names = response.model_names
-          return model_names
+          
+          model_names.remove(self.robot)
+          model_names.remove('target')
 
-     def randomize_object(self, model_name):
+          for model_name in model_names:
+               rospy.wait_for_service("gazebo/get_model_state")
+               try:
+                    response = self.get_pose(model_name, "")
+                    x = response.pose.position.x
+                    y = response.pose.position.y
+                    z = response.pose.position.z
+                    pose_mode.append((x, y, z))
+               except rospy.ServiceException as e:
+                    pass
 
-          x = np.random.uniform(0, self.dimentional_world[0])
-          y = np.random.uniform(0, self.dimentional_world[1])
+          models = list(zip(model_names, pose_mode))
+     
+          np.random.shuffle(models)
 
-          set_model = ModelState()
-          set_model.model_name = model_name
-          set_model.pose.position.x = x
-          set_model.pose.position.y = y
-          set_model.pose.position.z = 0.0
-          set_model.pose.orientation.x = 0.0
-          set_model.pose.orientation.y = 0.0
-          set_model.pose.orientation.z = 0.0
-          set_model.pose.orientation.w = 1.0
-          set_model.publish(set_model)
+          # Set each model to its new randomized position
+          for model_name, position in models:
+               state = ModelState()
+               state.model_name = model_name
+               state.pose.position.x, state.pose.position.y, state.pose.position.z = position
+               self.set_state.publish(state)
 
-          time.sleep(self.time_delta)
 

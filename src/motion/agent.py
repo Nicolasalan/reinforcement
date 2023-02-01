@@ -29,7 +29,7 @@ class Agent():
         """
         useful = Extension(CONFIG_PATH)
         # Function to load yaml configuration file
-        self.param = useful.load_config("main_config.yaml")
+        self.param = useful.load_config("config.yaml")
 
         self.state_size = state_size
         self.action_size = action_size

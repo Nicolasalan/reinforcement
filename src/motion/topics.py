@@ -12,7 +12,7 @@ class Mensage():
      def __init__(self, CONFIG_PATH):       
 
           self.CONFIG_PATH = CONFIG_PATH
-          param = self.load_config("main_config.yaml")
+          param = self.load_config("config.yaml")
 
           self.vel_publisher = rospy.Publisher(param["topic_cmd"], Twist, queue_size=1)
           self.cmd_vel = Twist()

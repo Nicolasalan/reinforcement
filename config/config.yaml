@@ -16,10 +16,10 @@ action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
 time_simulate: 2.0 # 2x time
 noise_sigma: 0.5 
-dimentional_world: [10, 10]
+visualize: True
 
 # ==== path to the model ==== #
-waypoints: '/ws/src/motion/config/waypoints.yaml'
+waypoints: '/ws/src/motion/config/poses.yaml'
 goal_model: '/ws/src/motion/models/target.sdf'
 config_path: '/ws/src/motion/config/'
 
@@ -43,7 +43,7 @@ EPSILON: 1.0            # explore->exploit noise process added to act step #####
 EPSILON_DECAY: 0.000001 # decay rate for noise process 
 
 N_EPISODES: 200000      # maximum number of training episodes
-PRINT_EVERY: 100        # print results every n episodes
+PRINT_EVERY: 10        # print results every n episodes
 MAX_T: 150              # maximum number of timesteps per episode
 SCORE_SOLVED: 1000000   # minimum score to be considered solved
 
