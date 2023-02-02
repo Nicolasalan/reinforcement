@@ -10,9 +10,6 @@ DOCKER_VOLUMES = \
 	
 DOCKER_ARGS = ${DOCKER_VOLUMES} ${DOCKER_ENV_VARS}
 
-COMMAND="source devel/setup.bash && roslaunch motion bringup.launch"
-COMMAND_VIEW="source devel/setup.bash && roslaunch motion view.launch"
-
 define xhost_activate
 	@echo "Enabling local xhost sharing:"
 	@echo "  Display: ${DISPLAY}"
@@ -42,14 +39,14 @@ terminal:
 .PHONY: setup
 setup:
 	@echo "Setup world ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c ${COMMAND}
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
 
 # === setup view ===
 .PHONY: view 
 view:
 	@echo "Setup View world ..."
 	@sudo xhost +
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c ${COMMAND_VIEW}
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
 
 # === Spawn model ===
 .PHONY: spawn 

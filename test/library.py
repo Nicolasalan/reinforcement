@@ -63,8 +63,8 @@ class TestLibrary(unittest.TestCase):
     """
     def test_get_reward(self):
      
-        resp = self.rc.get_reward(False, False, [0.5205170887624098, 1.0], 0.48969200253486633, 12, [0.78984, 0.42453453], 20)
-        self.assertEquals(resp, -26.73936972230312, "-26.73936972230312!=-26.73936972230312")
+        resp = self.rc.get_reward(False, False, [0.5205170887624098, 1.0], 0.48969200253486633)
+        self.assertEquals(resp, -0.49489545435136195, "-0.49489545435136195!=-0.49489545435136195")
         self.rc.shutdownhook()
 
     """
