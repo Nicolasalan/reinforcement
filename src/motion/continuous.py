@@ -6,14 +6,10 @@ import math
 import tf
 import time
 
-from geometry_msgs.msg import Twist, Pose
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
-from gazebo_msgs.srv import SetLightProperties
-
-from std_srvs.srv import Empty
-from squaternion import Quaternion
 
 from utils import Extension
 
@@ -25,11 +21,6 @@ class Env():
 
           # Function to load yaml configuration file
           param = self.useful.load_config("config.yaml")
-
-          self.position = Pose()
-          #self.goal_position = Pose()
-          #self.goal_position.position.x = 0.
-          #self.goal_position.position.y = 0.
 
           # set the initial state
           self.goal_model = param["goal_model"]
@@ -49,9 +40,6 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.prev_action = [0.0, 0.0]
-          self.initial_distance = None
-
           self.scan_data = np.ones(self.environment_dim) * 10
           self.path_waypoints = param["waypoints"]
           self.goals = self.useful.path_goal(self.path_waypoints)
@@ -63,14 +51,6 @@ class Env():
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
           self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=10)
           self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
-
-          # ROS services 
-          self.reset = rospy.ServiceProxy('gazebo/reset_world', Empty)
-          self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
-          self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
-          self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
-          self.set_light_properties = rospy.ServiceProxy("/gazebo/set_light_properties", SetLightProperties)
-
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
           rospy.sleep(1)
@@ -94,7 +74,6 @@ class Env():
                scan_data (array): A list of range measurements.
           """
           data = scan.ranges
-          #noisy_data = data + np.random.normal(0, self.noise_sigma, data.shape)
           self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
           #self.data = self.useful.range(scan)
 
@@ -114,6 +93,7 @@ class Env():
           target = False
 
           # ================== PUBLISH ACTION ================== #
+
           try:
                # Publish the robot action
                vel_cmd = Twist()
@@ -127,21 +107,6 @@ class Env():
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
-
-          # ================== UNPAUSE SIMULATION ================== #
-          rospy.wait_for_service("/gazebo/unpause_physics")
-          try:
-               self.unpause()
-
-               time.sleep(self.time_delta)
-
-               rospy.wait_for_service("/gazebo/pause_physics")
-
-               self.pause()
-               
-               rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
-          except:
-               rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
           # ================== READ SCAN DATA ================== #
           
@@ -226,20 +191,26 @@ class Env():
                state (array): array with robot states (leisure, speed, distance and theta)
           """
 
-          # ================== RESET ENVIRONMENT ================== #
-          rospy.logwarn("Reset Environment            => Resetting environment ...")
-          # Resets the state of the environment and returns an initial observation.
-          rospy.wait_for_service("/gazebo/reset_simulation")
-          try:
-               self.reset()
-
-          except:
-               rospy.logerr('Reset Simulation           => Failed service call failed')
-
           # ================== SET RANDOM ANGLE ================== #
-          angle = np.random.uniform(-np.pi, np.pi)
-          quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-          rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
+
+          try:
+               self.odom_x = self.last_odom.position.x
+               self.odom_y = self.last_odom.position.y
+
+               quaternion = (
+                    self.last_odom.orientation.x,
+                    self.last_odom.orientation.y,
+                    self.last_odom.orientation.z,
+                    self.last_odom.orientation.w
+               )
+               euler = tf.transformations.euler_from_quaternion(quaternion)
+               yaw = euler[2]
+               angle = math.degrees(yaw)
+               rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
+          
+          except:
+               rospy.logerr('Set Random Angle Robot      => Error setting random angle')
+               angle = 0.0
 
           # ================== SET RANDOM ORIENTATION ================== #
           try:
@@ -299,21 +270,6 @@ class Env():
           
           except:
                rospy.logerr('Set Random Goal Model       => Error setting random goal model')
-
-          # ================== UNPAUSE SIMULATION ================== #
-          rospy.wait_for_service("/gazebo/unpause_physics")
-          try:
-               self.unpause()
-
-               time.sleep(self.time_delta)
-
-               rospy.wait_for_service("/gazebo/pause_physics")
-
-               self.pause()
-               
-               rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
-          except:
-               rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
           # ================== GET STATE SCAN ================== #
           try:

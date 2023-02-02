@@ -26,11 +26,6 @@ class Env():
           # Function to load yaml configuration file
           param = self.useful.load_config("config.yaml")
 
-          self.position = Pose()
-          #self.goal_position = Pose()
-          #self.goal_position.position.x = 0.
-          #self.goal_position.position.y = 0.
-
           # set the initial state
           self.goal_model = param["goal_model"]
           self.goal_reached_dist = param["goal_reached_dist"]
@@ -48,9 +43,6 @@ class Env():
           self.odom_y = 0.0
           self.goal_x = 0.0
           self.goal_y = 0.0
-
-          self.prev_action = [0.0, 0.0]
-          self.initial_distance = None
 
           self.scan_data = np.ones(self.environment_dim) * 10
           self.path_waypoints = param["waypoints"]
@@ -121,9 +113,6 @@ class Env():
                vel_cmd.angular.z = action[1] * self.cmd_angular
                self.pub_cmd_vel.publish(vel_cmd)
                rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
-
-               vel_cmd.linear.x = self.prev_action[0]
-               vel_cmd.angular.z = self.prev_action[1]
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -202,7 +191,7 @@ class Env():
 
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
-          if distance < self.goal_reached_dist: #and orientation_diff < self.orientation_threshold:
+          if distance < self.goal_reached_dist and orientation_diff < self.orientation_threshold:
                target = True
                done = True
           
@@ -211,9 +200,7 @@ class Env():
           # ================== SET STATE ================== #
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(state_laser, robot_state)
-          reward = self.useful.get_reward(target, collision, action, min_laser, distance, self.prev_action, self.initial_distance)
-
-          self.initial_distance = distance
+          reward = self.useful.get_reward(target, collision, action, min_laser)
 
           rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
           return state, reward, done, target
@@ -330,10 +317,10 @@ class Env():
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
-          self.initial_distance = distance
+
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
-          self.useful.randomize_objects()
+          #self.useful.randomize_objects()
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
