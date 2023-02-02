@@ -20,6 +20,15 @@ jobs:
 
       - name: Build Docker
         run: make build
+  
+  Integration:
+    runs-on: ubuntu-latest
+    container:
+      image: motion-docker
+
+    steps:
+      - name: checkout docker image
+        uses: docker://motion-docker
     
       - name: Run Simulations
         run: make setup
