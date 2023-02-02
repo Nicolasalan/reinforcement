@@ -1,4 +1,4 @@
-name: dev-env
+name: environment
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Checkout submodules
         run: git submodule update --init --recursive
