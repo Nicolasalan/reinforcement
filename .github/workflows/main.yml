@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v3
+        uses: docker://motion-docker
 
       - name: Checkout submodules
         run: git submodule update --init --recursive
@@ -21,7 +22,6 @@ jobs:
         run: make build
     
       - name: Run Simulations
-        uses: docker://motion-docker
         run: make setup
       
       - name: Run Tests
