@@ -289,7 +289,7 @@ class Env():
           self.initial_distance = distance
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
-          self.useful.randomize_objects()
+          #self.useful.randomize_objects()
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
