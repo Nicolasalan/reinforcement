@@ -96,3 +96,9 @@ rosboard:
 	@echo "Starting rosboard ..."
 	@echo "Access http://localhost:8888"
 	@sudo docker run -it --net=host -p 8888:8888 ${DOCKER_ARGS} motion-docker bash -c "source /opt/ros/noetic/setup.bash && cd src/rosboard && ./run"
+
+# === Test workflow ===
+.PHONY: workflow
+workflow:
+	@echo "Testing ..."
+	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"

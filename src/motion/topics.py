@@ -2,8 +2,6 @@
 #! /usr/bin/env python3
 
 from geometry_msgs.msg import Twist
-import numpy as np
-import math
 import yaml
 import os
 import rospy
