@@ -39,7 +39,7 @@ terminal:
 .PHONY: setup
 setup:
 	@echo "Setup world ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
+	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
 
 # === setup view ===
 .PHONY: view 
@@ -88,7 +88,7 @@ package:
 .PHONY: integration
 integration:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
+	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
 
 # === Start Rosboard docker ===
 .PHONY: rosboard
