@@ -9,7 +9,7 @@ import os
 PKG = 'motion'
 NAME = 'library'
 
-print("\033[92m\nLibrary Unit Tests\033[0m")
+print("\033[92mLibrary Unit Tests\033[0m")
 
 class TestLibrary(unittest.TestCase):
 

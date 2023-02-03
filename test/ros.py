@@ -15,7 +15,7 @@ import os
 PKG = 'motion'
 NAME = 'ros'
 
-print("\033[92m\nROS Unit Tests\033[0m")
+print("\033[92mROS Unit Tests\033[0m")
 
 class TestROS(unittest.TestCase):
 
