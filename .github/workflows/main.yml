@@ -17,16 +17,9 @@ jobs:
 
       - name: Build Docker
         run: make build
-  
-  Integration:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Pull docker image
-        run: docker pull ninim/motion-docker:latest
     
       - name: Run Simulations
-        run: docker run --net=host --volume="${PWD}":"/ws/src/motion":rw motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
+        run: docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
       
       - name: Run Tests
-        run: make integration
+        run: docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
