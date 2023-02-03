@@ -22,11 +22,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout docker image
+      - name: Pull docker image
         run: docker pull ninim/motion-docker:latest
     
       - name: Run Simulations
-        run: docker run -it --net=host --volume="${PWD}":"/ws/src/motion":rw motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
+        run: docker run --net=host --volume="${PWD}":"/ws/src/motion":rw motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
       
       - name: Run Tests
         run: make integration
