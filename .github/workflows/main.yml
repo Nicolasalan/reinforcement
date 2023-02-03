@@ -20,12 +20,10 @@ jobs:
   
   Integration:
     runs-on: ubuntu-latest
-    container:
-      image: motion-docker
 
     steps:
       - name: checkout docker image
-        uses: docker://motion-docker
+        run: docker pull ninim/motion-docker:latest
     
       - name: Run Simulations
         run: make setup
