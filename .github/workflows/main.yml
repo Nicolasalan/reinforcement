@@ -19,7 +19,7 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: Build Docker
-        run: make build
+        run: docker login && docker pull ninim/motion-docker:latest
       
       - name: Run Tests
         run: docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"
