@@ -20,9 +20,6 @@ jobs:
 
       - name: Build Docker
         run: make build
-    
-      - name: Run Simulations
-        run: docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
       
       - name: Run Tests
         run: docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"
