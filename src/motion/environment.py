@@ -109,8 +109,8 @@ class Env():
           try:
                # Publish the robot action
                vel_cmd = Twist()
-               vel_cmd.linear.x = action[0] * self.cmd_linear
-               vel_cmd.angular.z = action[1] * self.cmd_angular
+               vel_cmd.linear.x = action[0]
+               vel_cmd.angular.z = action[1]
                self.pub_cmd_vel.publish(vel_cmd)
                rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
@@ -167,7 +167,7 @@ class Env():
                euler = tf.transformations.euler_from_quaternion(quaternion)
                yaw = euler[2]
                angle = math.degrees(yaw)
-               
+
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
