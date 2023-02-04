@@ -1028,8 +1028,6 @@
         <pose frame="">-3.146512 2.928458 1.035654 0 0 0</pose>
 	</model>
 
-
-
 	<model name="Spotlight_01_001">
         <include>
             <uri>model://aws_robomaker_retail_Spotlight_01</uri>
@@ -1139,5 +1137,29 @@
       <cast_shadows>0</cast_shadows>
       <direction>0 0 -1</direction>
     </light>
+    
+    <!-- Actors -->
+    <actor name="actor_1">
+        <pose>0 1 1.25 0 0 0</pose>
+        <skin>
+            <filename>moonwalk.dae</filename>
+            <scale>1.0</scale>
+        </skin>
+        <animation name="walking">
+            <filename>walk.dae</filename>
+            <scale>1.000000</scale>
+            <interpolate_x>true</interpolate_x>
+        </animation>
+        <plugin name="actor_1_plugin" filename="libActorPlugin.so">
+            <target>0 -5 1.2138</target>
+            <target_weight>1.15</target_weight>
+            <obstacle_weight>1.8</obstacle_weight>
+            <animation_factor>5.1</animation_factor>
+            <ignore_obstacles>
+                <model>cafe</model>
+                <model>ground_plane</model>
+            </ignore_obstacles>
+        </plugin>
+    </actor>
   </world>
 </sdf>
