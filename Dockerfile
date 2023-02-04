@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
 
 # install pytorch
 RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip3 install tensorboard
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \

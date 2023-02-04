@@ -167,6 +167,7 @@ class Env():
                euler = tf.transformations.euler_from_quaternion(quaternion)
                yaw = euler[2]
                angle = math.degrees(yaw)
+               
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:

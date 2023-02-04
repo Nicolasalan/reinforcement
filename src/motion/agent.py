@@ -6,11 +6,13 @@ import random
 from model import Actor, Critic
 from noise import OUNoise
 from replaybuffer import ReplayBuffer
+from torch.utils.tensorboard import SummaryWriter
 
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import rospy
+from numpy import inf
 from utils import Extension
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -54,6 +56,10 @@ class Agent():
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
+        self.writer = SummaryWriter()
+
+        self.av_Q = 0
+        self.max_Q = -inf
 
         # Replay memory
         self.memory = ReplayBuffer(int(self.param["BUFFER_SIZE"]), int(self.param["BATCH_SIZE"]), random_seed)
@@ -132,12 +138,21 @@ class Agent():
             target_Q1, target_Q2 = self.critic_target(next_states, target_actions)
             target_Q = torch.min(target_Q1, target_Q2)
 
+            self.av_Q += torch.mean(target_Q)
+            self.max_Q = max(self.max_Q, torch.max(target_Q))
+
             # Compute the target n-step return
             n_step_return = (self.discount_factor ** timestep) * target_Q * (1 - dones)
             n_step_return += rewards
 
             # Update the critic target networks
             self.soft_update(self.critic_local, self.critic_target, self.tau)
+
+            # Write new values for tensorboard
+            self.writer.add_scalar("Loss", critic_loss / timestep)
+            self.writer.add_scalar("Av. Q", self.av_Q / timestep)
+            self.writer.add_scalar("Max. Q", self.max_Q, timestep)
+            self.writer.add_scalar("Rewards", rewards.mean().reshape(1), timestep)
 
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(self.param["EPSILON_DECAY"])

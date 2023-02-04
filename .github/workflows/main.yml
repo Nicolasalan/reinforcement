@@ -18,7 +18,7 @@ jobs:
         run: git submodule update --init --recursive
 
       - name: Build Docker
-        run: make build
+        run: docker build -t motion-docker  . 
       
       - name: Run Tests
         run: make workflow

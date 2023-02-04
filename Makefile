@@ -20,7 +20,7 @@ endef
 .PHONY: build
 build:
 	@echo "Building docker image ..."
-	@sudo docker build -t motion-docker  . 
+	@docker login && docker build -t motion-docker  . 
 
 # === Clean docker ===
 .PHONY: clean
@@ -102,3 +102,9 @@ rosboard:
 workflow:
 	@echo "Testing ..."
 	@sudo docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"
+
+# === T ===
+.PHONY: tensorboard
+tensorboard:
+	@echo "tensorboard ..."
+	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} motion-docker bash -c "cd /ws/src/motion/src/motion && tensorboard --logdir=run/"
