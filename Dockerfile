@@ -59,7 +59,6 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-driver-base \
  && apt-get install -y ros-noetic-rosserial-arduino 
 
-
 # install pytorch
 RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 RUN pip3 install tensorboard
@@ -69,8 +68,7 @@ RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace \
- && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git \
- && git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git 
+ && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git 
 
 # Copy the source files
 COPY . /ws/src/motion
