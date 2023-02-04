@@ -101,4 +101,4 @@ rosboard:
 .PHONY: workflow
 workflow:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"
+	@sudo docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"

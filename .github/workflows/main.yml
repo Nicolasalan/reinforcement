@@ -21,4 +21,4 @@ jobs:
         run: make build
       
       - name: Run Tests
-        run: docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"
+        run: make workflow
