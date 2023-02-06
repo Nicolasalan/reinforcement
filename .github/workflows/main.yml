@@ -26,6 +26,7 @@ jobs:
 
   Running:
     needs: [Build]
+    uses: ./.github/workflows/main.yaml
     runs-on: ubuntu-latest
     steps:
       - name: Running the tests
