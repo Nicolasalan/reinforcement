@@ -16,7 +16,7 @@ jobs:
         run: git submodule update --init --recursive
 
   Build:
-    needs: [Checkout]:
+    needs: [Checkout]
     runs-on: ubuntu-latest
     steps:
       - name: Build the docker image
@@ -24,8 +24,8 @@ jobs:
       - name: Login to DockerHub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-  Running
-    needs: [Build]:
+  Running:
+    needs: [Build]
     runs-on: ubuntu-latest
     steps:
       - name: Running the tests
