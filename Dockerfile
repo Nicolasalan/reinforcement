@@ -1,5 +1,5 @@
 # Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
-FROM nvidia/cuda:11.4.2-base-ubuntu20.04
+FROM nvidia/cuda:11.8.0-base-ubuntu20.04 
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
@@ -10,7 +10,7 @@ RUN dpkg-reconfigure locales
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ros-noetic-desktop-full
+ && apt-get install -y --no-install-recommends ros-noetic-ros-base
 RUN apt-get install -y --no-install-recommends python3-rosdep
 RUN rosdep init \
  && rosdep fix-permissions \
@@ -60,7 +60,9 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-rosserial-arduino 
 
 # install pytorch
-RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch
+
+#RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 RUN pip3 install tensorboard
 
 # create a catkin workspace
@@ -69,7 +71,7 @@ RUN mkdir -p /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace \
  && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git \
- && git clone -b ros1 https://github.com/aws-robotics/aws-robomaker-bookstore-world.git
+ && git clone -b ros1 https://github.com/Nicolasalan/bookstore-world.git 
 
 # Copy the source files
 COPY . /ws/src/motion

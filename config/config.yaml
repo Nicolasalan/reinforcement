@@ -16,7 +16,6 @@ action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
 time_simulate: 2.0 # 2x time
 noise_sigma: 0.5 
-visualize: True
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/poses.yaml'
@@ -24,8 +23,8 @@ goal_model: '/ws/src/motion/models/target.sdf'
 config_path: '/ws/src/motion/config/'
 
 # path model saved
-model_actor: '/ws/src/motion/src/motion/checkpoints/best_actor_model.pth'
-model_critic: '/ws/src/motion/src/motion/checkpoints/best_critic_model.pth'
+model_actor: '/ws/src/motion/src/motion/checkpoints/actor_model.pth'
+model_critic: '/ws/src/motion/src/motion/checkpoints/critic_model.pth'
 
 # ==== parameters for the model ==== #
 CONTINUOUS: True        # continuous or trained

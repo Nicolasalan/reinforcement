@@ -1,7 +1,8 @@
 pyyaml
-matplotlib
 numpy
 squaternion
 tornado
 simplejpeg
+psutil
 rospkg
+wget

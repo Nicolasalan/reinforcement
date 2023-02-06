@@ -31,12 +31,6 @@ class TestPackage(unittest.TestCase):
           except ImportError:
                self.fail("Could not import os") 
 
-     def test_os_import(self):
-          try:
-               import os
-          except ImportError:
-               self.fail("Could not import os")
-
      def test_torch_import(self):
           try:
                import torch
@@ -54,12 +48,6 @@ class TestPackage(unittest.TestCase):
                import numpy
           except ImportError:
                self.fail("Could not import numpy")  
-
-     def test_matplotlib_import(self):
-          try:
-               import matplotlib
-          except ImportError:
-               self.fail("Could not import matplotlib") 
 
      def test_collections_import(self):
           try:

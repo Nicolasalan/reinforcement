@@ -16,11 +16,30 @@ define xhost_activate
 	@xhost local:root
 endef
 
+.PHONY: help
+help:
+	@echo '  help						--Display this help message'
+	@echo '  update 					--Update ROS packages from git'
+	@echo '  build 					--Build docker image for machine architecture'
+	@echo '  clean 					--Docker image cleanup'
+	@echo '  start						--Start training session'
+	@echo '  terminal					--Start terminal in docker'
+	@echo '  setup						--setup world and robot'
+	@echo '  view						--setup view gazebo'
+	@echo '  library					--Test library functions'
+	@echo '  ros						--Test ROS topics'
+	@echo '  sim						--Test Simulation Gazebo'
+	@echo '  package					--Test Dependencies'
+	@echo '  integration					--Test All'
+	@echo '  tensorboard					--Start Tensorboard in localhost:6006'
+
 # === Build docker ===
 .PHONY: build
 build:
 	@echo "Building docker image ..."
-	@docker login && docker build -t motion-docker  . 
+	@docker login && docker build -t motion-docker . 
+	@mkdir -p ${PWD}/src/motion/checkpoints
+	@mkdir -p ${PWD}/src/motion/run
 
 # === Clean docker ===
 .PHONY: clean
@@ -48,17 +67,17 @@ view:
 	@sudo xhost +
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
 
-# === Spawn model ===
-.PHONY: spawn 
-spawn:
-	@echo "Spawn Model ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion spawn.launch"
-
 # === Start train docker ===
 .PHONY: start 
 start:
 	@echo "Starting training ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
+
+# === Start train docker GPU ===
+.PHONY: start-gpu
+start-gpu:
+	@echo "Starting training ..."
+	@sudo docker run -it --net=host --gpus all ${DOCKER_ARGS} --env="NVIDIA_DRIVER_CAPABILITIES=all" motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
 # === Test Library ===
 .PHONY: library
@@ -90,21 +109,20 @@ integration:
 	@echo "Testing ..."
 	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
 
-# === Start Rosboard docker ===
-.PHONY: rosboard
-rosboard:
-	@echo "Starting rosboard ..."
-	@echo "Access http://localhost:8888"
-	@sudo docker run -it --net=host -p 8888:8888 ${DOCKER_ARGS} motion-docker bash -c "source /opt/ros/noetic/setup.bash && cd src/rosboard && ./run"
-
 # === Test workflow ===
 .PHONY: workflow
 workflow:
 	@echo "Testing ..."
 	@sudo docker run --net=host --volume=${PWD}:/ws/src/motion:rw motion-docker bash -c "cd /ws/src/motion && ./workflow.sh"
 
-# === T ===
+# === Tensorboard ===
 .PHONY: tensorboard
 tensorboard:
 	@echo "tensorboard ..."
 	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} motion-docker bash -c "cd /ws/src/motion/src/motion && tensorboard --logdir=run/"
+
+# === Install Weights ===
+.PHONY: install
+install:
+	@echo "Install Weights ..."
+	@cd ${PWD}/src/motion/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
