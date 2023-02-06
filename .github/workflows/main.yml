@@ -7,21 +7,24 @@ on:
     branches: ["main"]
   
 jobs:
-  Run:
+  Checkout Repository:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-    
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
+  Build environment:
+    runs-on: ubuntu-latest
+    steps:
       - name: Build the docker image
         run: docker pull ninim/motion-docker:latest
-
       - name: Login to DockerHub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
+  Running the tests:
+    runs-on: ubuntu-latest
+    steps:
       - name: Running the tests
         run: make workflow
