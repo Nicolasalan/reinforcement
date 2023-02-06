@@ -38,6 +38,8 @@ The inputs to the model are data from the lidar sensors, distance to the target,
 - [Usage](#Usage)
 - [Training Agent](#Training-Agent)
 - [Authors](#Authors)
+- [Directory Structure](#Directory-Structure)
+
 
 ## Getting Started
 <a name="Getting-Started"></a>
@@ -81,7 +83,7 @@ cd <your_workspace>/src/motion
 make build
 ```
 
-(OPCIONAL) Install weights for the model:
+(Optional) Install weights for the model:
 
 ```bash
 cd <your_workspace>/src/motion
@@ -158,3 +160,28 @@ make tensorboard
 Nicolas Alan - [Linkdin](https://www.linkedin.com/in/nicolas-alan-grotti/)
 
 This repository also serves as a template for ROS applications, has CI/CD, automated tests and easy configuration templates.
+
+## Directory Structure
+
+<a name="Directory-Structure"></a>
+
+```
+.
+├── config/            # [dir] Configuration files
+├── launch/            # [dir] Launch files 
+├── models/            # [dir] Model SDF target
+├── src/motion/        # [dir] Source code
+│   ├── checkpoints    # [dir] Pre-trained weights for the agent
+│   └── run/           # [dir] Logs and results of the agent
+├── test/              # [dir] Unit tests 
+├── .gitignore         # [file] Files to ignore in git
+├── Dockerfile         # [file] Dockerfile image
+├── entrypoint.sh      # [file] Entrypoint for the docker image
+├── Makefile           # [file] Commands to run
+├── README             # [file] This file
+├── requirements.txt   # [file] Project requirements
+├── setup.py           # [file] Setup file for the project
+├── workflow.sh        # [file] Github actions workflow
+├── CMakeLists.txt     # [file] Colcon-enabled CMake recipe
+└── package.xml        # [file] ROS Noetic package metadata
+```

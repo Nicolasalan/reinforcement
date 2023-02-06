@@ -13,12 +13,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+    
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
-      - name: Build Docker
-        run: docker build -t motion-docker  . 
-      
-      - name: Run Tests
+      - name: Build the docker image
+        run: docker pull ninim/motion-docker:latest
+
+      - name: Running the tests
         run: make workflow
