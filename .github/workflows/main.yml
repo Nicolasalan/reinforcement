@@ -26,8 +26,9 @@ jobs:
 
   Running:
     needs: [Build]
-    uses: ./.github/workflows/main.yaml
     runs-on: ubuntu-latest
     steps:
+      - name: Change to root directory
+        run: cd $(git rev-parse --show-toplevel)
       - name: Running the tests
         run: make workflow
