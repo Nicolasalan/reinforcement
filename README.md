@@ -36,6 +36,8 @@ The inputs to the model are data from the lidar sensors, distance to the target,
 - [Setup](#Setup)
 - [Running the tests](#Running-the-tests)
 - [Usage](#Usage)
+- [Training Agent](#Training-Agent)
+- [Authors](#Authors)
 
 ## Getting Started
 <a name="Getting-Started"></a>
@@ -127,6 +129,8 @@ For training, the robot Hera from the [RoboFEI At Home](https://github.com/robof
 
 ## Training Agent
 
+<a name="Training-Agent"></a>
+
 To start the Gazebo sandbox, you need to start the world first and then the robot. Afterwards, you can spawn the target in the world to complete the simulation.
 ```bash
 cd <your_workspace>/src/motion
@@ -148,6 +152,9 @@ make tensorboard
 ```
 
 ## Authors
+
+<a name="Authors"></a>
+
 Nicolas Alan - [Linkdin](https://www.linkedin.com/in/nicolas-alan-grotti/)
 
 This repository also serves as a template for ROS applications, has CI/CD, automated tests and easy configuration templates.
