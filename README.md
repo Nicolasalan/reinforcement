@@ -121,7 +121,7 @@ For training, the robot Hera from the [RoboFEI At Home](https://github.com/robof
   > **Note** :
   > There are a wide variety of parameters in this `config.yaml` file, but most are by default.
   
-  > By default, the files are already configured for use by the bookstore world of aws and robo Hera
+  > By default, the files are already configured for use by the bookstore world of AWS and robot Hera.
 
 <div align="center">
      <img src="https://raw.githubusercontent.com/Home-Environment-Robot-Assistant/hera_description/master/doc/hera2020.png" alt="Hera Robot" width="350px">

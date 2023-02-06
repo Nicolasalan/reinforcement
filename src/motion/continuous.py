@@ -238,6 +238,9 @@ class ContinuousEnv():
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
 
+          # remove the first element of the list
+          self.goals.pop(0)
+          
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
           state = np.append(laser_state, robot_state)

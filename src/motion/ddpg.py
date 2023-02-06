@@ -31,7 +31,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
 
      ## ====================== Training Loop ====================== ##
 
-     if param["CONTINUOUS"] == False:
+     if param["TYPE"] == 0:
           print('Training DDPG in simulation')
                
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
@@ -86,7 +86,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
 
      ## ====================== Continuous Training ====================== ##
 
-     if param["CONTINUOUS"] == True:
+     if param["TYPE"] == 1:
           print('Training continuous DDPG in simulation')
 
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
@@ -144,7 +144,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
      
      ## ====================== Test Environment ====================== ##
      
-     if param["TEST"] == True:
+     if param["TYPE"] == 2:
           print('Testing DDPG in real environment')
      
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
@@ -163,6 +163,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
                agent.reset()                                               # reset environment    
                states = env.reset_env()                                    # get the current state of each agent
 
+               max_t = 10000
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
