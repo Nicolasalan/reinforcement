@@ -19,6 +19,7 @@ noise_sigma: 0.5 # noise for the laser scan
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/poses.yaml'
+path_goal: '/ws/src/motion/config/goals.yaml'
 goal_model: '/ws/src/motion/models/target.sdf'
 config_path: '/ws/src/motion/config/'
 

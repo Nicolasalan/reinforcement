@@ -28,7 +28,5 @@ jobs:
     needs: [Build]
     runs-on: ubuntu-latest
     steps:
-      - name: Root directory
-        run: cd ${{ env.GITHUB_WORKSPACE }}
       - name: Running the tests
-        run: make workflow
+        run: ./make workflow
