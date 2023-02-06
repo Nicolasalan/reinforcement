@@ -29,4 +29,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Running the tests
-        run: ./make workflow
+        run: make workflow
+        working-directory: .

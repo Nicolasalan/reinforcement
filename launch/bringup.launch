@@ -10,7 +10,4 @@
      </include>
      
      <include file="$(find motion)/launch/spawn.launch"/>
-
-     <node name="move" pkg="motion" type="goal.py" output="screen"/>
-          <rosparam command="load" file="$(find motion)/config/goals.yaml"/>
 </launch>
