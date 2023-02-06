@@ -27,7 +27,9 @@ jobs:
   Running:
     needs: [Build]
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./
     steps:
       - name: Running the tests
         run: make workflow
-        working-directory: .
+        working-directory: ${{env.working-directory}}
