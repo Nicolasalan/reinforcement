@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Build the docker image
         run: docker pull ninim/motion-docker:latest
-      - name: Login to DockerHub
+      - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
   Running:
@@ -29,6 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Change to root directory
-        run: cd $(git rev-parse --show-toplevel)
+        run: cd "$GITHUB_WORKSPACE"
       - name: Running the tests
         run: make workflow
