@@ -4,9 +4,6 @@
   <a href="http://wiki.ros.org/noetic">
     <img src="https://img.shields.io/badge/ROS-Noetic-yellow" alt="ROS Noetic Compatible">
   </a>
-  <a href="https://github.com/Nicolasalan/motion/actions/workflows/main.yml">
-    <img src="https://github.com/Nicolasalan/motion/actions/workflows/main.yml/badge.svg?branch=main&event=status" alt="CI Build Status">
-  </a>
   <a href="https://docs.docker.com/">
     <img src="https://img.shields.io/badge/Docker-v20.10.21-blue" alt="Docker">
   </a>
