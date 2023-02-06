@@ -37,7 +37,7 @@ The inputs to the model are data from the lidar sensors, distance to the target,
 - [Running the tests](#Running-the-tests)
 - [Usage](#Usage)
 - [Training Agent](#Training-Agent)
-- [Authors](#Authors)
+- [Limitations](#Limitations)
 - [Directory Structure](#Directory-Structure)
 
 
@@ -153,11 +153,11 @@ cd <your_workspace>/src/motion
 make tensorboard
 ```
 
-## Authors
+## Limitations
 
-<a name="Authors"></a>
+<a name="Limitations"></a>
 
-Nicolas Alan - [Linkdin](https://www.linkedin.com/in/nicolas-alan-grotti/)
+The agent has limitations in its navigation capacity, being effective only in static environments and without significant variations. He has difficulty detecting obstacles such as chairs, tables and similar objects, which can affect his efficiency in carrying out tasks. It is necessary to manually define the waypoints on the map so that the agent can move properly.
 
 This repository also serves as a template for ROS applications, has CI/CD, automated tests and easy configuration templates.
 
