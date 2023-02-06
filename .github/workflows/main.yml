@@ -28,7 +28,7 @@ jobs:
     needs: [Build]
     runs-on: ubuntu-latest
     steps:
-      - name: Change to root directory
-        run: cd "$GITHUB_WORKSPACE"
+      - name: Cd to the workspace
+        run: ls
       - name: Running the tests
         run: make workflow
