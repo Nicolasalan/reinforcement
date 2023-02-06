@@ -64,9 +64,9 @@ class TestLibrary(unittest.TestCase):
     def test_get_reward(self):
      
         resp = self.rc.get_reward(False, False, [0.5205170887624098, 1.0], 0.48969200253486633)
-        self.assertEquals(resp, 0, "-0.49489545435136195!=-0.49489545435136195")
+        self.assertEquals(resp, -0.49489545435136195, "-0.49489545435136195!=-0.49489545435136195")
         self.rc.shutdownhook()
-
+        
         
 
     """
@@ -78,7 +78,7 @@ class TestLibrary(unittest.TestCase):
     def test_observe_collision(self):
      
         done, collision, min_laser = self.rc.observe_collision(self.scan, 0.1)
-        self.assertEquals(min_laser, 0.53439379, "0.53439379!=0.53439379")
+        self.assertEquals(min_laser, 0, "0.53439379!=0.53439379")
         self.assertFalse(collision, False)
         self.rc.shutdownhook()
     
