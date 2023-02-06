@@ -46,10 +46,9 @@ class Env():
 
           self.scan_data = np.ones(self.environment_dim) * 10
           self.path_waypoints = param["waypoints"]
+
           self.goals = self.useful.path_goal(self.path_waypoints)
-          #self.data = None
           self.last_odom = None
-          #self.orientation = None
 
           # ROS publications and subscriptions
           self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
@@ -307,9 +306,12 @@ class Env():
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
-               laser_state = [v_state]
+               
+               # add noise to the laser data
+               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               state_laser = [list(noisy_state)]
 
-               rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(laser_state)))
+               rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:
                rospy.logerr('Get state scan              => Error getting state scan')
 
@@ -325,7 +327,7 @@ class Env():
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
-          state = np.append(laser_state, robot_state)
+          state = np.append(state_laser, robot_state)
 
           # ================== RETURN STATE ================== #
           return np.array(state)

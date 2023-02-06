@@ -5,6 +5,7 @@ import numpy as np
 
 from agent import Agent
 from environment import Env
+from continuous import ContinuousEnv
 from utils import Extension
 import psutil
 
@@ -18,7 +19,6 @@ if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
 def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
-     print('Starting DDPG ...')
      """
      parameters
      ======
@@ -29,7 +29,10 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
      state_dim = param["environment_dim"] + param["robot_dim"]
      action_dim = param["action_dim"]
 
+     ## ====================== Training Loop ====================== ##
+
      if param["CONTINUOUS"] == False:
+          print('Training DDPG in simulation')
                
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
@@ -81,7 +84,10 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
 
           return scores
 
+     ## ====================== Continuous Training ====================== ##
+
      if param["CONTINUOUS"] == True:
+          print('Training continuous DDPG in simulation')
 
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
@@ -135,6 +141,50 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
                     break
 
           return scores
+     
+     ## ====================== Test Environment ====================== ##
+     
+     if param["TEST"] == True:
+          print('Testing DDPG in real environment')
+     
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+          env = ContinuousEnv(CONFIG_PATH)
+
+          agent.actor_local.load_state_dict(torch.load(param["model_actor"]))
+          agent.critic_local.load_state_dict(torch.load(param["model_critic"]))
+
+          scores_window = []                                               # average scores of the most recent episodes
+          scores = []                                                      # list of average scores of each episode                     
+
+          while True:                                                      # initialize score for each agent
+               score = 0.0                
+               done = False
+
+               agent.reset()                                               # reset environment    
+               states = env.reset_env()                                    # get the current state of each agent
+
+               for t in range(max_t):   
+                         
+                    action = agent.action(states)                          # choose an action for each agent
+                    actions = [(action[0] + 1) / 2, action[1]]
+
+                    next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
+
+                    # save the experiment in the replay buffer, run the learning step at a defined interval
+                    agent.step(states, actions, rewards, next_states, done, t)
+
+                    states = next_states
+                    score += rewards
+                    if np.any(done):                                       # exit loop when episode ends
+                         break              
+                    
+                    scores_window.append(score)                            # save average score for the episode
+                    scores.append(score)                                   # save average score in the window  
+                         
+               cpu_usage = psutil.cpu_percent()
+               rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+
+               return scores
 
 if __name__ == '__main__':
      """Start training."""
