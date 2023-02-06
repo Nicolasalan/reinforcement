@@ -113,7 +113,7 @@ integration:
 .PHONY: workflow
 workflow:
 	@echo "Testing ..."
-	@sudo docker login -u ninim && sudo docker run --net=host --volume=${PWD}:/ws/src/motion:rw ninim/motion-docker:latest bash -c "cd /ws/src/motion && ./workflow.sh"
+	@sudo docker run --net=host --volume=${PWD}:/ws/src/motion:rw ninim/motion-docker:latest bash -c "cd /ws/src/motion && ./workflow.sh"
 
 # === Tensorboard ===
 .PHONY: tensorboard

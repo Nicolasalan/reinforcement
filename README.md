@@ -171,7 +171,7 @@ This repository also serves as a template for ROS applications, has CI/CD, autom
 ├── launch/            # [dir] Launch files 
 ├── models/            # [dir] Model SDF target
 ├── src/motion/        # [dir] Source code
-│   ├── checkpoints    # [dir] Pre-trained weights for the agent
+│   ├── checkpoints/   # [dir] Pre-trained weights for the agent
 │   └── run/           # [dir] Logs and results of the agent
 ├── test/              # [dir] Unit tests 
 ├── .gitignore         # [file] Files to ignore in git
