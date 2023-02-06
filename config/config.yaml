@@ -1,21 +1,21 @@
 # ==== parameters ros ==== #
-topic_cmd: 'cmd_vel'
-topic_odom: 'odom'
-topic_scan: 'base_scan_front'
-robot: 'robot'
+topic_cmd: 'cmd_vel' # topic to publish the velocity
+topic_odom: 'odom' # topic to get the odometry
+topic_scan: 'base_scan_front' # topic to get the laser scan
+robot: 'robot' # name of the robot in gazebo
 
 # ==== parameters for the environment ==== #
-goal_reached_dist: 0.4
-collision_dist: 0.3
-orientation_threshold: 0.1 
-environment_dim: 150 
+goal_reached_dist: 0.4 # distance to the goal to consider it reached
+collision_dist: 0.3 # distance to the obstacle to consider it a collision
+orientation_threshold: 0.1 # threshold to consider the orientation reached
+environment_dim: 150
 robot_dim: 4 # x, y, theta, linear velocity
 action_dim: 2 # angular and linear
 action_linear_max: 0.3  # m/s
 action_angular_max: 0.6  # rad/s
 time_delta: 0.1 # 10 Hz
 time_simulate: 2.0 # 2x time
-noise_sigma: 0.5 
+noise_sigma: 0.5 # noise for the laser scan
 
 # ==== path to the model ==== #
 waypoints: '/ws/src/motion/config/poses.yaml'
