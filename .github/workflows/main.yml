@@ -31,5 +31,5 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: make workflow
+        run: docker run --net=host ninim/motion-docker:latest bash -c "cd /ws/src/motion && ./workflow.sh"
         working-directory: ${{env.working-directory}}
