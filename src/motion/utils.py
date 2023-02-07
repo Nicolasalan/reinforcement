@@ -85,6 +85,29 @@ class Extension():
 
           return goals
 
+     def path_target(self, path_waypoints):
+          """Load the waypoints from the yaml file."""
+          
+          goals = []
+          list = []
+
+          with open(path_waypoints) as f:
+               data = yaml.safe_load(f)
+               for i in data:
+                    list.append(i['position'])
+
+               for i in list:
+                    str_x = str(i[0]).strip('[]')
+                    str_y = str(i[1]).strip('[]')
+                    str_yaw = str(i[2]).strip('[]')
+                    
+                    x = float(str_x)
+                    y = float(str_y)
+                    yaw = float(str_yaw)
+                    goals.append((x, y, yaw))
+
+          return goals
+
      def random_goal(self, goals):
           """Select a random goal from the list of waypoints."""
 

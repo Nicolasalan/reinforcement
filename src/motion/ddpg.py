@@ -18,7 +18,7 @@ checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
+def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count):
      """
      parameters
      ======
@@ -154,11 +154,14 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
           agent.critic_local.load_state_dict(torch.load(param["model_critic"]))
 
           scores_window = []                                               # average scores of the most recent episodes
-          scores = []                                                      # list of average scores of each episode                     
+          scores = []                                                      # list of average scores of each episode
 
-          while True:                                                      # initialize score for each agent
-               score = 0.0                
-               done = False
+          num_resets = 0   
+          print(count)  
+          print(num_resets)    
+
+          while num_resets < count:                                        # initialize score for each agent
+               done = False       
 
                agent.reset()                                               # reset environment    
                states = env.reset_env()                                    # get the current state of each agent
@@ -175,17 +178,13 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH):
                     agent.step(states, actions, rewards, next_states, done, t)
 
                     states = next_states
-                    score += rewards
                     if np.any(done):                                       # exit loop when episode ends
                          break              
-                    
-                    scores_window.append(score)                            # save average score for the episode
-                    scores.append(score)                                   # save average score in the window  
+
+               num_resets += 1 
                          
                cpu_usage = psutil.cpu_percent()
                rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
-
-               return scores
 
 if __name__ == '__main__':
      """Start training."""
@@ -195,10 +194,11 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
+     count = len(useful.path_target(param["path_goal"]))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_T"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH)
+     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count)
