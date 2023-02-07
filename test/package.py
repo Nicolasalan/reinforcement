@@ -115,5 +115,17 @@ class TestPackage(unittest.TestCase):
           except ImportError:
                self.fail("Could not import psutil")  
 
+     def test_tensorboard_import(self):
+          try:
+               from torch.utils.tensorboard import SummaryWriter
+          except ImportError:
+               self.fail("Could not import tensorboard")  
+
+     def test_time_import(self):
+          try:
+               import time
+          except ImportError:
+               self.fail("Could not import time") 
+
 if __name__ == '__main__':
     rosunit.unitrun(PKG, NAME, TestPackage)

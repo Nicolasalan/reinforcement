@@ -4,12 +4,10 @@ import rospy
 import numpy as np
 import math
 import tf
-import time
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
-from gazebo_msgs.msg import ModelState
 
 from utils import Extension
 
