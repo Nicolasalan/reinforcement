@@ -114,16 +114,14 @@ Before starting the training, it is important to set up a requirements file for 
 
 ```yaml
 # ==== parameters ros ==== #
-topic_cmd: 'cmd_vel' # topic to publish the velocity
-topic_odom: 'odom' # topic to get the odometry
-topic_scan: 'base_scan_front' # topic to get the laser scan
-robot: 'robot' # name of the robot in gazebo
+topic_cmd: 'cmd_vel'              # topic to publish the velocity
+topic_odom: 'odom'                # topic to get the odometry
+topic_scan: 'base_scan_front'     # topic to get the laser scan
+robot: 'robot'                    # name of the robot in gazebo
 ```
 For training, the robot Hera from the [RoboFEI At Home](https://github.com/robofei-home) team was used, which is intended for domestic use.
   > **Note** :
-  > There are a wide variety of parameters in this `config.yaml` file, but most are by default.
-  
-  > By default, the files are already configured for use by the bookstore world of AWS and robot Hera.
+  > There are a wide variety of parameters in this config.yaml file, but most are defaults. In addition, they are already configured for use by the AWS bookstore world and the Hera robot.
 
 <div align="center">
      <img src="https://raw.githubusercontent.com/Home-Environment-Robot-Assistant/hera_description/master/doc/hera2020.png" alt="Hera Robot" width="350px">
