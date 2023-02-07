@@ -118,6 +118,16 @@ topic_cmd: 'cmd_vel'              # topic to publish the velocity
 topic_odom: 'odom'                # topic to get the odometry
 topic_scan: 'base_scan_front'     # topic to get the laser scan
 robot: 'robot'                    # name of the robot in gazebo
+
+# ==== parameters for the environment ==== #
+goal_reached_dist: 0.4            # distance to the goal to consider it reached
+collision_dist: 0.3               # distance to the obstacle to consider it a collision
+orientation_threshold: 0.1        # threshold to consider the orientation reached
+environment_dim: 150              # size of the environment
+robot_dim: 4                      # x, y, theta, velocity
+action_dim: 2                     # angular and linear
+time_delta: 0.1                   # 10 Hz
+noise_sigma: 0.5                  # noise for the laser scan
 ```
 For training, the robot Hera from the [RoboFEI At Home](https://github.com/robofei-home) team was used, which is intended for domestic use.
   > **Note** :
