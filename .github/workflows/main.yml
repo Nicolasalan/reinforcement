@@ -51,7 +51,7 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun motion library.py"
+        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun motion library.py"
         working-directory: ${{env.working-directory}}
 
   Package:
@@ -61,5 +61,5 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun motion package.py"
+        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun motion package.py"
         working-directory: ${{env.working-directory}}
