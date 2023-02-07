@@ -95,7 +95,7 @@ make install
 The definition of waypoints is necessary for the correct functioning of the robot in the environment. This includes robot spawn, target, and file saving in /motion/config/. The waypoint_navigation_plugin repository (available at https://github.com/KumarRobotics/waypoint_navigation_plugin) is used to mark the points on the map and create a save file of the positions. Also, it is important to specify the full path in the configuration file.
 
 ```yaml
-waypoints: '/ws/src/motion/config/poses.yaml'
+waypoints: '/<your_workspace>/src/motion/config/poses.yaml'
 ```
 ## Running the Tests
 
