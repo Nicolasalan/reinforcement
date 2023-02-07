@@ -1,4 +1,4 @@
-# Twin Delayed DDPG for Mobile Robot Navigation
+# PyTorch Implementation of Deep Deterministic Policy Gradients for Navigation
 
 <p align="center">
   <a href="http://wiki.ros.org/noetic">
