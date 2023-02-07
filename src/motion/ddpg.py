@@ -219,6 +219,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                nn.Linear(hidden_size, 1)
           )
 
+          # TODO: colocar redes neurais para salvar pesos ou treinamento
+
           # Replace the old models with the new models
           agent.actor_local = new_actor
           agent.critic_local = new_critic

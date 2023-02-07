@@ -22,8 +22,6 @@ class Extension():
 
           self.state_dim = param["environment_dim"] + param["robot_dim"]
           self.action_dim = param["action_dim"]
-          self.action_linear_max = param["action_linear_max"]
-          self.action_angular_max = param["action_angular_max"]
           self.cmd = param["topic_cmd"]
           self.odom = param["topic_odom"]
           self.scan = param["topic_scan"]

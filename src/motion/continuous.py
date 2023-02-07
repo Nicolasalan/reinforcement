@@ -28,8 +28,6 @@ class ContinuousEnv():
           self.collision_dist = param["collision_dist"]
           self.robot = param["robot"]
           self.orientation_threshold = param["orientation_threshold"]
-          self.cmd_linear = param["action_linear_max"]
-          self.cmd_angular = param["action_angular_max"]
           self.noise_sigma = param["noise_sigma"]
 
           # initialize global variables
