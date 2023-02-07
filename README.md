@@ -82,6 +82,8 @@ Build the image Dockerfile:
 cd <your_workspace>/src/motion
 make build
 ```
+  > **Warning** :
+  > This part can take a while, so be patient and go take another ☕ or 🍫.
 
 ***(Optional)*** Install weights for the model:
 
