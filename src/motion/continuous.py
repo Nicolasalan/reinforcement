@@ -14,7 +14,7 @@ from gazebo_msgs.msg import ModelState
 from utils import Extension
 
 class ContinuousEnv():
-     def __init__(self, CONFIG_PATH, goals_idx):
+     def __init__(self, CONFIG_PATH):
 
           self.useful = Extension(CONFIG_PATH)
           rospy.init_node("gym", anonymous=True)
@@ -41,8 +41,8 @@ class ContinuousEnv():
           self.goal_y = 0.0
 
           self.scan_data = np.ones(self.environment_dim) * 10
-          self.path_targets = param["goals"]
-          self.goals = self.useful.path_goal(self.path_targets)
+          self.path_targets = param["path_goal"]
+          self.goals = self.useful.path_target(self.path_targets)
           self.last_odom = None
 
           # ROS publications and subscriptions
@@ -51,8 +51,8 @@ class ContinuousEnv():
           self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
-          self.idx = goals_idx
-
+          self.count_goals = 0
+          self.idx = 0
           rospy.sleep(1)
 
      def odom_callback(self, msg):
@@ -100,9 +100,6 @@ class ContinuousEnv():
                vel_cmd.angular.z = action[1] * self.cmd_angular
                self.pub_cmd_vel.publish(vel_cmd)
                rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
-
-               vel_cmd.linear.x = self.prev_action[0]
-               vel_cmd.angular.z = self.prev_action[1]
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -175,9 +172,7 @@ class ContinuousEnv():
           # ================== SET STATE ================== #
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(state_laser, robot_state)
-          reward = self.useful.get_reward(target, collision, action, min_laser, distance, self.prev_action, self.initial_distance)
-
-          self.initial_distance = distance
+          reward = self.useful.get_reward(target, collision, action, min_laser)
 
           rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
           return state, reward, done, target
@@ -189,7 +184,8 @@ class ContinuousEnv():
           Params:
                state (array): array with robot states (leisure, speed, distance and theta)
           """
-
+          # ================== RESET ENVIRONMENT ================== #
+          rospy.logwarn("Reset Environment            => Resetting environment ...")
           # ================== SET ANGLE ================== #
 
           try:
@@ -206,18 +202,29 @@ class ContinuousEnv():
                yaw = euler[2]
                angle = math.degrees(yaw)
 
-               rospy.loginfo('Set Angle Robot       => Angle: ' + str(angle))
+               rospy.loginfo('Set Angle Robot              => Angle: ' + str(angle))
           
           except:
-               rospy.logerr('Set Angle Robot      => Error setting random angle')
+               rospy.logerr('Set Angle Robot           => Error setting random angle')
                angle = 0.0
 
-          # ================== SET RANDOM POSITION ================== #
-          
           path = self.goals
-          self.goal_x, self.goal_y = path[self.idx]
+          print(path)
+
+          self.goal_x, self.goal_y, self.goal_orientation = path[self.idx]
+
+          # ================== SET ORIENTATION ================== #
+          try:
+
+               rospy.loginfo('Set Angle Target             => Angle: ' + str(self.goal_orientation))
+          
+          except:
+               rospy.logerr('Set Orientation                => Error setting random orientation')
+               self.goal_orientation = 0.0
+
+          # ================== SET POSITION ================== #
     
-          rospy.loginfo('Set Random Position          => Goal: (' + str(self.goal_x) + ', ' + str(self.goal_y) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
+          rospy.loginfo('Set Position                 => Goal: (' + str(self.goal_x) + ', ' + str(self.goal_y) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
 
           # ================== GET STATE SCAN ================== #
           try:
@@ -234,16 +241,25 @@ class ContinuousEnv():
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
-          self.initial_distance = distance
+
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
 
           # remove the first element of the list
-          self.goals.pop(0)
-          
+          #self.goals.pop(0)
+
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
           state = np.append(laser_state, robot_state)
 
+          self.idx += 1
+
           # ================== RETURN STATE ================== #
           return np.array(state)
+     
+     def count(self):
+          """
+          Counts the number of goals reached
+          """
+          self.count_goals += 1
+          rospy.loginfo('Count Goals Reached          => Goals: ' + str(self.count_goals))
