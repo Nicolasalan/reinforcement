@@ -25,7 +25,7 @@ model_actor: '/ws/src/motion/src/motion/checkpoints/actor_model.pth'
 model_critic: '/ws/src/motion/src/motion/checkpoints/critic_model.pth'
 
 # ==== parameters training ==== #
-TYPE: 1                 # (0) - Train from scratch, (1) - Load model, (2) - Load model and continue training (3) - Transfer learning
+TYPE: 1                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model, (3) -> Transfer Learning
 BUFFER_SIZE: 1000000    # replay buffer size
 BATCH_SIZE: 128         # minibatch size
 TAU: 0.001              # for soft update of target parameters
