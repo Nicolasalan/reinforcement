@@ -167,6 +167,7 @@ This repository also serves as a template for ROS applications, has CI/CD, autom
 
 ```
 .
+├── .github/           # [dir] Github actions
 ├── config/            # [dir] Configuration files
 ├── launch/            # [dir] Launch files 
 ├── models/            # [dir] Model SDF target
@@ -181,7 +182,6 @@ This repository also serves as a template for ROS applications, has CI/CD, autom
 ├── README             # [file] This file
 ├── requirements.txt   # [file] Project requirements
 ├── setup.py           # [file] Setup file for the project
-├── workflow.sh        # [file] Github actions workflow
 ├── CMakeLists.txt     # [file] Colcon-enabled CMake recipe
 └── package.xml        # [file] ROS Noetic package metadata
 ```
