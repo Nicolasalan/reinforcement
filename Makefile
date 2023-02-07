@@ -23,6 +23,7 @@ help:
 	@echo '  build 					--Build docker image for machine architecture'
 	@echo '  clean 					--Docker image cleanup'
 	@echo '  start						--Start training session'
+	@echo '  start-gpu					--Start training session with GPU'
 	@echo '  terminal					--Start terminal in docker'
 	@echo '  setup						--setup world and robot'
 	@echo '  view						--setup view gazebo'
@@ -32,6 +33,7 @@ help:
 	@echo '  package					--Test Dependencies'
 	@echo '  integration					--Test All'
 	@echo '  tensorboard					--Start Tensorboard in localhost:6006'
+	@echo '  install					--Install Weights'
 
 # === Build docker ===
 .PHONY: build
