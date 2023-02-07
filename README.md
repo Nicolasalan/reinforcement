@@ -83,7 +83,7 @@ cd <your_workspace>/src/motion
 make build
 ```
 
-(Optional) Install weights for the model:
+***(Optional)*** Install weights for the model:
 
 ```bash
 cd <your_workspace>/src/motion
