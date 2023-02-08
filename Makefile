@@ -23,7 +23,6 @@ help:
 	@echo '  build 					--Build docker image for machine architecture'
 	@echo '  clean 					--Docker image cleanup'
 	@echo '  start						--Start training session'
-	@echo '  start-gpu					--Start training session with GPU'
 	@echo '  terminal					--Start terminal in docker'
 	@echo '  setup						--setup world and robot'
 	@echo '  view						--setup view gazebo'
@@ -34,7 +33,8 @@ help:
 	@echo '  integration					--Test All'
 	@echo '  tensorboard					--Start Tensorboard in localhost:6006'
 	@echo '  install					--Install Weights'
-
+	@echo '  start-all					--Start Simulation and Training'
+	
 # === Build docker ===
 .PHONY: build
 build:
@@ -93,7 +93,7 @@ sim:
 	@echo "Testing ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/sim.py"
 
-# === Test Learning ===
+# === Test Package ===
 .PHONY: package
 package:
 	@echo "Testing ..."
@@ -117,7 +117,7 @@ install:
 	@echo "Install Weights ..."
 	@cd ${PWD}/src/motion/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
 
-# === Start all training ===
+# === Start All Training ===
 .PHONY: start-all
 start-all:
 	@echo "Starting training ..."
