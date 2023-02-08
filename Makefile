@@ -75,12 +75,6 @@ start:
 	@echo "Starting training ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
-# === Start train docker GPU ===
-.PHONY: start-gpu
-start-gpu:
-	@echo "Starting training ..."
-	@sudo docker run -it --net=host --gpus all ${DOCKER_ARGS} --env="NVIDIA_DRIVER_CAPABILITIES=all" motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
-
 # === Test Library ===
 .PHONY: library
 library:
@@ -111,12 +105,6 @@ integration:
 	@echo "Testing ..."
 	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
 
-# === Test workflow ===
-.PHONY: workflow
-workflow:
-	@echo "Testing ..."
-	@sudo docker run --net=host --volume=${PWD}:/ws/src/motion:rw ninim/motion-docker:latest bash -c "cd /ws/src/motion && ./workflow.sh"
-
 # === Tensorboard ===
 .PHONY: tensorboard
 tensorboard:
@@ -128,3 +116,9 @@ tensorboard:
 install:
 	@echo "Install Weights ..."
 	@cd ${PWD}/src/motion/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
+
+# === Start all training ===
+.PHONY: start-all
+start-all:
+	@echo "Starting training ..."
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch motion start.launch"
