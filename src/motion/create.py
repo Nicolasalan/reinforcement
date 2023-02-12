@@ -4,21 +4,18 @@ import cv2
 import numpy as np
 import trimesh
 import rospkg
-import aspose.threed as a3d
-import os
 
 import rospy
 from nav_msgs.msg import OccupancyGrid
-from utils import Extension
 
 class CreateEnvironment(object):
 
-     def __init__(self, map_topic, threshold=1, height=1.0):
+     def __init__(self, map_topic, thresholds=1, height=1.0):
           rospy.Subscriber(map_topic, OccupancyGrid, self.map_callback)
           rospack = rospkg.RosPack()
                     
           self.path_to_package = rospack.get_path('motion')
-          self.threshold = threshold
+          self.threshold = thresholds
           self.height = height
 
      def map_callback(self, msg):
@@ -34,20 +31,10 @@ class CreateEnvironment(object):
           mesh = trimesh.util.concatenate(meshes)
 
           # Export DAE
-          export_dir = self.path_to_package + "/world"
+          export_dir = self.path_to_package + "/models/map"
 
           with open(export_dir + "/map.dae", 'w') as f:
-               f.write(trimesh.exchange.dae.export_collada(mesh).decode())
-
-          # convert DAE to STL
-          scene = a3d.Scene.from_file(export_dir + "/map.dae")
-          scene.save(export_dir + "/map.stl")
-
-          # remove DAE
-          os.remove(export_dir + "/map.dae")      
-
-          # create World file
-          self.create_world_file(export_dir)
+               f.write(trimesh.exchange.dae.export_collada(mesh).decode()) 
 
           # Shut down the program
           rospy.signal_shutdown("Exported map successfully")
@@ -102,56 +89,12 @@ class CreateEnvironment(object):
           x, y = coords
           loc_x = x * metadata.resolution + metadata.origin.position.x
           loc_y = y * metadata.resolution + metadata.origin.position.y
-          return np.array([loc_x, loc_y, 0.0])
-
-     def create_world_file(self, path):
-          world_file = f"""<?xml version="1.0"?>
-          <sdf version="1.7">
-               <world name="my_stl_world">
-                    <include>
-                         <uri>model://sun</uri>
-                    </include>
-                    <include>
-                         <uri>model://ground_plane</uri>
-                    </include>
-                    <model name="my_stl_model">
-                         <pose>0 0 0 0 0 0</pose>
-                         <link name="base_link">
-                              <collision name="collision">
-                                   <geometry>
-                                        <mesh>
-                                             <uri>file://{path}</uri>
-                                             <scale>1 1 1</scale>
-                                        </mesh>
-                                   </geometry>
-                              </collision>
-                              <visual name="visual">
-                                   <geometry>
-                                        <mesh>
-                                             <uri>file://{path}</uri>
-                                             <scale>1 1 1</scale>
-                                        </mesh>
-                                   </geometry>
-                              </visual>
-                         </link>
-                    </model>
-               </world>
-          </sdf>
-          """
-          save_path = self.path_to_package + '/world' + '/environment.world'
-          with open(save_path, "w") as f:
-               f.write(world_file)      
+          return np.array([loc_x, loc_y, 0.0])     
 
 if __name__ == "__main__":
      rospy.init_node("create_env")
 
-     CONFIG_PATH = rospy.get_param('config_path')  
+     rospy.loginfo("Creating environment...")
 
-     useful = Extension(CONFIG_PATH)
-     param = useful.load_config("config.yaml")
-     map_topic = param["topic_map"]
-     threshold = param["threshold"] 
-     height = param["height"] 
-
-     create = CreateEnvironment(map_topic, threshold=threshold, height=height)
+     create = CreateEnvironment("map", thresholds=1, height=1.0)
      rospy.spin()

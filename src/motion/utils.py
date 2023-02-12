@@ -126,14 +126,6 @@ class Extension():
                return True, True, min_laser
           return False, False, min_laser
 
-     def check_pose(self, x1, y1, x2, y2):
-          """checks that the position is not in conflict with another position."""
-          
-          if x1 == x2 and y1 == y2:
-               return False
-          else:
-               return True
-
      def array_gaps(self, environment_dim):
           """Retorna uma matriz de intervalos representando lacunas em um determinado ambiente.."""
 

@@ -36,7 +36,7 @@ help:
 	@echo '  start-all					--Start Simulation and Training'
 	@echo '  server					--Start Training Server'
 	@echo '  start-gpu					--Start Training GPU'
-	@echo '  create 					--Create world'
+	@echo '  waypoint					--Setup Waypoint'
 
 # === Build docker ===
 .PHONY: build
@@ -45,7 +45,7 @@ build:
 	@sudo docker login && docker build -t motion-docker . 
 	@sudo mkdir -p ${PWD}/src/motion/checkpoints
 	@sudo mkdir -p ${PWD}/src/motion/run
-	@sudo mkdir -p ${PWD}/world
+	@sudo mkdir -p ${PWD}/config/map
 
 # === Clean docker ===
 .PHONY: clean
@@ -142,12 +142,6 @@ start-gpu:
 # === Setup Waypoint ===
 .PHONY: waypoint
 waypoint:
-	@echo "Setup Waypoint ..."
+	@echo "Setup Waypoint and Create Env..."
 	@sudo xhost + 
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion setup.launch "
-
-# === Create World ===
-.PHONY: create
-create:
-	@echo "Create world ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion create.py"

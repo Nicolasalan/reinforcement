@@ -19,7 +19,7 @@ checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count):
+def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful):
      """
      parameters
      ======
@@ -57,6 +57,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     action = agent.action(states)                          # choose an action for each agent
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
+                    action_random = useful.random_near_obstacle(states, count_rand_actions, random_action)
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
@@ -289,4 +290,4 @@ if __name__ == '__main__':
      max_t = param["MAX_T"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count)
+     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful)

@@ -6,5 +6,4 @@ rospkg
 wget
 pycollada
 trimesh
-aspose-3d
 opencv-python

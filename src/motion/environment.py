@@ -152,15 +152,14 @@ class Env():
                self.odom_x = self.last_odom.position.x
                self.odom_y = self.last_odom.position.y
 
-               quaternion = (
+               quaternion = Quaternion(
                     self.last_odom.orientation.x,
                     self.last_odom.orientation.y,
                     self.last_odom.orientation.z,
                     self.last_odom.orientation.w
                )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               angle = math.degrees(yaw)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
 
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
@@ -277,7 +276,7 @@ class Env():
           time.sleep(self.time_delta)
 
           # ================== SET RANDOM OBJECT MODEL ================== #
-          names = ['cube', 'cylinder', 'sphere', 'person']
+          names = ['cube', 'cylinder', 'sphere']
 
           select_pose = self.useful.select_random_poses(poses, self.n_objects)
 

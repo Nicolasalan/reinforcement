@@ -127,12 +127,6 @@ class TestPackage(unittest.TestCase):
           except ImportError:
                self.fail("Could not import time") 
 
-     def test_aspose_import(self):
-          try:
-               import aspose.threed as a3d
-          except ImportError:
-               self.fail("Could not import aspose")
-
      def test_opencv_import(self):
           try:
                import cv2

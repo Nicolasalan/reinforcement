@@ -1,34 +1,35 @@
 <launch>
-     <arg name="world_name"        default="$(find motion)/world/environment.world"/>
-     <arg name="gui"               default="false"/>
+     <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find motion)/models/" />
+
+     <arg name="world_name"        default="environment.world"/>
+     <arg name="gui"               default="true"/>
 
      <arg name="model_target"      default="$(find motion)/models/cube.sdf"/>
      <arg name="model_cube"        default="$(find motion)/models/cylinder.sdf"/>
      <arg name="model_sphere"      default="$(find motion)/models/sphere.sdf"/>
      <arg name="model_cylinder"    default="$(find motion)/models/target.sdf"/>
-     <arg name="model_person"      default="$(find motion)/models/person.sdf"/>
 
-     <!-- Launch World -->
-     <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen">
-          <param name="world_name" value="$(arg world_name)"/>
-     </node>
+     <!-- start gazebo server -->
+    <param name="/use_sim_time" value="true"/>
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
+	    args="--verbose $(find motion)/world/$(arg world_name)" />
 
-     <node name="gazebo_client" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
-          <param name="gui" value="$(arg gui)"/>
-          <param name="world_name" value="$(arg world_name)"/>
-     </node>
+    <!-- start gazebo client -->
+    <group if="$(arg gui)">
+        <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" output="screen" />
+    </group>
 
-     <!-- Launch Robot -->
+    <!-- Launch Robot -->
      <include file="$(find hera_description)/launch/load_description.launch">
           <arg name="robot_model" default="hera_full"/>
           <arg name="use_jsp_gui" default="false"/>
      </include>
-     
+
      <!-- Launch Objects -->
-     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y 0 -z -1"/>
-     <node name="spawn_model_cube"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cube) -sdf -model cube -x 1 -y 1 -z -1"/>
-     <node name="spawn_model_sphere"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphere) -sdf -model sphere -x 2 -y 0 -z -1"/>
-     <node name="spawn_model_cylinder" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinder) -sdf -model cylinder -x 3 -y 0 -z -1"/>
-     <node name="spawn_model_person"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_person) -sdf -model person -x 4 -y 0 -z -1"/>
+     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y 0 -z 3"/>
+     <node name="spawn_model_cube"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cube) -sdf -model cube -x 1 -y 1 -z 2"/>
+     <node name="spawn_model_sphere"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphere) -sdf -model sphere -x 0 -y 0 -z 0"/>
+     <node name="spawn_model_cylinder" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinder) -sdf -model cylinder -x 3 -y 0 -z 0"/>
        
+
 </launch>
