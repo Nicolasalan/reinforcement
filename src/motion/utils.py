@@ -205,7 +205,6 @@ class Extension():
 
      def shutdownhook(self):
           """Shutdown hook for the node."""
-
           rospy.is_shutdown()
 
      def load_config(self, config_name):
@@ -214,44 +213,16 @@ class Extension():
 
           return param
 
-     def randomize_objects(self):
-          rospy.wait_for_service("gazebo/get_world_properties")
-          get_world_properties = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
+     def select_poses(self, poses):
+          index_robot = int(round(np.random.uniform(0, len(poses))))
+          index_target = int(round(np.random.uniform(0, len(poses))))
+          while index_robot == index_target:
+               index_target = int(round(np.random.uniform(0, len(poses))))
 
-          model_poses = []
+          new_poses = [pose for i, pose in enumerate(poses) if i != index_robot and i != index_target]
+          return poses[index_robot], poses[index_target], new_poses
 
-          response = get_world_properties()
-          model_names = response.model_names
-          
-          model_names.remove(self.robot)
-          model_names.remove('target')
+     def select_random_poses(self, poses, percentage):
+          n = int(len(poses) * (percentage))
 
-          for model_name in model_names:
-               rospy.wait_for_service("gazebo/get_model_state")
-               try:
-                    response = self.get_pose(model_name, "")
-                    x = response.pose.position.x
-                    y = response.pose.position.y
-                    z = response.pose.position.z
-                    model_poses.append((x, y, z))
-               except rospy.ServiceException as e:
-                    pass
-
-          poses_copy = model_poses.copy()
-
-          # Set each model to its new randomized position
-          for name in model_names:
-               state = ModelState()
-               state.model_name = name
-               random_pose = np.random.choice(poses_copy)
-               state.pose.position.x, state.pose.position.y, state.pose.position.z = random_pose
-               poses_copy.remove(random_pose)
-               self.set_state.publish(state)
-          
-          time.sleep(self.time_delta)
-
-          print(poses_copy)
-
-          time.sleep(self.time_delta)
-
-
+          return np.random.sample(poses, n)

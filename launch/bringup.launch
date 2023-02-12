@@ -1,13 +1,34 @@
 <launch>
+     <arg name="world_name"        default="$(find motion)/world/environment.world"/>
+     <arg name="gui"               default="false"/>
+
+     <arg name="model_target"      default="$(find motion)/models/cube.sdf"/>
+     <arg name="model_cube"        default="$(find motion)/models/cylinder.sdf"/>
+     <arg name="model_sphere"      default="$(find motion)/models/sphere.sdf"/>
+     <arg name="model_cylinder"    default="$(find motion)/models/target.sdf"/>
+     <arg name="model_person"      default="$(find motion)/models/person.sdf"/>
+
      <!-- Launch World -->
-     <include file="$(find aws_robomaker_bookstore_world)/launch/bookstore.launch"/>
-          <arg name="gui" default="false"/>
-       
+     <node name="gazebo" pkg="gazebo_ros" type="gzserver" respawn="false" output="screen">
+          <param name="world_name" value="$(arg world_name)"/>
+     </node>
+
+     <node name="gazebo_client" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen">
+          <param name="gui" value="$(arg gui)"/>
+          <param name="world_name" value="$(arg world_name)"/>
+     </node>
+
      <!-- Launch Robot -->
      <include file="$(find hera_description)/launch/load_description.launch">
           <arg name="robot_model" default="hera_full"/>
           <arg name="use_jsp_gui" default="false"/>
      </include>
      
-     <include file="$(find motion)/launch/spawn.launch"/>
+     <!-- Launch Objects -->
+     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y 0 -z -1"/>
+     <node name="spawn_model_cube"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cube) -sdf -model cube -x 1 -y 1 -z -1"/>
+     <node name="spawn_model_sphere"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphere) -sdf -model sphere -x 2 -y 0 -z -1"/>
+     <node name="spawn_model_cylinder" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinder) -sdf -model cylinder -x 3 -y 0 -z -1"/>
+     <node name="spawn_model_person"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_person) -sdf -model person -x 4 -y 0 -z -1"/>
+       
 </launch>

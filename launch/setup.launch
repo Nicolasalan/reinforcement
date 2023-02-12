@@ -1,0 +1,18 @@
+<launch>
+  <arg name="map_resource"          default="$(find motion)/config/map"/>
+
+  <!-- mapping -->
+  <node name="map_server" pkg="map_server" type="map_server" output="screen"
+    args="$(arg map_resource)/map.yaml">
+  </node>
+
+  <!-- setup -->
+  <node pkg="rviz" type="rviz" name="waypoint_nav_plugin"
+    args="$(find waypoint_navigation_plugin)/rviz/waypoint_nav_plugin.rviz">
+  </node>
+
+  <!-- Create World -->
+  <node name="create" pkg="motion" type="create.py" output="screen"/>
+    <rosparam command="load" file="$(find motion)/config/config.yaml"/>
+
+</launch>

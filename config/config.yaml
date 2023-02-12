@@ -1,30 +1,33 @@
-# ==== parameters ros ==== #
+# ==== Parameters ROS ==== #
 topic_cmd: 'cmd_vel'              # topic to publish the velocity
 topic_odom: 'odom'                # topic to get the odometry
 topic_scan: 'base_scan_front'     # topic to get the laser scan
+topic_map: 'map'                  # topic to get the map
 robot: 'robot'                    # name of the robot in gazebo
 
-# ==== parameters for the environment ==== #
-goal_reached_dist: 0.3            # distance to the goal to consider it reached
-collision_dist: 0.2               # distance to the obstacle to consider it a collision
-orientation_threshold: 0.1        # threshold to consider the orientation reached
-environment_dim: 150              # size of the environment
-robot_dim: 4                      # x, y, theta, velocity
-action_dim: 2                     # angular and linear
-time_delta: 0.1                   # 10 Hz
-noise_sigma: 1.0                  # noise for the laser scan
+# ==== Parameters for the Environment ==== #
+goal_reached_dist: 0.3            # distance to the goal to consider it reached (in meters)
+collision_dist: 0.2               # distance to the obstacle to consider it a collision (in meters)
+orientation_threshold: 0.1        # threshold to consider the orientation reached (in radians)
+environment_dim: 150              # size of the environment (default)
+robot_dim: 4                      # x, y, theta, velocity (default)
+action_dim: 2                     # angular and linear (default)
+time_delta: 0.5                   # 10 Hz (default)
+noise_sigma: 0.5                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
+n_noise: 0.2                       # porcent of obstacles randomly generated
 
-# ==== path to the model and poses ==== #
-waypoints: '/ws/src/motion/config/poses.yaml'
-path_goal: '/ws/src/motion/config/goals.yaml'
-goal_model: '/ws/src/motion/models/target.sdf'
-config_path: '/ws/src/motion/config/'
+# ==== Parameters for the World ==== #
+threshold: 1                      # threshold to consider a cell as occupied (default)
+height: 1.0                       # Height of boxes in gazebo environment (default)
 
-# ==== path weights pre-trained ==== #
-model_actor: '/ws/src/motion/src/motion/checkpoints/actor_model.pth'
-model_critic: '/ws/src/motion/src/motion/checkpoints/critic_model.pth'
+# ==== Path to the model and config ==== #
+model_path: '/ws/src/motion/models/'  # default: 'models/'
+config_path: '/ws/src/motion/config/' # default: 'config/'
 
-# ==== parameters training ==== #
+# ==== Path Weights pre-trained ==== #
+model: '/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
+
+# ==== Parameters Training ==== #
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model, (3) -> Transfer Learning
 BUFFER_SIZE: 1000000    # replay buffer size
 BATCH_SIZE: 128         # minibatch size

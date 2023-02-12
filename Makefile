@@ -34,14 +34,18 @@ help:
 	@echo '  tensorboard					--Start Tensorboard in localhost:6006'
 	@echo '  install					--Install Weights'
 	@echo '  start-all					--Start Simulation and Training'
-	
+	@echo '  server					--Start Training Server'
+	@echo '  start-gpu					--Start Training GPU'
+	@echo '  create 					--Create world'
+
 # === Build docker ===
 .PHONY: build
 build:
 	@echo "Building docker image ..."
-	@docker login && docker build -t motion-docker . 
-	@mkdir -p ${PWD}/src/motion/checkpoints
-	@mkdir -p ${PWD}/src/motion/run
+	@sudo docker login && docker build -t motion-docker . 
+	@sudo mkdir -p ${PWD}/src/motion/checkpoints
+	@sudo mkdir -p ${PWD}/src/motion/run
+	@sudo mkdir -p ${PWD}/world
 
 # === Clean docker ===
 .PHONY: clean
@@ -120,5 +124,30 @@ install:
 # === Start All Training ===
 .PHONY: start-all
 start-all:
-	@echo "Starting training ..."
+	@echo "Starting training All ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch motion start.launch"
+
+# === Start Training Server ===
+.PHONY: server
+server:
+	@echo "Starting training in Server..."
+	@sudo docker run -it ${DOCKER_ARGS} motion-docker bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch motion start.launch"
+
+# === Start Training GPU ===
+.PHONY: start-gpu
+start-gpu:
+	@echo "Starting training in GPU ..."
+	@sudo docker run -it --net=host --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" ${DOCKER_ARGS} motion-docker bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch motion start.launch"
+
+# === Setup Waypoint ===
+.PHONY: waypoint
+waypoint:
+	@echo "Setup Waypoint ..."
+	@sudo xhost + 
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion setup.launch "
+
+# === Create World ===
+.PHONY: create
+create:
+	@echo "Create world ..."
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion create.py"

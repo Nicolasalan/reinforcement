@@ -27,7 +27,6 @@ class Env():
           param = self.useful.load_config("config.yaml")
 
           # set the initial state
-          self.goal_model = param["goal_model"]
           self.goal_reached_dist = param["goal_reached_dist"]
           self.environment_dim = param["environment_dim"]
           self.time_delta = param["time_delta"]
@@ -35,6 +34,7 @@ class Env():
           self.robot = param["robot"]
           self.orientation_threshold = param["orientation_threshold"]
           self.noise_sigma = param["noise_sigma"]
+          self.n_percent = param["n_noise"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -43,7 +43,7 @@ class Env():
           self.goal_y = 0.0
 
           self.scan_data = np.ones(self.environment_dim) * 10
-          self.path_waypoints = param["waypoints"]
+          self.path_waypoints = param["waypoints"] + 'poses.yaml'
 
           self.goals = self.useful.path_goal(self.path_waypoints)
           self.last_odom = None
@@ -144,7 +144,7 @@ class Env():
                rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
-               rospy.logerr('Read Scan Data              => Error reading scan data')
+               rospy.logfatal('Read Scan Data              => Error reading scan data')
                done = False
                collision = False
                min_laser = 0.0
@@ -237,25 +237,17 @@ class Env():
                self.goal_orientation = 0.0
 
           # ================== SET RANDOM POSITION ================== #
-          
-          path = self.goals
-          x, y = 0.0, 0.0
 
-          while True:
-               x, y = self.useful.random_goal(path)
-               _x, _y = self.useful.change_goal(path)
-               check = self.useful.check_pose(x, y, _x, _y)
-               if check == True:
-                    break
+          poses, goal, robot = self.useful.select_poses(self.goals)
                     
-          rospy.loginfo('Set Random Position          => Goal: (' + str(x) + ', ' + str(y) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
+          rospy.loginfo('Set Random Position          => Goal: (' + str(robot[0]) + ', ' + str(robot[1]) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
 
           # ================== SET RANDOM ROBOT MODEL ================== #
           try:
                set_robot = ModelState()
                set_robot.model_name = self.robot
-               set_robot.pose.position.x = x
-               set_robot.pose.position.y = y
+               set_robot.pose.position.x = robot[0]
+               set_robot.pose.position.y = robot[1]
                set_robot.pose.position.z = 0.0
                set_robot.pose.orientation.x = quaternion.x
                set_robot.pose.orientation.y = quaternion.y
@@ -272,18 +264,44 @@ class Env():
           try:
                set_target = ModelState()
                set_target.model_name = "target"
-               set_target.pose.position.x = _x
-               set_target.pose.position.y = _y
+               set_target.pose.position.x = goal[0]
+               set_target.pose.position.y = goal[1]
                set_target.pose.position.z = 0.0
                set_target.pose.orientation.x = 0.0
                set_target.pose.orientation.y = 0.0
                set_target.pose.orientation.z = 0.0
                set_target.pose.orientation.w = 1.0
                self.set_state.publish(set_target)
-               self.goal_x, self.goal_y = _x, _y
+               self.goal_x, self.goal_y = goal[0], goal[1]
           
           except:
                rospy.logerr('Set Random Goal Model       => Error setting random goal model')
+          
+          time.sleep(self.time_delta)
+
+          # ================== SET RANDOM OBJECT MODEL ================== #
+          names = ['cube', 'cylinder', 'sphere', 'person']
+
+          select_pose = self.useful.select_random_poses(poses, self.n_objects)
+
+          try:
+               # Shuffle the list of poses
+               np.random.shuffle(select_pose)
+
+               for model_name, model_pose in zip(names, select_pose):
+                    # Create a new ModelState message
+                    set_objects = ModelState()
+                    set_objects.model_name = model_name
+                    set_objects.pose.position.x = model_pose[0]
+                    set_objects.pose.position.y = model_pose[1]
+                    set_objects.pose.orientation.x = quaternion.x
+                    set_objects.pose.orientation.y = quaternion.y
+                    set_objects.pose.orientation.z = quaternion.z
+                    set_objects.pose.orientation.w = quaternion.w
+                    self.set_state.publish(set_objects)
+               
+          except:
+               rospy.logerr('Set Random Object Model       => Error setting random object model')
 
           # ================== UNPAUSE SIMULATION ================== #
           rospy.wait_for_service("/gazebo/unpause_physics")
@@ -321,7 +339,6 @@ class Env():
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
-          #self.useful.randomize_objects()
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]

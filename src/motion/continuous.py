@@ -21,7 +21,6 @@ class ContinuousEnv():
           param = self.useful.load_config("config.yaml")
 
           # set the initial state
-          self.goal_model = param["goal_model"]
           self.goal_reached_dist = param["goal_reached_dist"]
           self.environment_dim = param["environment_dim"]
           self.time_delta = param["time_delta"]
@@ -37,7 +36,7 @@ class ContinuousEnv():
           self.goal_y = 0.0
 
           self.scan_data = np.ones(self.environment_dim) * 10
-          self.path_targets = param["path_goal"]
+          self.path_targets = param["path_goal"] + '/goal.yaml'
           self.goals = self.useful.path_target(self.path_targets)
           self.last_odom = None
 
