@@ -155,7 +155,7 @@ class ContinuousEnv():
           orientation_diff = abs(angle - self.goal_orientation)
 
           rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
-
+          
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
           if distance < self.goal_reached_dist: #and orientation_diff < self.orientation_threshold:

@@ -15,6 +15,7 @@ action_dim: 2                     # angular and linear (default)
 time_delta: 0.5                   # 10 Hz (default)
 noise_sigma: 0.5                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
 n_noise: 0.2                       # porcent of obstacles randomly generated
+random_near_obstacle: true  # To take random actions near obstacles or not
 
 # ==== Parameters for the World ==== #
 threshold: 1                      # threshold to consider a cell as occupied (default)

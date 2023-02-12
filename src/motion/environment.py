@@ -42,8 +42,7 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.scan_data = np.ones(self.environment_dim) * 10
-          self.path_waypoints = param["waypoints"] + 'poses.yaml'
+          self.path_waypoints = param["config_path"] + 'poses.yaml'
 
           self.goals = self.useful.path_goal(self.path_waypoints)
           self.last_odom = None
@@ -83,9 +82,7 @@ class Env():
                scan_data (array): A list of range measurements.
           """
           data = scan.ranges
-          #noisy_data = data + np.random.normal(0, self.noise_sigma, data.shape)
-          self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
-          #self.data = self.useful.range(scan)
+          self.scan_data = self.useful.range(scan)
 
      def step_env(self, action):
           """

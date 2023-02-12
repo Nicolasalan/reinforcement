@@ -59,7 +59,7 @@ class Extension():
      def distance_to_goal(self, odom_x, odom_y, goal_x, goal_y):
           """Calculate the distance between the robot and the goal."""
 
-          distance = np.linalg.norm([odom_x - goal_x, odom_y - goal_y])
+          distance = np.linalg.norm([odom_x - goal_x, odom_y - goal_y]) # vector length
 
           return distance
 
@@ -105,19 +105,7 @@ class Extension():
                     goals.append((x, y, yaw))
 
           return goals
-
-     def random_goal(self, goals):
-          """Select a random goal from the list of waypoints."""
-
-          points = goals
-          x, y = 0, 0
-          rand = int(round(np.random.uniform(0, len(points))))
-          for i in range(len(points)):
-               if i == rand:
-                    x, y = points[i][0], points[i][1] 
-          
-          return x, y
-
+     
      def get_reward(self, target, collision, action, min_laser):
           """Agent reward function."""
 
@@ -126,6 +114,7 @@ class Extension():
           elif collision:
                return -100.0
           else:
+               # This gives an additional negative reward if the robot is closer to any obstacle than 1 meter. Using this 'repulsion' causes the robot to get more tired of obstacles in general and go around them with a greater go.
                r3 = lambda x: 1 - x if x < 1 else 0.0
                return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
 
@@ -136,21 +125,6 @@ class Extension():
           if min_laser < collision_dist:
                return True, True, min_laser
           return False, False, min_laser
-
-     def change_goal(self, goals):
-          """Select a random goal from the list of waypoints."""
-
-          points = goals
-          _x, _y = 0.0, 0.0
-          rand = int(round(np.random.uniform(0, len(points))))
-          for i in range(len(points)):
-               if i == rand:
-                    _x, _y = points[i][0], points[i][1] 
-          
-          x = _x
-          y = _y
-
-          return x, y
 
      def check_pose(self, x1, y1, x2, y2):
           """checks that the position is not in conflict with another position."""
@@ -214,6 +188,8 @@ class Extension():
           return param
 
      def select_poses(self, poses):
+          """Select two random poses from the list of poses."""
+
           index_robot = int(round(np.random.uniform(0, len(poses))))
           index_target = int(round(np.random.uniform(0, len(poses))))
           while index_robot == index_target:
@@ -223,6 +199,24 @@ class Extension():
           return poses[index_robot], poses[index_target], new_poses
 
      def select_random_poses(self, poses, percentage):
+          """Select a random percentage of poses from the list of poses."""
+
           n = int(len(poses) * (percentage))
 
           return np.random.sample(poses, n)
+
+     def random_near_obstacle(self, state, count_rand_actions, random_action, add_noise=True):
+          """Select a random action near an obstacle."""
+
+          if add_noise: 
+
+               if (np.random.uniform(0, 1) > 0.85 and min(state[4:-8]) < 0.6 and count_rand_actions < 1):
+                    count_rand_actions = np.random.randint(8, 15)
+                    random_action = np.random.uniform(-1, 1, 2)
+
+               if count_rand_actions > 0:
+                    count_rand_actions -= 1
+                    action = random_action
+               
+               return action, count_rand_actions, random_action
+

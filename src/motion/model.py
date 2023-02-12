@@ -31,7 +31,6 @@ class Actor(nn.Module):
         self.layer_2 = nn.Linear(l1, l2)
         self.layer_3 = nn.Linear(l2, action_dim)
         self.tanh = nn.Tanh()
-        self.batch_norm = nn.BatchNorm1d(l1)  
         self.dropout = nn.Dropout(dropout_p)  
         self.reset_parameters()
 
@@ -47,7 +46,6 @@ class Actor(nn.Module):
         state = lstm_output[:, -1, :]  
 
         state = F.relu(self.layer_1(state))
-        state = self.batch_norm(state)
         state = F.relu(self.layer_2(state))
         state = self.dropout(state)
         a = self.tanh(self.layer_3(state))
@@ -72,7 +70,6 @@ class Critic(nn.Module):
         self.layer_2_s = nn.Linear(l1, l2)
         self.layer_2_a = nn.Linear(action_dim, l2)
         self.layer_3 = nn.Linear(l2, 1)
-        self.batch_norm_1 = nn.BatchNorm1d(l1)  
         self.dropout_1 = nn.Dropout(dropout_p)  
         self.reset_parameters_q1()
 
@@ -81,7 +78,6 @@ class Critic(nn.Module):
         self.layer_5_s = nn.Linear(l1, l2)
         self.layer_5_a = nn.Linear(action_dim, l2)
         self.layer_6 = nn.Linear(l2, 1)
-        self.batch_norm_2 = nn.BatchNorm1d(l1)  
         self.dropout_2 = nn.Dropout(dropout_p)  
         self.reset_parameters_q2()
 
@@ -104,7 +100,6 @@ class Critic(nn.Module):
         state = lstm_output[:, -1, :] 
 
         s1 = F.relu(self.layer_1(state))
-        self.batch_norm_1(s1)  
         self.dropout_1(s1)  
         self.layer_2_s(s1)
         self.layer_2_a(action)
@@ -114,7 +109,6 @@ class Critic(nn.Module):
         q1 = self.layer_3(s1)
 
         s2 = F.relu(self.layer_4(state))
-        self.batch_norm_2(s2)  
         self.dropout_2(s2)  
         self.layer_5_s(s2)
         self.layer_5_a(action)

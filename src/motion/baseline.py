@@ -30,6 +30,9 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
      state_dim = param["environment_dim"] + param["robot_dim"]
      action_dim = param["action_dim"]
 
+     count_rand_actions = 0
+     random_action = []
+
      ## ====================== Training Loop ====================== ##
 
      if param["TYPE"] == 0:
@@ -52,7 +55,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    actions = [(action[0] + 1) / 2, action[1]]
+                    
+                    actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
@@ -110,7 +114,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    actions = [(action[0] + 1) / 2, action[1]]
+                    actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
@@ -169,7 +173,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    actions = [(action[0] + 1) / 2, action[1]]
+                    actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
@@ -238,7 +242,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    actions = [(action[0] + 1) / 2, action[1]]
+                    actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
