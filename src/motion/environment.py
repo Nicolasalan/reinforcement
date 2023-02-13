@@ -2,8 +2,6 @@
 
 import rospy
 import numpy as np
-import math
-import tf
 import time
 
 from geometry_msgs.msg import Twist, Pose
@@ -58,7 +56,6 @@ class Env():
           self.unpause = rospy.ServiceProxy("/gazebo/unpause_physics", Empty)
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
           self.set_light_properties = rospy.ServiceProxy("/gazebo/set_light_properties", SetLightProperties)
-
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
           rospy.sleep(1)

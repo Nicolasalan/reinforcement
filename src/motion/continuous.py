@@ -2,12 +2,11 @@
 
 import rospy
 import numpy as np
-import math
-import tf
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
+from squaternion import Quaternion
 
 from utils import Extension
 
@@ -125,15 +124,15 @@ class ContinuousEnv():
                self.odom_x = self.last_odom.position.x
                self.odom_y = self.last_odom.position.y
 
-               quaternion = (
+               quaternion = Quaternion(
                     self.last_odom.orientation.x,
                     self.last_odom.orientation.y,
                     self.last_odom.orientation.z,
                     self.last_odom.orientation.w
                )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               angle = math.degrees(yaw)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
+
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
@@ -179,23 +178,21 @@ class ContinuousEnv():
           Params:
                state (array): array with robot states (leisure, speed, distance and theta)
           """
-          # ================== RESET ENVIRONMENT ================== #
-          rospy.logwarn("Reset Environment            => Resetting environment ...")
+
           # ================== SET ANGLE ================== #
 
           try:
                self.odom_x = self.last_odom.position.x
                self.odom_y = self.last_odom.position.y
 
-               quaternion = (
+               quaternion = Quaternion(
                     self.last_odom.orientation.x,
                     self.last_odom.orientation.y,
                     self.last_odom.orientation.z,
                     self.last_odom.orientation.w
                )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               angle = math.degrees(yaw)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
 
                rospy.loginfo('Set Angle Robot              => Angle: ' + str(angle))
           
@@ -204,7 +201,6 @@ class ContinuousEnv():
                angle = 0.0
 
           path = self.goals
-          print(path)
 
           self.goal_x, self.goal_y, self.goal_orientation = path[self.idx]
 
@@ -239,9 +235,6 @@ class ContinuousEnv():
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
-
-          # remove the first element of the list
-          #self.goals.pop(0)
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]

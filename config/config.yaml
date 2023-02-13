@@ -2,7 +2,6 @@
 topic_cmd: 'cmd_vel'              # topic to publish the velocity
 topic_odom: 'odom'                # topic to get the odometry
 topic_scan: 'base_scan_front'     # topic to get the laser scan
-topic_map: 'map'                  # topic to get the map
 robot: 'robot'                    # name of the robot in gazebo
 
 # ==== Parameters for the Environment ==== #
@@ -15,11 +14,7 @@ action_dim: 2                     # angular and linear (default)
 time_delta: 0.5                   # 10 Hz (default)
 noise_sigma: 0.5                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
 n_noise: 0.2                      # porcent of obstacles randomly generated
-random_near_obstacle: true  # To take random actions near obstacles or not
-
-# ==== Parameters for the World ==== #
-threshold: 1                      # threshold to consider a cell as occupied (default)
-height: 1.0                       # Height of boxes in gazebo environment (default)
+random_near_obstacle: true        # To take random actions near obstacles or not
 
 # ==== Path to the model and config ==== #
 model_path: '/ws/src/motion/models/'  # default: 'models/'
@@ -29,7 +24,7 @@ config_path: '/ws/src/motion/config/' # default: 'config/'
 model: '/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
 
 # ==== Parameters Training ==== #
-TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model, (3) -> Transfer Learning
+TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model
 BUFFER_SIZE: 1000000    # replay buffer size
 BATCH_SIZE: 128         # minibatch size
 TAU: 0.001              # for soft update of target parameters

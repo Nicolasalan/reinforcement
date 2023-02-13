@@ -2,7 +2,7 @@
      <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find motion)/models/" />
 
      <arg name="world_name"        default="environment.world"/>
-     <arg name="gui"               default="true"/>
+     <arg name="gui"               default="false"/>
 
      <arg name="model_target"      default="$(find motion)/models/cube.sdf"/>
      <arg name="model_cube"        default="$(find motion)/models/cylinder.sdf"/>
@@ -10,9 +10,10 @@
      <arg name="model_cylinder"    default="$(find motion)/models/target.sdf"/>
 
      <!-- start gazebo server -->
-    <param name="/use_sim_time" value="true"/>
-    <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
+     <param name="/use_sim_time" value="true"/>
+     <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
 	    args="--verbose $(find motion)/world/$(arg world_name)" />
+         
 
     <!-- start gazebo client -->
     <group if="$(arg gui)">

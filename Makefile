@@ -64,14 +64,14 @@ terminal:
 .PHONY: setup
 setup:
 	@echo "Setup world ..."
-	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion bringup.launch"
 
 # === setup view ===
 .PHONY: view 
 view:
 	@echo "Setup View world ..."
 	@sudo xhost +
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch gui:=true"
 
 # === Start train docker ===
 .PHONY: start 
