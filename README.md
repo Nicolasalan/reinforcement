@@ -102,7 +102,7 @@ make waypoint
   > The world will be saved in the `src/motion/models/map/map.dae` file.
 
 <div align="center">
-     <img src="https://raw.githubusercontent.com/Nicolasalan/motion/depth-network/docs/3D.png" alt="Create World 3D" width="350px">
+     <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="350px">
 </div>
 
 The definition of waypoints is necessary for the correct functioning of the robot in the environment. This includes robot spawn, target, and file saving in `motion/config/`. The ***waypoint_navigation_plugin*** repository (available at [waypoints](https://github.com/KumarRobotics/waypoint_navigation_plugin)) is used to mark the points on the map and create a save file of the positions. Also, it is important to specify the full path in the configuration file.
