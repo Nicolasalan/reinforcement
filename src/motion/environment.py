@@ -4,7 +4,7 @@ import rospy
 import numpy as np
 import time
 
-from geometry_msgs.msg import Twist, Pose
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
@@ -77,9 +77,8 @@ class Env():
                scan (LaserScan): list of range measurements, one for each beam in the scan.
                scan_data (array): A list of range measurements.
           """
-          data = scan.ranges
-          #self.scan_data = self.useful.range(scan)
-          self.scan_data = self.useful.scan_rang(self.environment_dim, scan)
+          self.scan_data = self.useful.range(scan)
+          #self.scan_data = self.useful.scan_rang(self.environment_dim, scan)
 
      def step_env(self, action):
           """
@@ -131,12 +130,9 @@ class Env():
                v_state = []
                v_state[:] = self.scan_data[:]
 
-               print(self.scan_data[:])
-
                # add noise to the laser data
-               #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               #state_laser = list(noisy_state)
-               state_laser = v_state[:]
+               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               state_laser = list(noisy_state)
 
                #rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
@@ -318,12 +314,10 @@ class Env():
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
-               print(self.scan_data[:])
-               
+
                # add noise to the laser data
-               #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               #state_laser = list(noisy_state)
-               state_laser = v_state[:]
+               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               state_laser = list(noisy_state)
 
                #rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:

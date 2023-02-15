@@ -153,7 +153,7 @@ class Extension():
                               laser_data[index] = dist
           return laser_data
           
-     def range(self,  scan):
+     def range(self, scan):
           """Returns an array of the minimum distances from the laser scan data"""
 
           scan_range = []

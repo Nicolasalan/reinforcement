@@ -142,6 +142,10 @@ class Agent():
             torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1) 
             self.actor_optimizer.step()
 
+            # Use the newly updated actor to generate target actions and add noise
+            noise = (torch.randn_like(actions) * policy_noise).clamp(-self.clip_param, self.clip_param)
+            target_actions = (self.actor_target(next_states) + noise).clamp(-self.max_action, self.max_action)
+
             # Update the critic target networks
             self.soft_update(self.critic_local, self.critic_target, self.tau)
 
