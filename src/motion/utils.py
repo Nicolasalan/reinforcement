@@ -132,28 +132,27 @@ class Extension():
 
           gaps = [[-np.pi, -np.pi + 2 * np.pi / environment_dim]]
           for m in range(environment_dim - 1):
-               gaps.append([self.gaps[m][1], self.gaps[m][1] + 2 * np.pi / environment_dim])
+               gaps.append([gaps[m][1], gaps[m][1] + 2 * np.pi / environment_dim])
                gaps[-1][-1] += 0.01  # add a small offset to the last gap to avoid overlap
 
           return gaps
 
-     def scan_rang(self, environment_dim, gaps, data):
+     def scan_rang(self, environment_dim, scan_data):
           """Returns an array of the minimum distances from the laser scan data to the gaps in a given environment."""
 
-          lidar_data = np.ones(environment_dim) * 10
-          for i in range(len(data)):
-               if not math.isnan(data[i][0]) and not math.isnan(data[i][1]):
-                    angle = math.degrees(math.atan2(data[i][1], data[i][0]))
-                    if angle < 0:
-                         angle += 360
-                    dist = math.sqrt(data[i][0] ** 2 + data[i][1] ** 2)
-                    for j in range(len(gaps)):
-                         if gaps[j][0] <= angle < gaps[j][1]:
-                              lidar_data[j] = min(lidar_data[j], dist)
-                              break
-
-          return lidar_data
-
+          laser_data = np.ones(environment_dim) * 10
+          for i in range(len(scan_data.ranges)):
+               dist = scan_data.ranges[i]
+               if not np.isnan(dist):
+                    # calculate the index of the laser data array that corresponds to the current angle
+                    angle = scan_data.angle_min + i * scan_data.angle_increment
+                    index = int((angle + np.pi/2) / (np.pi / environment_dim))
+                    # make sure that the index is within the bounds of the laser data array
+                    if index >= 0 and index < environment_dim:
+                         if dist < laser_data[index]:
+                              laser_data[index] = dist
+          return laser_data
+          
      def range(self,  scan):
           """Returns an array of the minimum distances from the laser scan data"""
 
@@ -180,6 +179,9 @@ class Extension():
 
      def select_poses(self, poses):
           """Select two random poses from the list of poses."""
+
+          if len(poses) < 2:
+               raise ValueError("The 'poses' list must have at least two elements")
 
           index_robot = int(round(np.random.uniform(0, len(poses))))
           index_target = int(round(np.random.uniform(0, len(poses))))

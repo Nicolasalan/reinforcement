@@ -3,9 +3,9 @@
 <!--######################## argument list #################################-->
 
   <arg name="robot_name" default="woody"/>
-  <arg name="x"           default="1"/>
+  <arg name="x"           default="3"/>
   <arg name="y"           default="1"/>
-  <arg name="yaw"         default="0"/>
+  <arg name="yaw"         default="4"/>
 
 <!--#################### generate urdf from xacro  ########################-->
 

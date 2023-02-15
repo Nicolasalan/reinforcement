@@ -77,7 +77,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                if i_episode % print_every == 0:
                     rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
                
-               if i_episode % 1000 == 0:
+               if i_episode % 100 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 

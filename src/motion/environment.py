@@ -57,7 +57,6 @@ class Env():
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
           self.set_light_properties = rospy.ServiceProxy("/gazebo/set_light_properties", SetLightProperties)
 
-          self.gaps = self.useful.array_gaps(self.environment_dim)
           rospy.sleep(1)
 
      def odom_callback(self, msg):
@@ -80,7 +79,7 @@ class Env():
           """
           data = scan.ranges
           #self.scan_data = self.useful.range(scan)
-          self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
+          self.scan_data = self.useful.scan_rang(self.environment_dim, scan)
 
      def step_env(self, action):
           """
@@ -132,9 +131,12 @@ class Env():
                v_state = []
                v_state[:] = self.scan_data[:]
 
+               print(self.scan_data[:])
+
                # add noise to the laser data
-               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               state_laser = list(noisy_state)
+               #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               #state_laser = list(noisy_state)
+               state_laser = v_state[:]
 
                #rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
@@ -257,7 +259,7 @@ class Env():
           # ================== SET RANDOM GOAL MODEL ================== #
           try:
                set_target = ModelState()
-               set_target.model_name = "target"
+               set_target.model_name = 'target'
                set_target.pose.position.x = goal[0]
                set_target.pose.position.y = goal[1]
                set_target.pose.position.z = 0.0
@@ -316,10 +318,12 @@ class Env():
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
+               print(self.scan_data[:])
                
                # add noise to the laser data
-               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               state_laser = list(noisy_state)
+               #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               #state_laser = list(noisy_state)
+               state_laser = v_state[:]
 
                #rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:

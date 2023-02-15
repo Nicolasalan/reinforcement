@@ -35,6 +35,13 @@
         <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" output="screen" />
     </group>
 
+     <!-- Launch Robot -->
+     <include file="$(find hera_description)/launch/load_description.launch">
+          <arg name="robot_model" default="hera_full"/>
+          <arg name="use_jsp_gui" default="false"/>
+     </include>
+
+
      <!-- Launch Objects -->
      <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y 0 -z 0"/>
      <node name="spawn_model_cube"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cube) -sdf -model cube -x 0.5 -y 0.5 -z 0"/>
