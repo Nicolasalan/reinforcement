@@ -17,20 +17,13 @@ class ReplayBuffer:
                buffer_size (int): maximum size of buffer
                batch_size (int): size of each training batch
           """
-          self.memory = deque(maxlen=buffer_size)
+          self.memory = deque(maxlen=buffer_size)  # internal memory (deque)
           self.batch_size = batch_size
           self.seed = random.seed(seed)
-          self.n = 4
      
      def add(self, state, action, reward, next_state, done):
           """Add a new experience to memory."""
-          n_step_return = reward
-          for i in range(1, self.n+1):
-               if i < len(self.memory):
-                    _, _, r, _, _ = self.memory[-i]
-                    n_step_return += r
-               
-          experience = (state, action, reward, next_state, done)
+          experience = (state, action, reward, next_state, done) # criar uma nova experiência
           self.memory.append(experience) 
 
      def sample(self):
@@ -44,7 +37,6 @@ class ReplayBuffer:
           batch_action         = np.array([_[1] for _ in batch])
           batch_rewards        = np.array([_[2] for _ in batch]).reshape(-1, 1)
           batch_next_states    = np.array([_[3] for _ in batch])
-          batch_n_step_returns = np.array([_[4] for _ in batch]).reshape(-1, 1)
           batch_dones          = np.array([_[4] for _ in batch]).reshape(-1, 1)
 
           # Convert the batch to a torch tensor
@@ -52,10 +44,9 @@ class ReplayBuffer:
           actions = torch.Tensor(batch_action).to(device)
           rewards = torch.Tensor(batch_rewards).to(device)
           next_states = torch.Tensor(batch_next_states).to(device)
-          n_step_returns = torch.Tensor(batch_n_step_returns).to(device)
           dones = torch.Tensor(batch_dones).to(device)
 
-          return (states, actions, rewards, next_states, n_step_returns, dones)
+          return (states, actions, rewards, next_states, dones)
 
      def erase(self):
           """Erase the memory."""

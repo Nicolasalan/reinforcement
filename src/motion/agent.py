@@ -102,16 +102,26 @@ class Agent():
         self.noise.reset()
 
     def learn(self, experiences, timestep, policy_noise, policy_freq):
-        states, actions, rewards, next_states, n_step_returns, dones = experiences
+        states, actions, rewards, next_states, dones = experiences
 
         # ---------------------------- update critic ---------------------------- #
+        # Calculate the Q values from the critic-target network for the next state-action pair
+        target_Q1, target_Q2 = self.critic_target(next_states, actions)
 
-        # Compute Q targets for current states (y_i) using the n-step returns
-        Q_targets = n_step_returns 
-        # Compute critic loss
-        Q1_expected, Q2_expected = self.critic_local(states, actions)
+        # Select the minimal Q value from the 2 calculated values
+        target_Q = torch.min(target_Q1, target_Q2)
 
-        critic_loss = F.mse_loss(Q1_expected, Q_targets) + F.mse_loss(Q2_expected, Q_targets)
+        self.av_Q += torch.mean(target_Q)
+        self.max_Q = max(self.max_Q, torch.max(target_Q))
+
+        # Calculate the final Q value from the target network parameters by using Bellman equation
+        target_Q = rewards + ((1 - dones) * self.discount_factor * target_Q).detach()
+
+        # Get the Q values of the basis networks with the current parameters
+        current_Q1, current_Q2 = self.critic_local(states, actions)
+
+        # Calculate the loss between the current Q value and the target Q value
+        critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
@@ -124,29 +134,19 @@ class Agent():
             # Compute actor loss
             actions_pred = self.actor_local(states)
             actor_loss, _ = self.critic_local(states, actions_pred)
-            actor_loss = - actor_loss.mean()
+            actor_loss = -actor_loss.mean()
             # Minimize the loss
             self.actor_optimizer.zero_grad()
             actor_loss.backward()
+            # normailize the gradient
+            torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1) 
             self.actor_optimizer.step()
-
-            # Use the newly updated actor to generate target actions and add noise
-            noise = (torch.randn_like(actions) * policy_noise).clamp(-self.clip_param, self.clip_param)
-            target_actions = (self.actor_target(next_states) + noise).clamp(-self.max_action, self.max_action)
-
-            # Compute the minimum of the two Q values for the target actions
-            target_Q1, target_Q2 = self.critic_target(next_states, target_actions)
-            target_Q = torch.min(target_Q1, target_Q2)
-
-            self.av_Q += torch.mean(target_Q)
-            self.max_Q = max(self.max_Q, torch.max(target_Q))
-
-            # Compute the target n-step return
-            n_step_return = (self.discount_factor ** timestep) * target_Q * (1 - dones)
-            n_step_return += rewards
 
             # Update the critic target networks
             self.soft_update(self.critic_local, self.critic_target, self.tau)
+
+            # Update the critic target networks
+            self.soft_update(self.actor_local, self.actor_target, self.tau)
 
             # Write new values for tensorboard
             self.writer.add_scalar("Loss", critic_loss / timestep)
