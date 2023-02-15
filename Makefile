@@ -71,7 +71,7 @@ setup:
 view:
 	@echo "Setup View world ..."
 	@sudo xhost +
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch gui:=true"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
 
 # === Start train docker ===
 .PHONY: start 
@@ -144,4 +144,4 @@ start-gpu:
 waypoint:
 	@echo "Setup Waypoint and Create Env..."
 	@sudo xhost + 
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion setup.launch "
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion setup.launch"

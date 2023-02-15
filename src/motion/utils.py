@@ -9,6 +9,7 @@ import yaml
 import os
 import rospy
 import time
+import random
 
 class Extension():
      def __init__(self, CONFIG_PATH):       
@@ -195,7 +196,7 @@ class Extension():
 
           n = int(len(poses) * (percentage))
 
-          return np.random.sample(poses, n)
+          return random.sample(poses, n)
 
      def random_near_obstacle(self, state, count_rand_actions, random_action, add_noise=True):
           """Select a random action near an obstacle."""

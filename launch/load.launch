@@ -1,0 +1,26 @@
+<launch>
+
+<!--######################## argument list #################################-->
+
+  <arg name="robot_name" default="woody"/>
+  <arg name="x"           default="1"/>
+  <arg name="y"           default="1"/>
+  <arg name="yaw"         default="0"/>
+
+<!--#################### generate urdf from xacro  ########################-->
+
+  <param name="robot_description"
+    command="$(find xacro)/xacro $(find robot_description)/robots/$(arg robot_name).urdf.xacro" />
+
+<!--#################### simulation #######################################-->
+
+  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+	args="-param robot_description
+	      -urdf
+	      -x $(arg x)
+	      -y $(arg y)
+	      -Y $(arg yaw)
+	      -model $(arg robot_name)">
+  </node>
+
+</launch>

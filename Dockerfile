@@ -57,7 +57,9 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-gazebo-ros-control \
  && apt-get install -y ros-noetic-rplidar-ros \
  && apt-get install -y ros-noetic-driver-base \
- && apt-get install -y ros-noetic-rosserial-arduino 
+ && apt-get install -y ros-noetic-rosserial-arduino \
+ && apt-get install -y ros-noetic-map-server \
+ && apt-get install -y ros-noetic-gazebo-ros-pkgs
 
 # install pytorch
 RUN pip install torch

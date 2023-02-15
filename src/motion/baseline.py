@@ -44,7 +44,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           scores = []                                                      # list of average scores of each episode                     
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
-               rospy.loginfo('Episode: ' + str(i_episode))
+               #rospy.loginfo('Episode: ' + str(i_episode))
                score = 0.0                
                done = False
 
@@ -56,7 +56,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     action = agent.action(states)                          # choose an action for each agent
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
-                    action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
+                    #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
 
@@ -72,10 +72,10 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     scores.append(score)                                   # save average score in the window  
                          
                cpu_usage = psutil.cpu_percent()
-               rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+               rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
                
                if i_episode % print_every == 0:
-                    rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
+                    rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
                
                if i_episode % 1000 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
@@ -200,7 +200,7 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     count = len(useful.path_target(param["path_goal"]))
+     count = len(useful.path_target(param["config_path"] + "poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 

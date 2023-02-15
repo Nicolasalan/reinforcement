@@ -9,6 +9,22 @@
      <arg name="model_sphere"      default="$(find motion)/models/sphere.sdf"/>
      <arg name="model_cylinder"    default="$(find motion)/models/target.sdf"/>
 
+     <arg name="model_cylinderA"      default="$(find motion)/models/cubeA.sdf"/>
+     <arg name="model_cubeA"        default="$(find motion)/models/cylinderA.sdf"/>
+     <arg name="model_sphereA"      default="$(find motion)/models/sphereA.sdf"/>
+
+     <arg name="model_cylinderB"      default="$(find motion)/models/cubeB.sdf"/>
+     <arg name="model_cubeB"        default="$(find motion)/models/cylinderB.sdf"/>
+     <arg name="model_sphereB"      default="$(find motion)/models/sphereB.sdf"/>
+
+     <arg name="model_cylinderC"      default="$(find motion)/models/cubeC.sdf"/>
+     <arg name="model_cubeC"        default="$(find motion)/models/cylinderC.sdf"/>
+     <arg name="model_sphereC"      default="$(find motion)/models/sphereC.sdf"/>
+
+     <arg name="model_cylinderD"      default="$(find motion)/models/cubeD.sdf"/>
+     <arg name="model_cubeD"        default="$(find motion)/models/cylinderD.sdf"/>
+     <arg name="model_sphereD"      default="$(find motion)/models/sphereD.sdf"/>
+
      <!-- start gazebo server -->
      <param name="/use_sim_time" value="true"/>
      <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
@@ -27,10 +43,27 @@
      </include>
 
      <!-- Launch Objects -->
-     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y 0 -z 3"/>
-     <node name="spawn_model_cube"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cube) -sdf -model cube -x 1 -y 1 -z 2"/>
+     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y 0 -z 0"/>
+     <node name="spawn_model_cube"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cube) -sdf -model cube -x 0.5 -y 0.5 -z 0"/>
      <node name="spawn_model_sphere"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphere) -sdf -model sphere -x 0 -y 0 -z 0"/>
-     <node name="spawn_model_cylinder" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinder) -sdf -model cylinder -x 3 -y 0 -z 0"/>
+     <node name="spawn_model_cylinder" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinder) -sdf -model cylinder -x 1 -y 0 -z 0"/>
+
+     <node name="spawn_model_cubeA"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cubeA) -sdf -model cube -x 2.0 -y 0.5 -z 0"/>
+     <node name="spawn_model_sphereA"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphereA) -sdf -model sphere -x 0 -y 1 -z 2"/>
+     <node name="spawn_model_cylinderA" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinderA) -sdf -model cylinder -x 1 -y 0 -z 1"/>
        
+
+     <node name="spawn_model_cubeB"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cubeB) -sdf -model cube -x 3.0 -y 0.5 -z 0"/>
+     <node name="spawn_model_sphereB"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphereB) -sdf -model sphere -x 0 -y 2 -z 3"/>
+     <node name="spawn_model_cylinderB" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinderB) -sdf -model cylinder -x 1 -y 0 -z 2"/>
+       
+
+     <node name="spawn_model_cubeC"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cubeC) -sdf -model cube -x 4.0 -y 0.5 -z 0"/>
+     <node name="spawn_model_sphereC"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphereC) -sdf -model sphere -x 0 -y 3 -z 4"/>
+     <node name="spawn_model_cylinderC" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinderC) -sdf -model cylinder -x 1 -y 0 -z 3"/>
+
+     <node name="spawn_model_cubeD"     pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cubeD) -sdf -model cube -x 5.0 -y 0.5 -z 0"/>
+     <node name="spawn_model_sphereD"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_sphereD) -sdf -model sphere -x 0 -y 4 -z 5"/>
+     <node name="spawn_model_cylinderD" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_cylinderD) -sdf -model cylinder -x 1 -y 0 -z 4"/>   
 
 </launch>

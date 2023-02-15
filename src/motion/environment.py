@@ -79,7 +79,8 @@ class Env():
                scan_data (array): A list of range measurements.
           """
           data = scan.ranges
-          self.scan_data = self.useful.range(scan)
+          #self.scan_data = self.useful.range(scan)
+          self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
 
      def step_env(self, action):
           """
@@ -93,7 +94,7 @@ class Env():
                target (bool): check if you reached the target
           """
 
-          rospy.logwarn('Step Environment             => Stepping environment ...')
+          #rospy.logwarn('Step Environment             => Stepping environment ...')
           target = False
 
           # ================== PUBLISH ACTION ================== #
@@ -103,7 +104,7 @@ class Env():
                vel_cmd.linear.x = action[0]
                vel_cmd.angular.z = action[1]
                self.pub_cmd_vel.publish(vel_cmd)
-               rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
+               #rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -119,7 +120,7 @@ class Env():
 
                self.pause()
                
-               rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
+               #rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
           except:
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
@@ -133,9 +134,9 @@ class Env():
 
                # add noise to the laser data
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               state_laser = [list(noisy_state)]
+               state_laser = list(noisy_state)
 
-               rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
+               #rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
                rospy.logfatal('Read Scan Data              => Error reading scan data')
@@ -158,7 +159,7 @@ class Env():
                euler = quaternion.to_euler(degrees=False)
                angle = round(euler[2], 4)
 
-               rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
+               #rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
                rospy.logfatal('Read Odom Data              => Error reading odometry data')
@@ -172,28 +173,28 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
-          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation
           orientation_diff = abs(angle - self.goal_orientation)
 
-          rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
+          #rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
 
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
-          if distance < self.goal_reached_dist and orientation_diff < self.orientation_threshold:
+          if distance < self.goal_reached_dist: # and orientation_diff < self.orientation_threshold:
                target = True
                done = True
           
-          rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
+          #rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
 
           # ================== SET STATE ================== #
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(state_laser, robot_state)
           reward = self.useful.get_reward(target, collision, action, min_laser)
 
-          rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
+          #rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
           return state, reward, done, target
 
      def reset_env(self):
@@ -205,7 +206,7 @@ class Env():
           """
 
           # ================== RESET ENVIRONMENT ================== #
-          rospy.logwarn("Reset Environment            => Resetting environment ...")
+          #rospy.logwarn("Reset Environment            => Resetting environment ...")
           # Resets the state of the environment and returns an initial observation.
           rospy.wait_for_service("/gazebo/reset_simulation")
           try:
@@ -217,13 +218,13 @@ class Env():
           # ================== SET RANDOM ANGLE ================== #
           angle = np.random.uniform(-np.pi, np.pi)
           quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-          rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
+          #rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
 
           # ================== SET RANDOM ORIENTATION ================== #
           try:
                self.goal_orientation = np.random.uniform(-np.pi, np.pi)
 
-               rospy.loginfo('Set Random Angle Target      => Angle: ' + str(self.goal_orientation))
+               #rospy.loginfo('Set Random Angle Target      => Angle: ' + str(self.goal_orientation))
           
           except:
                rospy.logerr('Set Random Orientation      => Error setting random orientation')
@@ -231,9 +232,9 @@ class Env():
 
           # ================== SET RANDOM POSITION ================== #
 
-          poses, goal, robot = self.useful.select_poses(self.goals)
-                    
-          rospy.loginfo('Set Random Position          => Goal: (' + str(robot[0]) + ', ' + str(robot[1]) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
+          goal, robot, poses = self.useful.select_poses(self.goals)
+
+          #rospy.loginfo('Set Random Position          => Goal: (' + str(goal[0]) + ', ' + str(goal[1]) + ') Robot: (' + str(robot[0]) + ', ' + str(robot[1]) + ')')
 
           # ================== SET RANDOM ROBOT MODEL ================== #
           try:
@@ -273,20 +274,20 @@ class Env():
           time.sleep(self.time_delta)
 
           # ================== SET RANDOM OBJECT MODEL ================== #
-          names = ['cube', 'cylinder', 'sphere']
+          names = ['cube', 'cylinder', 'sphere', 'cubeA', 'cylinderA', 'sphereA', 'cubeB', 'cylinderB', 'sphereB', 'cubeC', 'cylinderC', 'sphereC', 'cubeD', 'cylinderD', 'sphereD']
 
-          select_pose = self.useful.select_random_poses(poses, self.n_objects)
+          select_pose = self.useful.select_random_poses(poses, self.n_percent)
+
+          # Shuffle the list of poses
+          np.random.shuffle(select_pose)
 
           try:
-               # Shuffle the list of poses
-               np.random.shuffle(select_pose)
-
-               for model_name, model_pose in zip(names, select_pose):
+               for name, pose in zip(names, select_pose):
                     # Create a new ModelState message
                     set_objects = ModelState()
-                    set_objects.model_name = model_name
-                    set_objects.pose.position.x = model_pose[0]
-                    set_objects.pose.position.y = model_pose[1]
+                    set_objects.model_name = name
+                    set_objects.pose.position.x = pose[0]
+                    set_objects.pose.position.y = pose[1]
                     set_objects.pose.orientation.x = quaternion.x
                     set_objects.pose.orientation.y = quaternion.y
                     set_objects.pose.orientation.z = quaternion.z
@@ -307,7 +308,7 @@ class Env():
 
                self.pause()
                
-               rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
+               #rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
           except:
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
@@ -318,9 +319,9 @@ class Env():
                
                # add noise to the laser data
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               state_laser = [list(noisy_state)]
+               state_laser = list(noisy_state)
 
-               rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
+               #rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:
                rospy.logerr('Get state scan              => Error getting state scan')
 
@@ -330,8 +331,8 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
-          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
-          print('========================================================================================================================')
+          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          #print('========================================================================================================================')
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
