@@ -130,31 +130,29 @@ class Extension():
      def array_gaps(self, environment_dim):
           """Retorna uma matriz de intervalos representando lacunas em um determinado ambiente.."""
 
-          gaps = [[-np.pi / 2, -np.pi / 2 + np.pi / environment_dim]]
+          gaps = [[-np.pi, -np.pi + 2 * np.pi / environment_dim]]
           for m in range(environment_dim - 1):
-               gaps.append(
-                    [gaps[m][1], gaps[m][1] + np.pi / environment_dim]
-               )
+               gaps.append([self.gaps[m][1], self.gaps[m][1] + 2 * np.pi / environment_dim])
+               gaps[-1][-1] += 0.01  # add a small offset to the last gap to avoid overlap
 
           return gaps
 
      def scan_rang(self, environment_dim, gaps, data):
           """Returns an array of the minimum distances from the laser scan data to the gaps in a given environment."""
 
-          scan_data = np.ones(environment_dim) * 10
-          for point in data:
-               dot = point * 1
-               mag1 = math.sqrt(point ** 2)
-               mag2 = 1
-               beta = math.acos(dot / (mag1 * mag2)) * np.sign(0)
-               dist = math.sqrt(point ** 2)
+          lidar_data = np.ones(environment_dim) * 10
+          for i in range(len(data)):
+               if not math.isnan(data[i][0]) and not math.isnan(data[i][1]):
+                    angle = math.degrees(math.atan2(data[i][1], data[i][0]))
+                    if angle < 0:
+                         angle += 360
+                    dist = math.sqrt(data[i][0] ** 2 + data[i][1] ** 2)
+                    for j in range(len(gaps)):
+                         if gaps[j][0] <= angle < gaps[j][1]:
+                              lidar_data[j] = min(lidar_data[j], dist)
+                              break
 
-               for j in range(len(gaps)):
-                    if gaps[j][0] <= beta < gaps[j][1]:
-                         scan_data[j] = min(scan_data[j], dist)
-                         break
-
-          return scan_data
+          return lidar_data
 
      def range(self,  scan):
           """Returns an array of the minimum distances from the laser scan data"""
