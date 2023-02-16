@@ -41,8 +41,10 @@ class Env():
           self.goal_y = 0.0
 
           self.path_waypoints = param["config_path"] + 'poses.yaml'
+          self.path_random = param["config_path"] + 'random.yaml'
 
           self.goals = self.useful.path_goal(self.path_waypoints)
+          self.random = self.useful.path_objects(self.path_random)
           self.last_odom = None
 
           # ROS publications and subscriptions
@@ -230,7 +232,7 @@ class Env():
 
           # ================== SET RANDOM POSITION ================== #
 
-          goal, robot, poses = self.useful.select_poses(self.goals)
+          goal, robot = self.useful.select_poses(self.goals)
 
           #rospy.loginfo('Set Random Position          => Goal: (' + str(goal[0]) + ', ' + str(goal[1]) + ') Robot: (' + str(robot[0]) + ', ' + str(robot[1]) + ')')
 
@@ -274,13 +276,11 @@ class Env():
           # ================== SET RANDOM OBJECT MODEL ================== #
           names = ['cube', 'cylinder', 'sphere', 'cubeA', 'cylinderA', 'sphereA', 'cubeB', 'cylinderB', 'sphereB', 'cubeC', 'cylinderC', 'sphereC', 'cubeD', 'cylinderD', 'sphereD']
 
-          select_pose = self.useful.select_random_poses(poses, self.n_percent)
-
           # Shuffle the list of poses
-          np.random.shuffle(select_pose)
+          np.random.shuffle(self.random)
 
           try:
-               for name, pose in zip(names, select_pose):
+               for name, pose in zip(names, self.random):
                     # Create a new ModelState message
                     set_objects = ModelState()
                     set_objects.model_name = name

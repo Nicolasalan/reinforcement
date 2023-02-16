@@ -106,6 +106,29 @@ class Extension():
                     goals.append((x, y, yaw))
 
           return goals
+
+     def path_objects(self, path_waypoints):
+          """Load the waypoints from the yaml file."""
+          
+          goals = []
+          list = []
+
+          with open(path_waypoints) as f:
+               data = yaml.safe_load(f)
+               for i in data:
+                    list.append(i['position'])
+
+               for i in list:
+                    str_x = str(i[0]).strip('[]')
+                    str_y = str(i[1]).strip('[]')
+                    str_yaw = str(i[2]).strip('[]')
+                    
+                    x = float(str_x)
+                    y = float(str_y)
+                    yaw = float(str_yaw)
+                    goals.append((x, y, yaw))
+
+          return goals
      
      def get_reward(self, target, collision, action, min_laser):
           """Agent reward function."""
@@ -159,7 +182,7 @@ class Extension():
           scan_range = []
           for i in range(len(scan.ranges)):
                if scan.ranges[i] == float('Inf'):
-                    scan_range.append(3.5)
+                    scan_range.append(30.0)
                elif np.isnan(scan.ranges[i]):
                     scan_range.append(0)
                else:
@@ -188,8 +211,7 @@ class Extension():
           while index_robot == index_target:
                index_target = int(round(np.random.uniform(0, len(poses))))
 
-          new_poses = [pose for i, pose in enumerate(poses) if i != index_robot and i != index_target]
-          return poses[index_robot], poses[index_target], new_poses
+          return poses[index_robot], poses[index_target]
 
      def select_random_poses(self, poses, percentage):
           """Select a random percentage of poses from the list of poses."""

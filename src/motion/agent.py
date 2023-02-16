@@ -79,7 +79,7 @@ class Agent():
                 # Sample a batch of experiences from the replay buffer
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
-                loss = self.learn(experiences, timestep, self.param["POLICY_NOISE"], self.param["POLICY_FREQ"])
+                loss = self.learn(experiences, timestep, self.param["POLICY_FREQ"])
                 loss_numpy = loss.detach().numpy()
             
             rospy.loginfo('Calculate Loss               => Loss: ' + str(loss_numpy))
@@ -101,7 +101,7 @@ class Agent():
     def reset(self):
         self.noise.reset()
 
-    def learn(self, experiences, timestep, policy_noise, policy_freq):
+    def learn(self, experiences, timestep, policy_freq):
         states, actions, rewards, next_states, dones = experiences
 
         # ---------------------------- update critic ---------------------------- #
@@ -141,10 +141,6 @@ class Agent():
             # normailize the gradient
             torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1) 
             self.actor_optimizer.step()
-
-            # Use the newly updated actor to generate target actions and add noise
-            noise = (torch.randn_like(actions) * policy_noise).clamp(-self.clip_param, self.clip_param)
-            target_actions = (self.actor_target(next_states) + noise).clamp(-self.max_action, self.max_action)
 
             # Update the critic target networks
             self.soft_update(self.critic_local, self.critic_target, self.tau)
