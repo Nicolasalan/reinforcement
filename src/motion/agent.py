@@ -73,7 +73,7 @@ class Agent():
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.param["BATCH_SIZE"] and timestep % float(self.param["LEARN_EVERY"]) == 0.0:
                  
-            rospy.logwarn('Agent Learning               => Agent Learning ...')
+            #rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
             for _ in range(self.param["LEARN_NUM"]):
                 # Sample a batch of experiences from the replay buffer
@@ -88,10 +88,10 @@ class Agent():
         """Returns actions for given state as per current policy."""
 
         state = torch.Tensor(state.reshape(1, -1)).to(device)
-        self.actor_local.eval()
-        with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy().flatten()
-        self.actor_local.train()
+        #self.actor_local.eval()
+        #with torch.no_grad():
+        action = self.actor_local(state).cpu().data.numpy().flatten()
+        #self.actor_local.train()
 
         if add_noise:
             action += self.epsilon * self.noise.sample()
@@ -125,8 +125,6 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        # normailize the gradient
-        torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1) 
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
@@ -139,7 +137,6 @@ class Agent():
             self.actor_optimizer.zero_grad()
             actor_loss.backward()
             # normailize the gradient
-            torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1) 
             self.actor_optimizer.step()
 
             # Update the critic target networks

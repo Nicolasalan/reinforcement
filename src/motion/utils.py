@@ -210,6 +210,9 @@ class Extension():
           index_target = int(round(np.random.uniform(0, len(poses))))
           while index_robot == index_target:
                index_target = int(round(np.random.uniform(0, len(poses))))
+          while index_robot >= len(poses) or index_target >= len(poses):
+               index_robot = int(round(np.random.uniform(0, len(poses))))
+               index_target = int(round(np.random.uniform(0, len(poses))))
 
           return poses[index_robot], poses[index_target]
 
@@ -222,6 +225,7 @@ class Extension():
 
      def random_near_obstacle(self, state, count_rand_actions, random_action, add_noise=True):
           """Select a random action near an obstacle."""
+          action = np.zeros(2)
 
           if add_noise: 
 

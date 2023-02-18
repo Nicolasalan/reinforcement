@@ -104,7 +104,7 @@ class Env():
                vel_cmd.linear.x = action[0]
                vel_cmd.angular.z = action[1]
                self.pub_cmd_vel.publish(vel_cmd)
-               #rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
+               rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -136,7 +136,7 @@ class Env():
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = list(noisy_state)
 
-               #rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
+               rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
                rospy.logfatal('Read Scan Data              => Error reading scan data')
@@ -159,7 +159,7 @@ class Env():
                euler = quaternion.to_euler(degrees=False)
                angle = round(euler[2], 4)
 
-               #rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
+               rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
                rospy.logfatal('Read Odom Data              => Error reading odometry data')
@@ -173,7 +173,7 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
-          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation
@@ -194,7 +194,7 @@ class Env():
           state = np.append(state_laser, robot_state)
           reward = self.useful.get_reward(target, collision, action, min_laser)
 
-          #rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
+          rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
           return state, reward, done, target
 
      def reset_env(self):

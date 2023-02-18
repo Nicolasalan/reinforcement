@@ -97,14 +97,14 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
-          agent.actor_local.load_state_dict(torch.load(param["model_actor"] + 'actor_model.pth'))
-          agent.critic_local.load_state_dict(torch.load(param["model_critic"] + 'critic_model.pth'))
+          agent.actor_local.load_state_dict(torch.load(param["model"] + 'actor_model.pth'))
+          agent.critic_local.load_state_dict(torch.load(param["model"] + 'critic_model.pth'))
 
           scores_window = []                                               # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode                     
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
-               rospy.loginfo('Episode: ' + str(i_episode))
+               #rospy.loginfo('Episode: ' + str(i_episode))
                score = 0.0                
                done = False
 
@@ -117,7 +117,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
+                    #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
 
                     # save the experiment in the replay buffer, run the learning step at a defined interval
                     agent.step(states, actions, rewards, next_states, done, t)
@@ -127,16 +127,16 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     if np.any(done):                                       # exit loop when episode ends
                          break              
                     
-                    scores_window.append(score)                            # save average score for the episode
-                    scores.append(score)                                   # save average score in the window  
+               scores_window.append(score)                            # save average score for the episode
+               scores.append(score)                                   # save average score in the window  
                          
                cpu_usage = psutil.cpu_percent()
-               rospy.logwarn('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+               rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
                
                if i_episode % print_every == 0:
-                    rospy.logwarn('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
+                    rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
                
-               if i_episode % 1000 == 0:
+               if i_episode % 100 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 
@@ -156,8 +156,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = ContinuousEnv(CONFIG_PATH)
 
-          agent.actor_local.load_state_dict(torch.load(param["model_actor"] + 'actor_model.pth'))
-          agent.critic_local.load_state_dict(torch.load(param["model_critic"] + 'critic_model.pth'))
+          agent.actor_local.load_state_dict(torch.load(param["model"] + 'actor_model.pth'))
+          agent.critic_local.load_state_dict(torch.load(param["model"] + 'critic_model.pth'))
 
           scores_window = []                                               # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode
