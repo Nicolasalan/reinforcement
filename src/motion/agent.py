@@ -93,6 +93,11 @@ class Agent():
         action = self.actor_local(state).cpu().data.numpy().flatten()
         #self.actor_local.train()
 
+        # ! state
+        # ! tensor([[10.0000, 10.0000, 10.0000, 10.0000, 10.0000, 10.0000, 10.0000, 10.0000,
+        # ! 10.0000, 10.0000, 10.0000, 10.0000, 10.0000, 10.0000, 10.0000, 10.0000,
+        # ! 10.0000, 10.0000, 10.0000, 10.0000,  3.4557,  2.2288,  0.0000,  0.0000]])
+
         if add_noise:
             action += self.epsilon * self.noise.sample()
 
@@ -108,6 +113,12 @@ class Agent():
         # Calculate the Q values from the critic-target network for the next state-action pair
         target_Q1, target_Q2 = self.critic_target(next_states, actions)
 
+        # ! Next Action tensor([[-0.2305,  0.5880], [-0.2348,  0.5885], [-0.2202,  0.5964]], grad_fn=<TanhBackward>)
+        # ! Next Action noise tensor([[-0.3595,  0.7761], [-0.4474,  0.4941], [-0.1140,  0.5544]], grad_fn=<ClampBackward1>)
+
+        # ! target_Q1 tensor([[0.5569], [0.5400], [0.6051]], grad_fn=<AddmmBackward>)
+        # ! target_Q2 tensor([[0.3943], [0.3690], [0.4310]], grad_fn=<AddmmBackward>)
+
         # Select the minimal Q value from the 2 calculated values
         target_Q = torch.min(target_Q1, target_Q2)
 
@@ -115,10 +126,11 @@ class Agent():
         self.max_Q = max(self.max_Q, torch.max(target_Q))
 
         # Calculate the final Q value from the target network parameters by using Bellman equation
-        target_Q = rewards + ((1 - dones) * self.discount_factor * target_Q).detach()
+        target_Q = rewards + ((1 - dones) * self.discount_factor * target_Q).detach() # ! tensor([[ 0.4580], [ 0.6587], [-0.0690]])
 
         # Get the Q values of the basis networks with the current parameters
         current_Q1, current_Q2 = self.critic_local(states, actions)
+        # ! loss tensor(0.5476, grad_fn=<AddBackward0>)
 
         # Calculate the loss between the current Q value and the target Q value
         critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
