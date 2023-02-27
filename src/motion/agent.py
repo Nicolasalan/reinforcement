@@ -41,6 +41,8 @@ class Agent():
         self.clip_param= self.param["CLIP_PARAM"]
         self.max_action = self.param["MAX_ACTION"]
         self.discount_factor = self.param["DISCOUNT"]
+        self.policy_noise = self.param["POLICY_NOISE"]
+        self.noise_clip = self.param["NOISE_CLIP"]
 
         # Actor Network (w/ Network)
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
@@ -101,12 +103,20 @@ class Agent():
     def reset(self):
         self.noise.reset()
 
-    def learn(self, experiences, timestep, policy_freq):
+    def learn(self, experiences, timestep, policy_freq, policy_noise=0.2):
         states, actions, rewards, next_states, dones = experiences
+        
+        # obtain the estimated action from next state by using the target actor network
+        next_action = self.actor_target(next_states)
+
+        # add noise to the estimated action
+        noise = torch.Tensor(actions).data.normal_(0, self.policy_noise).to(device)
+        noise = noise.clamp(-self.noise_clip, self.noise_clip)
+        next_action = (next_action + noise).clamp(-1, 1)
 
         # ---------------------------- update critic ---------------------------- #
         # Calculate the Q values from the critic-target network for the next state-action pair
-        target_Q1, target_Q2 = self.critic_target(next_states, actions)
+        target_Q1, target_Q2 = self.critic_target(next_states, next_action)
 
         # Select the minimal Q value from the 2 calculated values
         target_Q = torch.min(target_Q1, target_Q2)

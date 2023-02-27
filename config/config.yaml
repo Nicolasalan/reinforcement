@@ -45,5 +45,6 @@ SCORE_SOLVED: 1000000   # minimum score to be considered solved
 POLICY_FREQ: 2          # frequency of delayed policy updates
 POLICY_NOISE: 0.2       # std of Gaussian noise added to target policy during critic update
 CLIP_PARAM: 0.5         # clipping parameter for TD3 policy updates
+NOISE_CLIP: 0.5         # clipping range for TD3 noise
 MAX_ACTION: 1           # maximum action magnitude
 DISCOUNT: 0.9999        # discount factor
