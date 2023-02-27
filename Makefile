@@ -1,3 +1,4 @@
+DOCKER = True
 DOCKER_ENV_VARS = \
 	--env="DISPLAY" \
 	--env="QT_X11_NO_MITSHM=1" 
