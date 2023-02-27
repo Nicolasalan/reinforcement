@@ -32,7 +32,6 @@ class Env():
           self.robot = param["robot"]
           self.orientation_threshold = param["orientation_threshold"]
           self.noise_sigma = param["noise_sigma"]
-          self.n_percent = param["n_noise"]
 
           # initialize global variables
           self.odom_x = 0.0

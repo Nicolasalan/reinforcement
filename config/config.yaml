@@ -13,7 +13,6 @@ robot_dim: 4                      # x, y, theta, velocity (default)
 action_dim: 2                     # angular and linear (default)
 time_delta: 2.0                   # 10 Hz (default)
 noise_sigma: 0.2                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
-n_noise: 0.3                      # porcent of obstacles randomly generated
 random_near_obstacle: true        # To take random actions near obstacles or not
 
 # ==== Path to the model and config ==== #
