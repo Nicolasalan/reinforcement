@@ -98,12 +98,15 @@ class Agent():
         if add_noise:
             action += self.epsilon * self.noise.sample()
 
-        return np.clip(np.random.normal(action, size=self.action_size), -1, 1)
+        print("action: ", action)
+        print("action with noise: ", (action + np.random.normal(0, self.epsilon, size=self.action_size)).clip(-1, 1))
+
+        return (action + np.random.normal(0, self.epsilon, size=self.action_size)).clip(-1, 1)
 
     def reset(self):
         self.noise.reset()
 
-    def learn(self, experiences, timestep, policy_freq, policy_noise=0.2):
+    def learn(self, experiences, timestep, policy_freq):
         states, actions, rewards, next_states, dones = experiences
         
         # obtain the estimated action from next state by using the target actor network
@@ -132,6 +135,7 @@ class Agent():
 
         # Calculate the loss between the current Q value and the target Q value
         critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
+
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()

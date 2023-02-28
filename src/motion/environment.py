@@ -126,12 +126,10 @@ class Env():
           # ================== READ SCAN DATA ================== #
           
           done, collision, min_laser = self.useful.observe_collision(self.scan_data, self.collision_dist)
-          # ! min 10.0
 
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
-               # ! [10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10. 10.] len(20)
 
                # add noise to the laser data
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
@@ -339,7 +337,3 @@ class Env():
 
           # ================== RETURN STATE ================== #
           return np.array(state)
-          # ! [10.         10.         10.         10.  10.         10.
-          # !     10.         10.         10.         10.         10.         10.
-          # !     10.         10.         10.         10.         10.         10.
-          # !     10.         10.          3.45569621  2.2288405   0.0.        ]

@@ -1,7 +1,7 @@
 <launch>
      <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find motion)/models/" />
 
-     <arg name="world_name"        default="sample.world"/>
+     <arg name="world_name"        default="environment.world"/>
      <arg name="gui"               default="false"/>
 
      <arg name="model_target"      default="$(find motion)/models/cube.sdf"/>

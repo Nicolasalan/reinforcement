@@ -51,17 +51,22 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                agent.reset()                                               # reset environment    
                states = env.reset_env()                                    # get the current state of each agent
 
+               
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    # ! [0.34799473335075354, 1.0]
+                    print('action ', action)
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
+                    print('actions ', actions)
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    # ! state 24
-                    # ! rewards 0.28964070788728274
+                    print('next_states ', len(next_states))
+                    print('rewards ', rewards)
+                    print('done ', done)
+                    print('_ ', _)
+
                     # save the experiment in the replay buffer, run the learning step at a defined interval
                     agent.step(states, actions, rewards, next_states, done, t)
 
