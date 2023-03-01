@@ -25,13 +25,16 @@ class Env():
           param = self.useful.load_config("config.yaml")
 
           # set the initial state
-          self.goal_reached_dist = param["goal_reached_dist"]
-          self.environment_dim = param["environment_dim"]
-          self.time_delta = param["time_delta"]
-          self.collision_dist = param["collision_dist"]
-          self.robot = param["robot"]
-          self.orientation_threshold = param["orientation_threshold"]
-          self.noise_sigma = param["noise_sigma"]
+          self.goal_reached_dist = param["GOAL_REACHED_DIST"]
+          self.environment_dim = param["ENVIRONMENT_DIM"]
+          self.time_delta = param["TIME_DELTA"]
+          self.collision_dist = param["COLLISION_DIST"]
+          self.robot = param["ROBOT"]
+          self.orientation_threshold = param["ORIENTATION_THRESHOLD"]
+          self.noise_sigma = param["NOISE_SIGMA"]
+          self.cmd = param["TOPIC_CMD"]
+          self.odom = param["TOPIC_ODOM"]
+          self.scan = param["TOPIC_SCAN"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -39,17 +42,17 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.path_waypoints = param["config_path"] + 'poses.yaml'
-          self.path_random = param["config_path"] + 'random.yaml'
+          self.path_waypoints = param["CONFIG_PATH"] + 'poses.yaml'
+          self.path_random = param["CONFIG_PATH"] + 'random.yaml'
 
           self.goals = self.useful.path_goal(self.path_waypoints)
           self.random = self.useful.path_objects(self.path_random)
           self.last_odom = None
 
           # ROS publications and subscriptions
-          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
-          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=10)
-          self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
+          self.pub_cmd_vel = rospy.Publisher(self.cmd, Twist, queue_size=10)
+          self.odom = rospy.Subscriber(self.odom, Odometry, self.odom_callback, queue_size=10)
+          self.scan = rospy.Subscriber(self.scan, LaserScan, self.scan_callback)
 
           # ROS services 
           self.reset = rospy.ServiceProxy('gazebo/reset_world', Empty)
@@ -103,7 +106,7 @@ class Env():
                vel_cmd.linear.x = action[0]
                vel_cmd.angular.z = action[1]
                self.pub_cmd_vel.publish(vel_cmd)
-               rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
+               #rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -135,7 +138,7 @@ class Env():
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = list(noisy_state)
 
-               rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
+               #rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
                rospy.logfatal('Read Scan Data              => Error reading scan data')
@@ -158,7 +161,7 @@ class Env():
                euler = quaternion.to_euler(degrees=False)
                angle = round(euler[2], 4)
 
-               rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
+               #rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
                rospy.logfatal('Read Odom Data              => Error reading odometry data')
@@ -172,7 +175,7 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
-          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation
@@ -193,7 +196,7 @@ class Env():
           state = np.append(state_laser, robot_state)
           reward = self.useful.get_reward(target, collision, action, min_laser)
 
-          rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
+          #rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
           return state, reward, done, target
 
      def reset_env(self):

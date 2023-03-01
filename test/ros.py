@@ -29,6 +29,10 @@ class TestROS(unittest.TestCase):
           
           self.rc = Mensage(config_dir)
           self.param = self.rc.load_config("config.yaml")
+          
+          self.cmd = self.param["TOPIC_CMD"]
+          self.odom = self.param["TOPIC_ODOM"]
+          self.scan = self.param["TOPIC_SCAN"]
 
           self.success = False
           self.rate = rospy.Rate(1)
@@ -38,7 +42,7 @@ class TestROS(unittest.TestCase):
 
      def test_publish_cmd_vel(self):
           # Test function for the publish_cmd_vel function.   
-          test_sub = rospy.Subscriber("/cmd_vel", Twist, self.callback)
+          test_sub = rospy.Subscriber(self.cmd, Twist, self.callback)
           self.rc.cmd_vel.angular.z = 1
           self.rc.publish_cmd_vel()
           timeout_t = time.time() + 1.0  # 10 seconds
@@ -48,14 +52,14 @@ class TestROS(unittest.TestCase):
 
      def test_subscribe_odom(self):
           # Try to receive a message from the /odom topic
-          msg = rospy.wait_for_message(self.param["topic_odom"], Odometry, timeout=1.0)
+          msg = rospy.wait_for_message(self.odom, Odometry, timeout=1.0)
           self.rate.sleep()
           # Verify that the message was received
           self.assertIsNotNone(msg, "Failed to receive message from /odom topic")
 
      def test_subscribe_scan(self):
           # Try to receive a message from the /scan topic
-          msg = rospy.wait_for_message(self.param["topic_scan"], LaserScan, timeout=1.0)
+          msg = rospy.wait_for_message(self.scan, LaserScan, timeout=1.0)
           self.rate.sleep()
           # Verify that the message was received
           self.assertIsNotNone(msg, "Failed to receive message from /scan topic")  

@@ -26,8 +26,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           max_t(int): maximum number of timesteps per episode
      """
 
-     state_dim = param["environment_dim"] + param["robot_dim"]
-     action_dim = param["action_dim"]
+     state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
+     action_dim = param["ACTION_DIM"]
 
      count_rand_actions = 0
      random_action = []
@@ -55,17 +55,11 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    print('action ', action)
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
-                    print('actions ', actions)
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    print('next_states ', len(next_states))
-                    print('rewards ', rewards)
-                    print('done ', done)
-                    print('_ ', _)
 
                     # save the experiment in the replay buffer, run the learning step at a defined interval
                     agent.step(states, actions, rewards, next_states, done, t)
@@ -104,8 +98,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
-          agent.actor_local.load_state_dict(torch.load(param["model"] + 'actor_model.pth'))
-          agent.critic_local.load_state_dict(torch.load(param["model"] + 'critic_model.pth'))
+          agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
+          agent.critic_local.load_state_dict(torch.load(param["MODEL"] + 'critic_model.pth'))
 
           scores_window = []                                               # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode                     
@@ -163,8 +157,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = ContinuousEnv(CONFIG_PATH)
 
-          agent.actor_local.load_state_dict(torch.load(param["model"] + 'actor_model.pth'))
-          agent.critic_local.load_state_dict(torch.load(param["model"] + 'critic_model.pth'))
+          agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
+          agent.critic_local.load_state_dict(torch.load(param["MODEL"] + 'critic_model.pth'))
 
           scores_window = []                                               # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode

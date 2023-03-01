@@ -1,7 +1,7 @@
 
 #! /usr/bin/env python3
 
-from gazebo_msgs.srv import GetWorldProperties, GetModelState
+from gazebo_msgs.srv import GetModelState
 from gazebo_msgs.msg import ModelState
 import numpy as np
 import math
@@ -19,16 +19,16 @@ class Extension():
 
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
           self.get_pose = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-          self.robot = param["robot"]
+          self.robot = param["ROBOT"]
 
-          self.state_dim = param["environment_dim"] + param["robot_dim"]
-          self.action_dim = param["action_dim"]
-          self.cmd = param["topic_cmd"]
-          self.odom = param["topic_odom"]
-          self.scan = param["topic_scan"]
-          self.goal_reached_dist = param["goal_reached_dist"]
-          self.collision_dist = param["collision_dist"] 
-          self.time_delta = param["time_delta"]  
+          self.state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
+          self.action_dim = param["ACTION_DIM"]
+          self.cmd = param["TOPIC_CMD"]
+          self.odom = param["TOPIC_ODOM"]
+          self.scan = param["ROPIC_SCAN"]
+          self.goal_reached_dist = param["GOAL_REACHED_DIST"]
+          self.collision_dist = param["COLLISION_DIST"] 
+          self.time_delta = param["TIME_DELTA"]  
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
           """Calculate the relative angle between the robots heading and heading toward the goal."""

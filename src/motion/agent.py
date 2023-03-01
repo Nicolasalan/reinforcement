@@ -36,6 +36,7 @@ class Agent():
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
+        
         self.tau = self.param["TAU"]
         self.epsilon = self.param["EPSILON"]
         self.clip_param= self.param["CLIP_PARAM"]
@@ -43,18 +44,27 @@ class Agent():
         self.discount_factor = self.param["DISCOUNT"]
         self.policy_noise = self.param["POLICY_NOISE"]
         self.noise_clip = self.param["NOISE_CLIP"]
+        self.batch_size = self.param["BATCH_SIZE"]
+        self.learn_every = self.param["LEARN_EVERY"]
+        self.lr_actor = self.param["LR_ACTOR"]
+        self.lr_critic = self.param["LR_CRITIC"]
+        self.weight_decay = self.param["WEIGHT_DECAY"]
+        self.buffer_size = self.param["BUFFER_SIZE"]
+        self.policy_freq = self.param["POLICY_FREQ"]
+        self.learn_num = self.param["LEARN_NUM"]
+        self.epsilon_decay = self.param["EPSILON_DECAY"]
 
         # Actor Network (w/ Network)
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.param['LR_ACTOR'])
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.lr_actor)
 
         # Critic Network (w/ Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.param['LR_CRITIC'], weight_decay=self.param['WEIGHT_DECAY'])
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.lr_critic, weight_decay=self.weight_decay)
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -64,7 +74,7 @@ class Agent():
         self.max_Q = -inf
 
         # Replay memory
-        self.memory = ReplayBuffer(int(self.param["BUFFER_SIZE"]), int(self.param["BATCH_SIZE"]), random_seed)
+        self.memory = ReplayBuffer(int(self.buffer_size), int(self.batch_size), random_seed)
     
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
@@ -73,11 +83,11 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > self.param["BATCH_SIZE"] and timestep % float(self.param["LEARN_EVERY"]) == 0.0:
+        if len(self.memory) > self.batch_size and timestep % float(self.learn_every) == 0.0:
                  
             #rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
-            for _ in range(self.param["LEARN_NUM"]):
+            for _ in range(self.learn_num):
                 # Sample a batch of experiences from the replay buffer
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
@@ -97,9 +107,6 @@ class Agent():
 
         if add_noise:
             action += self.epsilon * self.noise.sample()
-
-        print("action: ", action)
-        print("action with noise: ", (action + np.random.normal(0, self.epsilon, size=self.action_size)).clip(-1, 1))
 
         return (action + np.random.normal(0, self.epsilon, size=self.action_size)).clip(-1, 1)
 
@@ -166,7 +173,7 @@ class Agent():
             self.writer.add_scalar("Rewards", rewards.mean().reshape(1), timestep)
 
         # ---------------------------- update noise ---------------------------- #
-        self.epsilon -= float(self.param["EPSILON_DECAY"])
+        self.epsilon -= float(self.epsilon_decay)
         self.noise.reset()  
 
         return critic_loss    

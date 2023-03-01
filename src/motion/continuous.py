@@ -20,13 +20,16 @@ class ContinuousEnv():
           param = self.useful.load_config("config.yaml")
 
           # set the initial state
-          self.goal_reached_dist = param["goal_reached_dist"]
-          self.environment_dim = param["environment_dim"]
-          self.time_delta = param["time_delta"]
-          self.collision_dist = param["collision_dist"]
-          self.robot = param["robot"]
-          self.orientation_threshold = param["orientation_threshold"]
-          self.noise_sigma = param["noise_sigma"]
+          self.goal_reached_dist = param["GOAL_REACHED_DIST"]
+          self.environment_dim = param["ENVIRONMENT_DIM"]
+          self.time_delta = param["TIME_DELTA"]
+          self.collision_dist = param["COLLISION_DIST"]
+          self.robot = param["ROBOT"]
+          self.orientation_threshold = param["ORIENTATION_THRESHOLD"]
+          self.noise_sigma = param["NOISE_SIGMA"]
+          self.cmd = param["TOPIC_CMD"]
+          self.odom = param["TOPIC_ODOM"]
+          self.scan = param["TOPIC_SCAN"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -40,9 +43,9 @@ class ContinuousEnv():
           self.last_odom = None
 
           # ROS publications and subscriptions
-          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
-          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=10)
-          self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
+          self.pub_cmd_vel = rospy.Publisher(self.cmd, Twist, queue_size=10)
+          self.odom = rospy.Subscriber(self.odom, Odometry, self.odom_callback, queue_size=10)
+          self.scan = rospy.Subscriber(self.scan, LaserScan, self.scan_callback)
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
           self.count_goals = 0
