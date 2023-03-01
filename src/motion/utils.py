@@ -166,6 +166,7 @@ class Extension():
                if count_rand_actions > 0:
                     count_rand_actions -= 1
                     action = random_action
+                    action[0] = -1
                
                return action, count_rand_actions, random_action
 

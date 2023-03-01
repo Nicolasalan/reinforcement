@@ -105,11 +105,11 @@ make waypoint
      <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="750px">
 </div>
 
-The definition of waypoints is necessary for the correct functioning of the robot in the environment. This includes robot spawn, target, and file saving in `motion/config/`. The ***waypoint_navigation_plugin*** repository (available at [waypoints](https://github.com/KumarRobotics/waypoint_navigation_plugin)) is used to mark the points on the map and create a save file of the positions. Also, it is important to specify the full path in the configuration file.
+For a better organization and structuring of the robot's movement planning, it is recommended to separate the waypoints into three distinct categories: targets, robot positions and object spawn.
 
-```yaml
-waypoints: '/<your_workspace>/src/motion/config/poses.yaml'
-```
+Targets are specific points in the environment that the robot must reach or interact with. Robot positions refer to locations where the robot can move or stand while executing the task. Finally, the object spawn is used to define the initial position of objects that will be used during the task.
+
+To make waypoints easier to read and maintain, it is recommended to separate the information into two different YAML files: `poses.yaml` and `random.yaml`. In `poses.yaml`, information regarding robot positions and targets must be stored. In `random.yaml`, information about the spawn of objects must be stored
 ## Running the Tests
 
 <a name="Running-the-tests"></a>
