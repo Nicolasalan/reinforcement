@@ -8,3 +8,5 @@ pycollada
 trimesh
 opencv-python
 scipy
+simplejpeg
+tornado
