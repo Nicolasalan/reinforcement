@@ -1,8 +1,6 @@
 
 #! /usr/bin/env python3
 
-from gazebo_msgs.srv import GetModelState
-from gazebo_msgs.msg import ModelState
 import numpy as np
 import math
 import yaml
