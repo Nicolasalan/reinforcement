@@ -39,7 +39,7 @@ class ContinuousEnv():
 
           self.scan_data = np.ones(self.environment_dim) * 10
           self.path_targets = param["path_goal"] + '/goal.yaml'
-          self.goals = self.useful.path_target(self.path_targets)
+          self.goals = self.useful.poses(self.path_targets)
           self.last_odom = None
 
           # ROS publications and subscriptions

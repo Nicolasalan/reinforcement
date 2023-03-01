@@ -45,8 +45,8 @@ class Env():
           self.path_waypoints = param["CONFIG_PATH"] + 'poses.yaml'
           self.path_random = param["CONFIG_PATH"] + 'random.yaml'
 
-          self.goals = self.useful.path_goal(self.path_waypoints)
-          self.random = self.useful.path_objects(self.path_random)
+          self.goals = self.useful.poses(self.path_waypoints)
+          self.objects = self.useful.poses(self.path_random)
           self.last_odom = None
 
           # ROS publications and subscriptions
@@ -278,10 +278,10 @@ class Env():
           names = ['cube', 'cylinder', 'sphere', 'cubeA', 'cylinderA', 'sphereA', 'cubeB', 'cylinderB', 'sphereB', 'cubeC', 'cylinderC', 'sphereC', 'cubeD', 'cylinderD', 'sphereD']
 
           # Shuffle the list of poses
-          np.random.shuffle(self.random)
+          np.random.shuffle(self.objects)
 
           try:
-               for name, pose in zip(names, self.random):
+               for name, pose in zip(names, self.objects):
                     # Create a new ModelState message
                     set_objects = ModelState()
                     set_objects.model_name = name

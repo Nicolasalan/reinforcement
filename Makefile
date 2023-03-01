@@ -80,11 +80,11 @@ start:
 	@echo "Starting training ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
-# === Test Library ===
-.PHONY: library
-library:
+# === Test functions ===
+.PHONY: functions
+functions:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/library.py"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/functions.py"
 
 # === Test ROS ===
 .PHONY: ros
@@ -108,7 +108,7 @@ package:
 .PHONY: integration
 integration:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/library.py && python3 test/package.py && python3 test/sim.py"
+	@docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roscd motion && python3 test/ros.py && python3 test/functions.py && python3 test/package.py && python3 test/sim.py"
 
 # === Tensorboard ===
 .PHONY: tensorboard

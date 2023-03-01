@@ -15,18 +15,6 @@ class Extension():
           self.CONFIG_PATH = CONFIG_PATH
           param = self.load_config("config.yaml")
 
-          self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
-          self.get_pose = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-          self.robot = param["ROBOT"]
-
-          self.state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
-          self.action_dim = param["ACTION_DIM"]
-          self.cmd = param["TOPIC_CMD"]
-          self.odom = param["TOPIC_ODOM"]
-          self.scan = param["TOPIC_SCAN"]
-          self.goal_reached_dist = param["GOAL_REACHED_DIST"]
-          self.collision_dist = param["COLLISION_DIST"] 
-          self.time_delta = param["TIME_DELTA"]  
           self.max_range = param["MAX_RANGE"]
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
@@ -96,7 +84,8 @@ class Extension():
           elif collision:
                return -100.0
           else:
-               # This gives an additional negative reward if the robot is closer to any obstacle than 1 meter. Using this 'repulsion' causes the robot to get more tired of obstacles in general and go around them with a greater go.
+               # This gives an additional negative reward if the robot is closer to any obstacle than 1 meter. Using this 'repulsion' causes the 
+               # robot to get more tired of obstacles in general and go around them with a greater go.
                r3 = lambda x: 1 - x if x < 1 else 0.0
                return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
 

@@ -9,7 +9,7 @@ import os
 PKG = 'motion'
 NAME = 'library'
 
-print("\033[92mLibrary Unit Tests\033[0m")
+print("\033[92mFunction Unit Tests\033[0m")
 
 class TestLibrary(unittest.TestCase):
 
@@ -21,8 +21,6 @@ class TestLibrary(unittest.TestCase):
         self.rc = Extension(config_dir)
          
         # examples of data entries
-        self.poses = [(-0.486865, 6.297588), (-1.036671, 5.001958), (-1.581001, 6.032743), (-1.972984, 5.123956), 
-            (-2.759404, 6.201657), (-2.999777, 4.887653), (-3.68207, 6.087976), (-3.676394, 5.217483)]
         
         self.scan = [1.40199554, 1.60912216, 1.61471009, 1.6209532, 1.627864, 1.63545573,
             1.64374459, 1.7048229, 1.71486449, 1.72568238, 1.73730004, 1.74974227,
@@ -37,7 +35,7 @@ class TestLibrary(unittest.TestCase):
             1.60935891, 1.60150588, 1.59433031, 1.58781755, 1.58195436, 1.57673013,
             1.57213259, 1.56815553, 2.86658835, 4.17488813, 4.68163204, 7.41342402,
             7.40879059, 13.50699139, 13.45877552, 13.46566105, 13.52773762, 13.54493904,
-            13.56733227, 10.67812157, Inf, 7.97131395, 7.26442909, 6.27183151,
+            13.56733227, 10.67812157, 6.97131395, 7.97131395, 7.26442909, 6.27183151,
             5.78773785, 5.297194, 4.90160942, 4.55540562, 4.25638628, 3.99562502,
             3.9215436, 3.5702312, 3.52142835, 3.21958733, 3.07313967, 3.02650595,
             2.93608308, 2.8213985, 2.71632695, 2.61975694, 2.53074384, 2.44847775,
@@ -49,8 +47,6 @@ class TestLibrary(unittest.TestCase):
             1.4965167, 1.48371518, 1.47758424, 1.55210793, 3.10324192, 3.28008509,
             3.47970223, 3.70668197, 3.96694851, 4.26826477, 4.62101316, 5.03939867,
             5.54339314, 6.10359621, 1.43871272, 1.40497327, 1.39061165, 1.38594687]  
-
-        self.environment = 154
 
     """
     Test: Angle of the robot in relation to the target
@@ -99,19 +95,6 @@ class TestLibrary(unittest.TestCase):
         done, collision, min_laser = self.rc.observe_collision(self.scan, 0.1)
         self.assertEquals(min_laser, 1.38594687, "1.38594687!=1.38594687")
         self.assertFalse(collision, False)
-        self.rc.shutdownhook()
-    
-    """
-    Test: target/robot randomization
-    ======
-        Input (array, float, float): map points and x, y
-        Output (float): x and y
-    """ 
-    def test_change_goal(self):
-     
-        x, y = self.rc.change_goal(self.path_goals)
-        self.assertTrue(-10.0 <= x <= 10.0)
-        self.assertTrue(-10.0 <= y <= 10.0)
         self.rc.shutdownhook()
 
 
