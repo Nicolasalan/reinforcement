@@ -25,7 +25,7 @@ class Extension():
           self.action_dim = param["ACTION_DIM"]
           self.cmd = param["TOPIC_CMD"]
           self.odom = param["TOPIC_ODOM"]
-          self.scan = param["ROPIC_SCAN"]
+          self.scan = param["TOPIC_SCAN"]
           self.goal_reached_dist = param["GOAL_REACHED_DIST"]
           self.collision_dist = param["COLLISION_DIST"] 
           self.time_delta = param["TIME_DELTA"]  

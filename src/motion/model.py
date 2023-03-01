@@ -14,7 +14,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, l1=800, l2=600, drop=0.3):
+    def __init__(self, state_dim, action_dim, seed, l1=800, lstm_dim=154, l2=600, drop=0.3):
         """Initialize parameters and build model.
         Params
         ======
@@ -25,6 +25,8 @@ class Actor(nn.Module):
         super(Actor, self).__init__()
 
         self.seed = torch.manual_seed(seed)
+        self.seed = torch.manual_seed(seed)
+        self.lstm = nn.LSTM(state_dim, lstm_dim, batch_first=True)
         self.layer_1 = nn.Linear(state_dim, l1)
         self.layer_2 = nn.Linear(l1, l2)
         self.layer_3 = nn.Linear(l2, action_dim)
@@ -39,6 +41,9 @@ class Actor(nn.Module):
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
+        state = state.unsqueeze(1)
+        lstm_output, _ = self.lstm(state)
+        state = lstm_output[:, -1, :]  
 
         state = F.relu(self.layer_1(state))
         state = F.relu(self.layer_2(state))
@@ -49,7 +54,7 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, l1=800, l2=600, drop=0.3):
+    def __init__(self, state_dim, action_dim, seed, lstm_dim=154, l1=800, l2=600, drop=0.3):
         """Initialize parameters and build model.
         Params
         ======
@@ -59,8 +64,9 @@ class Critic(nn.Module):
         """
         super(Critic, self).__init__()
         self.seed = torch.manual_seed(seed)
+        self.lstm = nn.LSTM(state_dim, lstm_dim, batch_first=True)
 
-        self.layer_1 = nn.Linear(state_dim, l1)
+        self.layer_1 = nn.Linear(lstm_dim, l1)
         self.layer_2_s = nn.Linear(l1, l2)
         self.layer_2_a = nn.Linear(action_dim, l2)
         self.layer_3 = nn.Linear(l2, 1)
@@ -68,7 +74,7 @@ class Critic(nn.Module):
         self.reset_parameters_q1()
 
         self.seed = torch.manual_seed(seed)
-        self.layer_4 = nn.Linear(state_dim, l1)
+        self.layer_4 = nn.Linear(lstm_dim, l1)
         self.layer_5_s = nn.Linear(l1, l2)
         self.layer_5_a = nn.Linear(action_dim, l2)
         self.layer_6 = nn.Linear(l2, 1)
@@ -89,6 +95,10 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
+        state = state.unsqueeze(1)
+        lstm_output, _ = self.lstm(state)
+        state = lstm_output[:, -1, :] 
+        
         s1 = F.relu(self.layer_1(state))
         self.dropout_1(s1)  
         self.layer_2_s(s1)

@@ -1,7 +1,7 @@
 # ==== Parameters ROS ==== #
 TOPIC_CMD: 'cmd_vel'              # topic to publish the velocity
 TOPIC_ODOM: 'odom'                # topic to get the odometry
-ROPIC_SCAN: 'base_scan_front'     # topic to get the laser scan
+TOPIC_SCAN: 'base_scan_front'     # topic to get the laser scan
 ROBOT: 'robot'                    # name of the robot in gazebo
 
 # ==== Parameters for the Environment ==== #

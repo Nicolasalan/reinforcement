@@ -91,7 +91,7 @@ class Agent():
                 # Sample a batch of experiences from the replay buffer
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
-                loss = self.learn(experiences, timestep, self.param["POLICY_FREQ"])
+                loss = self.learn(experiences, timestep, self.policy_freq)
                 loss_numpy = loss.detach().numpy()
             
             rospy.loginfo('Calculate Loss               => Loss: ' + str(loss_numpy))
@@ -118,6 +118,7 @@ class Agent():
         
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
+        print("next_action: ", next_action)
 
         # add noise to the estimated action
         noise = torch.Tensor(actions).data.normal_(0, self.policy_noise).to(device)

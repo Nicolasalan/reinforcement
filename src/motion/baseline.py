@@ -18,7 +18,7 @@ checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful):
+def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count):
      """
      parameters
      ======
@@ -197,15 +197,15 @@ if __name__ == '__main__':
      """Start training."""
      
      # folder to load config file        
-     CONFIG_PATH = rospy.get_param('config_path')  
+     CONFIG_PATH = rospy.get_param('CONFIG_PATH')  
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     count = len(useful.path_target(param["config_path"] + "poses.yaml"))
+     count = len(useful.path_target(param["CONFIG_PATH"] + "poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_T"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful)
+     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count)
