@@ -118,7 +118,6 @@ class Agent():
         
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
-        print("next_action: ", next_action)
 
         # add noise to the estimated action
         noise = torch.Tensor(actions).data.normal_(0, self.policy_noise).to(device)

@@ -8,8 +8,6 @@ import math
 import yaml
 import os
 import rospy
-import time
-import random
 
 class Extension():
      def __init__(self, CONFIG_PATH):       
@@ -29,6 +27,7 @@ class Extension():
           self.goal_reached_dist = param["GOAL_REACHED_DIST"]
           self.collision_dist = param["COLLISION_DIST"] 
           self.time_delta = param["TIME_DELTA"]  
+          self.max_range = param["MAX_RANGE"]
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
           """Calculate the relative angle between the robots heading and heading toward the goal."""
@@ -64,50 +63,7 @@ class Extension():
 
           return distance
 
-     def path_goal(self, path_waypoints):
-          """Load the waypoints from the yaml file."""
-          
-          goals = []
-          list = []
-
-          with open(path_waypoints) as f:
-               data = yaml.safe_load(f)
-               for i in data:
-                    list.append(i['position'])
-
-               for i in list:
-                    str_x = str(i[0]).strip('[]')
-                    str_y = str(i[1]).strip('[]')
-                    x = float(str_x)
-                    y = float(str_y)
-                    goals.append((x, y))
-
-          return goals
-
-     def path_target(self, path_waypoints):
-          """Load the waypoints from the yaml file."""
-          
-          goals = []
-          list = []
-
-          with open(path_waypoints) as f:
-               data = yaml.safe_load(f)
-               for i in data:
-                    list.append(i['position'])
-
-               for i in list:
-                    str_x = str(i[0]).strip('[]')
-                    str_y = str(i[1]).strip('[]')
-                    str_yaw = str(i[2]).strip('[]')
-                    
-                    x = float(str_x)
-                    y = float(str_y)
-                    yaw = float(str_yaw)
-                    goals.append((x, y, yaw))
-
-          return goals
-
-     def path_objects(self, path_waypoints):
+     def poses(self, path_waypoints):
           """Load the waypoints from the yaml file."""
           
           goals = []
@@ -130,6 +86,8 @@ class Extension():
 
           return goals
      
+     # ==== Reward Functions ==== #
+     
      def get_reward(self, target, collision, action, min_laser):
           """Agent reward function."""
 
@@ -149,32 +107,6 @@ class Extension():
           if min_laser < collision_dist:
                return True, True, min_laser
           return False, False, min_laser
-
-     def array_gaps(self, environment_dim):
-          """Retorna uma matriz de intervalos representando lacunas em um determinado ambiente.."""
-
-          gaps = [[-np.pi, -np.pi + 2 * np.pi / environment_dim]]
-          for m in range(environment_dim - 1):
-               gaps.append([gaps[m][1], gaps[m][1] + 2 * np.pi / environment_dim])
-               gaps[-1][-1] += 0.01  # add a small offset to the last gap to avoid overlap
-
-          return gaps
-
-     def scan_rang(self, environment_dim, scan_data):
-          """Returns an array of the minimum distances from the laser scan data to the gaps in a given environment."""
-
-          laser_data = np.ones(environment_dim) * 10
-          for i in range(len(scan_data.ranges)):
-               dist = scan_data.ranges[i]
-               if not np.isnan(dist):
-                    # calculate the index of the laser data array that corresponds to the current angle
-                    angle = scan_data.angle_min + i * scan_data.angle_increment
-                    index = int((angle + np.pi/2) / (np.pi / environment_dim))
-                    # make sure that the index is within the bounds of the laser data array
-                    if index >= 0 and index < environment_dim:
-                         if dist < laser_data[index]:
-                              laser_data[index] = dist
-          return laser_data
           
      def range(self, scan):
           """Returns an array of the minimum distances from the laser scan data"""
@@ -182,7 +114,7 @@ class Extension():
           scan_range = []
           for i in range(len(scan.ranges)):
                if scan.ranges[i] == float('Inf'):
-                    scan_range.append(30.0)
+                    scan_range.append(self.max_range)
                elif np.isnan(scan.ranges[i]):
                     scan_range.append(0)
                else:
@@ -200,6 +132,7 @@ class Extension():
 
           return param
 
+     # ==== Random Functions ==== #
      def select_poses(self, poses):
           """Select two random poses from the list of poses."""
 
@@ -208,20 +141,17 @@ class Extension():
 
           index_robot = int(round(np.random.uniform(0, len(poses))))
           index_target = int(round(np.random.uniform(0, len(poses))))
+
+          # Make sure that the robot and target are not the same
           while index_robot == index_target:
                index_target = int(round(np.random.uniform(0, len(poses))))
+
+          # Make sure that the robot and target are not too close to each other
           while index_robot >= len(poses) or index_target >= len(poses):
                index_robot = int(round(np.random.uniform(0, len(poses))))
                index_target = int(round(np.random.uniform(0, len(poses))))
 
           return poses[index_robot], poses[index_target]
-
-     def select_random_poses(self, poses, percentage):
-          """Select a random percentage of poses from the list of poses."""
-
-          n = int(len(poses) * (percentage))
-
-          return random.sample(poses, n)
 
      def random_near_obstacle(self, state, count_rand_actions, random_action, add_noise=True):
           """Select a random action near an obstacle."""
@@ -237,5 +167,8 @@ class Extension():
                     count_rand_actions -= 1
                     action = random_action
                
+               return action, count_rand_actions, random_action
+
+          else:
                return action, count_rand_actions, random_action
 

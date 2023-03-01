@@ -82,7 +82,6 @@ class Env():
                scan_data (array): A list of range measurements.
           """
           self.scan_data = self.useful.range(scan)
-          #self.scan_data = self.useful.scan_rang(self.environment_dim, scan)
 
      def step_env(self, action):
           """
@@ -127,7 +126,7 @@ class Env():
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
           # ================== READ SCAN DATA ================== #
-          
+          print("self.scan_data: ", self.scan_data)
           done, collision, min_laser = self.useful.observe_collision(self.scan_data, self.collision_dist)
 
           try:

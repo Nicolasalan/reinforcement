@@ -14,6 +14,7 @@ ACTION_DIM: 2                     # angular and linear (default)
 TIME_DELTA: 2.0                   # 10 Hz (default)
 NOISE_SIGMA: 0.2                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
 RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
+MAX_RANGE: 30.0                   # max range of the laser scan
 
 # ==== Path to the model and config ==== #
 MODEL_PATH: '/ws/src/motion/models/'  # default: 'models/'

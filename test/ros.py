@@ -4,6 +4,8 @@ from motion.topics import Mensage
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
+from nav_msgs.msg import OccupancyGrid
+from PIL import Image
 
 import unittest
 import rospy
@@ -29,16 +31,25 @@ class TestROS(unittest.TestCase):
           
           self.rc = Mensage(config_dir)
           self.param = self.rc.load_config("config.yaml")
-          
+          self.expected_map_file = self.param["CONFIG_MAP"] + "map/map.pgm"
+          self.expected_map = Image.open(self.expected_map_file)
+
           self.cmd = self.param["TOPIC_CMD"]
           self.odom = self.param["TOPIC_ODOM"]
           self.scan = self.param["TOPIC_SCAN"]
+
+          self.map_topic = "/map"
+          rospy.Subscriber(self.map_topic, OccupancyGrid, self.map_callback)
+          self.received_map = None
 
           self.success = False
           self.rate = rospy.Rate(1)
 
      def callback(self, msg):
           self.success = msg.angular.z and msg.angular.z == 1
+
+     def map_callback(self, msg):
+             self.received_map = msg
 
      def test_publish_cmd_vel(self):
           # Test function for the publish_cmd_vel function.   
@@ -62,7 +73,18 @@ class TestROS(unittest.TestCase):
           msg = rospy.wait_for_message(self.scan, LaserScan, timeout=1.0)
           self.rate.sleep()
           # Verify that the message was received
-          self.assertIsNotNone(msg, "Failed to receive message from /scan topic")  
+          self.assertIsNotNone(msg, "Failed to receive message from /scan topic") 
 
+     def test_gmapping_map(self):
+          rate = rospy.Rate(1)
+          timeout = rospy.Duration(10.0)
+          start_time = rospy.Time.now()
+          while self.received_map is None and rospy.Time.now() < start_time + timeout:
+               rate.sleep()
+          self.assertIsNotNone(self.received_map, "Did not receive map in time")
+          received_image = Image.frombytes("L", (self.received_map.info.width, self.received_map.info.height), bytes(self.received_map.data))
+          self.assertEqual(self.expected_map.size, received_image.size, "Map size does not match")
+          self.assertEqual(self.expected_map.tobytes(), received_image.tobytes(), "Maps do not match")
+ 
 if __name__ == '__main__':
     rostest.rosrun(PKG, NAME, TestROS)

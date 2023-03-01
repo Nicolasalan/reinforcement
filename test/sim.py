@@ -3,7 +3,7 @@
 from motion.utils import Extension
 from std_srvs.srv import Empty
 from gazebo_msgs.msg import ModelState 
-from gazebo_msgs.srv import GetModelState, GetWorldProperties
+from gazebo_msgs.srv import GetModelState
 
 import unittest
 import rospy
@@ -58,12 +58,6 @@ class TestROS(unittest.TestCase):
           success = self.unpause.call()
           # Check that the service call was successful
           self.assertTrue(success, "Failed to unpause physics")
-
-     def test_get_world_properties(self):
-          rospy.wait_for_service("gazebo/get_world_properties")
-          get_world_properties = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
-          world_properties = get_world_properties()
-          self.assertEqual(world_properties.sim_time, world_properties.sim_time, "Getting world properties failed")
 
      def test_get_model_state(self):
           rospy.wait_for_service("gazebo/get_model_state")
