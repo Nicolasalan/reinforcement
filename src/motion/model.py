@@ -25,7 +25,6 @@ class Actor(nn.Module):
         super(Actor, self).__init__()
 
         self.seed = torch.manual_seed(seed)
-        self.seed = torch.manual_seed(seed)
         self.lstm = nn.LSTM(state_dim, lstm_dim, batch_first=True)
         self.layer_1 = nn.Linear(state_dim, l1)
         self.layer_2 = nn.Linear(l1, l2)
