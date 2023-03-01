@@ -14,7 +14,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, l1=800, lstm_dim=154, l2=600, drop=0.3):
+    def __init__(self, state_dim, action_dim, seed, l1=800, lstm_dim=154, l2=600):
         """Initialize parameters and build model.
         Params
         ======
@@ -30,7 +30,6 @@ class Actor(nn.Module):
         self.layer_2 = nn.Linear(l1, l2)
         self.layer_3 = nn.Linear(l2, action_dim)
         self.tanh = nn.Tanh()
-        self.dropout = nn.Dropout(drop)
         self.reset_parameters() 
 
     def reset_parameters(self):
@@ -46,14 +45,13 @@ class Actor(nn.Module):
 
         state = F.relu(self.layer_1(state))
         state = F.relu(self.layer_2(state))
-        state = self.dropout(state)
         action = self.tanh(self.layer_3(state))
         return action
 
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_dim, action_dim, seed, lstm_dim=154, l1=800, l2=600, drop=0.3):
+    def __init__(self, state_dim, action_dim, seed, lstm_dim=154, l1=800, l2=600):
         """Initialize parameters and build model.
         Params
         ======
@@ -69,7 +67,6 @@ class Critic(nn.Module):
         self.layer_2_s = nn.Linear(l1, l2)
         self.layer_2_a = nn.Linear(action_dim, l2)
         self.layer_3 = nn.Linear(l2, 1)
-        self.dropout_1 = nn.Dropout(drop) 
         self.reset_parameters_q1()
 
         self.seed = torch.manual_seed(seed)
@@ -77,7 +74,6 @@ class Critic(nn.Module):
         self.layer_5_s = nn.Linear(l1, l2)
         self.layer_5_a = nn.Linear(action_dim, l2)
         self.layer_6 = nn.Linear(l2, 1)
-        self.dropout_2 = nn.Dropout(drop) 
         self.reset_parameters_q2()
 
     def reset_parameters_q1(self):
@@ -96,10 +92,9 @@ class Critic(nn.Module):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
         state = state.unsqueeze(1)
         lstm_output, _ = self.lstm(state)
-        state = lstm_output[:, -1, :] 
+        state = lstm_output[:, -1, :]
         
         s1 = F.relu(self.layer_1(state))
-        self.dropout_1(s1)  
         self.layer_2_s(s1)
         self.layer_2_a(action)
         s11 = torch.mm(s1, self.layer_2_s.weight.data.t())
@@ -108,7 +103,6 @@ class Critic(nn.Module):
         q1 = self.layer_3(s1)
 
         s2 = F.relu(self.layer_4(state))
-        self.dropout_2(s2)  
         self.layer_5_s(s2)
         self.layer_5_a(action)
         s21 = torch.mm(s2, self.layer_5_s.weight.data.t())
