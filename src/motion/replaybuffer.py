@@ -57,7 +57,6 @@ class ReplayBuffer:
           rewards = torch.Tensor(batch_rewards).to(device)
           next_states = torch.Tensor(batch_next_states).to(device)
           dones = torch.Tensor(batch_dones).to(device)
-          print("next_states: ", next_states)
 
           return (states, actions, rewards, next_states, dones)
 

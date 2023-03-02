@@ -4,7 +4,6 @@ from motion.topics import Mensage
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
-
 import unittest
 import rospy
 import rostest
@@ -66,6 +65,6 @@ class TestROS(unittest.TestCase):
           self.rate.sleep()
           # Verify that the message was received
           self.assertIsNotNone(msg, "Failed to receive message from /scan topic") 
- 
+          
 if __name__ == '__main__':
     rostest.rosrun(PKG, NAME, TestROS)

@@ -58,7 +58,7 @@ clean:
 .PHONY: terminal
 terminal:
 	@echo "Terminal docker ..."
-#@sudo xhost + 
+	@sudo xhost + 
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash
 
 # === setup model ===
@@ -71,7 +71,7 @@ setup:
 .PHONY: view 
 view:
 	@echo "Setup View world ..."
-#@sudo xhost +
+	@sudo xhost +
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
 
 # === Start train docker ===
