@@ -69,8 +69,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     if np.any(done):                                       # exit loop when episode ends
                          break              
                     
-                    scores_window.append(score)                            # save average score for the episode
-                    scores.append(score)                                   # save average score in the window  
+               scores_window.append(score)                            # save average score for the episode
+               scores.append(score)                                   # save average score in the window 
                          
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
@@ -201,7 +201,7 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     count = len(useful.path_target(param["CONFIG_PATH"] + "poses.yaml"))
+     count = len(useful.poses(param["CONFIG_PATH"] + "poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 

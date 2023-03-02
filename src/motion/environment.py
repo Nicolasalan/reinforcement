@@ -126,7 +126,7 @@ class Env():
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
           # ================== READ SCAN DATA ================== #
-          print("self.scan_data: ", self.scan_data)
+
           done, collision, min_laser = self.useful.observe_collision(self.scan_data, self.collision_dist)
 
           try:

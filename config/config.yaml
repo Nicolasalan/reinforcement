@@ -6,13 +6,13 @@ ROBOT: 'robot'                    # name of the robot in gazebo
 
 # ==== Parameters for the Environment ==== #
 GOAL_REACHED_DIST: 0.3            # distance to the goal to consider it reached (in meters)
-COLLISION_DIST: 0.6               # distance to the obstacle to consider it a collision (in meters)
+COLLISION_DIST: 0.4               # distance to the obstacle to consider it a collision (in meters)
 ORIENTATION_THRESHOLD: 0.1        # threshold to consider the orientation reached (in radians)
-ENVIRONMENT_DIM: 150               # size of the environment (default)
+ENVIRONMENT_DIM: 150              # size of the environment (default)
 ROBOT_DIM: 4                      # distance, theta, velocity linear, velocity angular (default)
 ACTION_DIM: 2                     # angular and linear (default)
 TIME_DELTA: 2.0                   # 10 Hz (default)
-NOISE_SIGMA: 0.2                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
+NOISE_SIGMA: 0.1                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
 RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
 MAX_RANGE: 30.0                   # max range of the laser scan
 
