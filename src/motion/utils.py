@@ -108,6 +108,8 @@ class Extension():
                     scan_range.append(scan.ranges[i])
 
           return np.array(scan_range)
+     
+     # ==== Helper Functions === #
 
      def shutdownhook(self):
           """Shutdown hook for the node."""
