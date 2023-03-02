@@ -12,7 +12,7 @@ import rostest
 import os
 
 PKG = 'motion'
-NAME = 'ros'
+NAME = 'sim'
 
 print("\033[92mSimulation Unit Tests\033[0m")
 
