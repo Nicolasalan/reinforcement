@@ -18,7 +18,7 @@ checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count):
+def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful):
      """
      parameters
      ======
@@ -50,7 +50,6 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
 
                agent.reset()                                               # reset environment    
                states = env.reset_env()                                    # get the current state of each agent
-
                
                for t in range(max_t):   
                          
@@ -69,9 +68,10 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     if np.any(done):                                       # exit loop when episode ends
                          break              
                     
-               scores_window.append(score)                            # save average score for the episode
-               scores.append(score)                                   # save average score in the window 
-                         
+               scores_window.append(score)                                 # save average score for the episode
+               scores.append(score)                                        # save average score in the window 
+               useful.save_results("reward", scores)                       # save results in a file
+
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
                
@@ -128,8 +128,9 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     if np.any(done):                                       # exit loop when episode ends
                          break              
                     
-               scores_window.append(score)                            # save average score for the episode
-               scores.append(score)                                   # save average score in the window  
+               scores_window.append(score)                                 # save average score for the episode
+               scores.append(score)                                        # save average score in the window  
+               useful.save_results("reward", scores)                       # save results in a file
                          
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
@@ -208,4 +209,4 @@ if __name__ == '__main__':
      max_t = param["MAX_T"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count)
+     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful)

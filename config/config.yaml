@@ -19,7 +19,7 @@ MAX_RANGE: 30.0                   # max range of the laser scan
 # ==== Path to the model and config ==== #
 MODEL_PATH: '/ws/src/motion/models/'  # default: 'models/'
 CONFIG_PATH: '/ws/src/motion/config/' # default: 'config/'
-
+RESULTS: '/ws/src/motion/src/motion/run/'    # default: 'results/'
 
 # ==== Path Weights pre-trained ==== #
 MODEL: '/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'

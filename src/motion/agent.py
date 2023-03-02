@@ -6,7 +6,6 @@ import random
 from model import Actor, Critic
 from noise import OUNoise
 from replaybuffer import ReplayBuffer
-from torch.utils.tensorboard import SummaryWriter
 
 import torch
 import torch.nn.functional as F
@@ -29,9 +28,9 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
-        useful = Extension(CONFIG_PATH)
+        self.useful = Extension(CONFIG_PATH)
         # Function to load yaml configuration file
-        self.param = useful.load_config("config.yaml")
+        self.param = self.useful.load_config("config.yaml")
 
         self.state_size = state_size
         self.action_size = action_size
@@ -68,7 +67,6 @@ class Agent():
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
-        self.writer = SummaryWriter()
 
         self.av_Q = 0
         self.max_Q = -inf
@@ -167,10 +165,9 @@ class Agent():
             self.soft_update(self.actor_local, self.actor_target, self.tau)
 
             # Write new values for tensorboard
-            self.writer.add_scalar("Loss", critic_loss / timestep)
-            self.writer.add_scalar("Av. Q", self.av_Q / timestep)
-            self.writer.add_scalar("Max. Q", self.max_Q, timestep)
-            self.writer.add_scalar("Rewards", rewards.mean().reshape(1), timestep)
+            self.useful.save_results("loss", critic_loss / timestep)
+            self.useful.save_results("Av", self.av_Q / timestep)
+            self.useful.save_results("Max", self.max_Q / timestep)
 
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(self.epsilon_decay)

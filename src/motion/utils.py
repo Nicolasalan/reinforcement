@@ -12,6 +12,7 @@ class Extension():
 
           self.CONFIG_PATH = CONFIG_PATH
           param = self.load_config("config.yaml")
+          self.results = param["RESULTS"]
 
           self.max_range = param["MAX_RANGE"]
 
@@ -161,4 +162,26 @@ class Extension():
 
           else:
                return action, count_rand_actions, random_action
+
+     def save_results(self, type, result):
+          """Save the results to a yaml file."""
+          if type == "reward":
+               file = open(self.results + 'reward.txt', 'a')
+               file.write("%d\n" % (result))
+
+          if type == "loss":
+               file = open(self.results + 'loss.txt', 'a')
+               file.write("%d\n" % (result))
+
+          if type == "Av":
+               file = open(self.results + 'AvQ.txt', 'a')
+               file.write("%d\n" % (result))
+          
+          if type == "Max":
+               file = open(self.results + 'MaxQ.txt', 'a')
+               file.write("%d\n" % (result))
+          
+          if type == "episode":
+               file = open(self.results + 'episode.txt', 'a')
+               file.write("%d\n" % (result))
 
