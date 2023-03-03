@@ -171,6 +171,7 @@ class Env():
           # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
           distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
+
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
@@ -320,7 +321,7 @@ class Env():
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = list(noisy_state)
 
-               #rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
+               rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:
                rospy.logerr('Get state scan              => Error getting state scan')
 

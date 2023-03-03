@@ -72,7 +72,7 @@ class Agent():
         self.max_Q = -inf
 
         # Replay memory
-        self.memory = ReplayBuffer(int(self.buffer_size), int(self.batch_size), random_seed)
+        self.memory = ReplayBuffer(self.buffer_size, self.batch_size, random_seed)
     
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
@@ -83,7 +83,7 @@ class Agent():
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.batch_size and timestep % float(self.learn_every) == 0.0:
                  
-            #rospy.logwarn('Agent Learning               => Agent Learning ...')
+            rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
             for _ in range(self.learn_num):
                 # Sample a batch of experiences from the replay buffer
@@ -108,12 +108,16 @@ class Agent():
 
         return (action + np.random.normal(0, self.epsilon, size=self.action_size)).clip(-1, 1)
 
+        #state = torch.Tensor(state.reshape(1, -1)).to(device)
+        #return self.actor_local(state).cpu().data.numpy().flatten()
+
     def reset(self):
         self.noise.reset()
 
     def learn(self, experiences, timestep, policy_freq):
-        states, actions, rewards, next_states, dones = experiences
         
+        states, actions, rewards, next_states, dones = experiences
+
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
 
@@ -132,8 +136,11 @@ class Agent():
         self.av_Q += torch.mean(target_Q)
         self.max_Q = max(self.max_Q, torch.max(target_Q))
 
+        # normalization [-1, 1]
+        rewards_norm = rewards / 100
+
         # Calculate the final Q value from the target network parameters by using Bellman equation
-        target_Q = rewards + ((1 - dones) * self.discount_factor * target_Q).detach() 
+        target_Q = rewards_norm + ((1 - dones) * self.discount_factor * target_Q).detach() 
 
         # Get the Q values of the basis networks with the current parameters
         current_Q1, current_Q2 = self.critic_local(states, actions)

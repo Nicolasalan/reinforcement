@@ -87,31 +87,37 @@ class Extension():
                # robot to get more tired of obstacles in general and go around them with a greater go.
                r3 = lambda x: 1 - x if x < 1 else 0.0
                return (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
-
+     
      def observe_collision(self, laser_data, collision_dist):
           """Detect a collision from laser data."""
-
-          min_laser = min(laser_data)
-          if min_laser < collision_dist:
-               return True, True, min_laser
-          return False, False, min_laser
+          # escrever teste aqui
+          try:
+               min_laser = min(laser_data)
+               if min_laser < collision_dist:
+                    return True, True, min_laser
+               return False, False, min_laser
+          except:
+               return False, False, 0
           
      def range(self, scan):
           """Returns an array of the minimum distances from the laser scan data"""
 
-          scan_range = []
-          for i in range(len(scan.ranges)):
-               if scan.ranges[i] == float('Inf'):
-                    scan_range.append(self.max_range)
-               elif np.isnan(scan.ranges[i]):
-                    scan_range.append(0)
-               else:
-                    scan_range.append(scan.ranges[i])
-
-          return np.array(scan_range)
+          try: 
+               scan_range = []
+               for i in range(len(scan.ranges)):
+                    if scan.ranges[i] == float('Inf'):
+                         scan_range.append()
+                    elif np.isnan(scan.ranges[i]):
+                         scan_range.append(0)
+                    else:
+                         scan_range.append(scan.ranges[i])
+          
+               return np.array(scan_range)
+          
+          except:
+               pass
      
      # ==== Helper Functions === #
-
      def shutdownhook(self):
           """Shutdown hook for the node."""
           rospy.is_shutdown()
@@ -168,11 +174,11 @@ class Extension():
           if result == None:
                result = 0
           if type == "reward":
-               file = open(self.results + 'reward.txt', 'a')
+               file = open(self.results + 'Reward.txt', 'a')
                file.write("%f\n" % (np.mean(result)))
 
           if type == "loss":
-               file = open(self.results + 'loss.txt', 'a')
+               file = open(self.results + 'Loss.txt', 'a')
                file.write("%f\n" % (result))
 
           if type == "Av":
@@ -184,6 +190,5 @@ class Extension():
                file.write("%f\n" % (result))
           
           if type == "episode":
-               file = open(self.results + 'episode.txt', 'a')
+               file = open(self.results + 'Episode.txt', 'a')
                file.write("%f\n" % (result))
-

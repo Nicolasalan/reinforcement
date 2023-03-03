@@ -5,16 +5,16 @@ TOPIC_SCAN: 'base_scan_front'     # topic to get the laser scan
 ROBOT: 'robot'                    # name of the robot in gazebo
 
 # ==== Parameters for the Environment ==== #
-GOAL_REACHED_DIST: 0.3            # distance to the goal to consider it reached (in meters)
+GOAL_REACHED_DIST: 10.0            # distance to the goal to consider it reached (in meters)
 COLLISION_DIST: 0.4               # distance to the obstacle to consider it a collision (in meters)
 ORIENTATION_THRESHOLD: 0.1        # threshold to consider the orientation reached (in radians)
 ENVIRONMENT_DIM: 150              # size of the environment (default)
 ROBOT_DIM: 4                      # distance, theta, velocity linear, velocity angular (default)
 ACTION_DIM: 2                     # angular and linear (default)
-TIME_DELTA: 2.0                   # 10 Hz (default)
+TIME_DELTA: 1.0                   # 10 Hz (default)
 NOISE_SIGMA: 0.1                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
 RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
-MAX_RANGE: 30.0                   # max range of the laser scan
+MAX_RANGE: 10.0                   # max range of the laser scan
 
 # ==== Path to the model and config ==== #
 MODEL_PATH: '/ws/src/motion/models/'  # default: 'models/'
@@ -28,12 +28,12 @@ MODEL: '/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model
 BUFFER_SIZE: 1000000    # replay buffer size (default: 1e6)
 BATCH_SIZE: 40          # minibatch size (default: 100)
-TAU: 0.001              # for soft update of target parameters (default: 1e-3)
+TAU: 0.005              # for soft update of target parameters (default: 1e-3)
 LR_ACTOR: 0.001         # learning rate of the actor (default: 1e-3)
 LR_CRITIC: 0.001        # learning rate of the critic (default: 1e-3)
 WEIGHT_DECAY: 0         # L2 weight decay (default: 0)
 
-LEARN_EVERY: 10         # learning timestep interval (default: 20)
+LEARN_EVERY: 20         # learning timestep interval (default: 20)
 LEARN_NUM: 10           # number of learning passes (default: 10)
 
 EPSILON: 1.0            # explore->exploit noise process added to act step (default: 1.0)
@@ -49,4 +49,4 @@ POLICY_NOISE: 0.2       # std of Gaussian noise added to target policy during cr
 CLIP_PARAM: 0.5         # clipping parameter for TD3 policy updates (default: 0.5)
 NOISE_CLIP: 0.5         # clipping range for TD3 noise (default: 0.5)
 MAX_ACTION: 1           # maximum action magnitude (default: 1.0)
-DISCOUNT: 0.9999        # discount factor (default: 0.9999)
+DISCOUNT: 0.99999       # discount factor (default: 0.9999)

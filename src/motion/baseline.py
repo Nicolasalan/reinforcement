@@ -46,6 +46,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
                #rospy.loginfo('Episode: ' + str(i_episode))
+               useful.save_results("episode", i_episode)
                score = 0.0                
                done = False
 
@@ -60,9 +61,11 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
 
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
+                    bool = 0 if t + 1 == max_t else int(done)
+                    done = 1 if t + 1 == max_t else int(done)
 
                     # save the experiment in the replay buffer, run the learning step at a defined interval
-                    agent.step(states, actions, rewards, next_states, done, t)
+                    agent.step(states, actions, rewards, next_states, bool, t)
 
                     states = next_states
                     score += rewards
