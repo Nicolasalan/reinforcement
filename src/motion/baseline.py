@@ -7,11 +7,12 @@ from agent import Agent
 from environment import Env
 from continuous import ContinuousEnv
 from utils import Extension
-import psutil
+from collections import deque
 
 import rospy
 import numpy as np
 import os
+import psutil
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 checkpoints_dir = os.path.join(script_dir, 'checkpoints')
@@ -40,7 +41,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
-          scores_window = []                                               # average scores of the most recent episodes
+          scores_window = deque()                                          # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode                     
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
@@ -101,7 +102,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
           agent.critic_local.load_state_dict(torch.load(param["MODEL"] + 'critic_model.pth'))
 
-          scores_window = []                                               # average scores of the most recent episodes
+          scores_window = deque()                                          # average scores of the most recent episodes
           scores = []                                                      # list of average scores of each episode                     
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent

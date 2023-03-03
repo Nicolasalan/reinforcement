@@ -165,23 +165,25 @@ class Extension():
 
      def save_results(self, type, result):
           """Save the results to a yaml file."""
+          if result == None:
+               result = 0
           if type == "reward":
                file = open(self.results + 'reward.txt', 'a')
-               file.write("%d\n" % (result))
+               file.write("%f\n" % (np.mean(result)))
 
           if type == "loss":
                file = open(self.results + 'loss.txt', 'a')
-               file.write("%d\n" % (result))
+               file.write("%f\n" % (result))
 
           if type == "Av":
                file = open(self.results + 'AvQ.txt', 'a')
-               file.write("%d\n" % (result))
+               file.write("%f\n" % (result))
           
           if type == "Max":
                file = open(self.results + 'MaxQ.txt', 'a')
-               file.write("%d\n" % (result))
+               file.write("%f\n" % (result))
           
           if type == "episode":
                file = open(self.results + 'episode.txt', 'a')
-               file.write("%d\n" % (result))
+               file.write("%f\n" % (result))
 

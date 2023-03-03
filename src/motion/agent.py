@@ -148,9 +148,9 @@ class Agent():
 
         # ---------------------------- update actor ---------------------------- #
         if timestep % policy_freq == 0:
+            
             # Compute actor loss
-            actions_pred = self.actor_local(states)
-            actor_loss, _ = self.critic_local(states, actions_pred)
+            actor_loss, _ = self.critic_local(states, self.actor_local(states))
             actor_loss = -actor_loss.mean()
             # Minimize the loss
             self.actor_optimizer.zero_grad()
