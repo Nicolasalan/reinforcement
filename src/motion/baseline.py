@@ -38,7 +38,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
      if param["TYPE"] == 0:
           print('Training DDPG in simulation')
                
-          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=123, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
           scores_window = deque()                                          # average scores of the most recent episodes
@@ -99,7 +99,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
      if param["TYPE"] == 1:
           print('Training continuous DDPG in simulation')
 
-          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=123, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
           agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
@@ -159,7 +159,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
      if param["TYPE"] == 2:
           print('Testing DDPG in real environment')
      
-          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=42, CONFIG_PATH=CONFIG_PATH)
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=123, CONFIG_PATH=CONFIG_PATH)
           env = ContinuousEnv(CONFIG_PATH)
 
           agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))

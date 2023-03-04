@@ -5,7 +5,7 @@ TOPIC_SCAN: 'base_scan_front'     # topic to get the laser scan
 ROBOT: 'robot'                    # name of the robot in gazebo
 
 # ==== Parameters for the Environment ==== #
-GOAL_REACHED_DIST: 10.0            # distance to the goal to consider it reached (in meters)
+GOAL_REACHED_DIST: 1.2            # distance to the goal to consider it reached (in meters)
 COLLISION_DIST: 0.4               # distance to the obstacle to consider it a collision (in meters)
 ORIENTATION_THRESHOLD: 0.1        # threshold to consider the orientation reached (in radians)
 ENVIRONMENT_DIM: 150              # size of the environment (default)
@@ -17,8 +17,8 @@ RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
 MAX_RANGE: 10.0                   # max range of the laser scan
 
 # ==== Path to the model and config ==== #
-MODEL_PATH: '/ws/src/motion/models/'  # default: 'models/'
-CONFIG_PATH: '/ws/src/motion/config/' # default: 'config/'
+MODEL_PATH: '/ws/src/motion/models/'         # default: 'models/'
+CONFIG_PATH: '/ws/src/motion/config/'        # default: 'config/'
 RESULTS: '/ws/src/motion/src/motion/run/'    # default: 'results/'
 
 # ==== Path Weights pre-trained ==== #
@@ -27,17 +27,17 @@ MODEL: '/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
 # ==== Parameters Training ==== #
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model
 BUFFER_SIZE: 1000000    # replay buffer size (default: 1e6)
-BATCH_SIZE: 40          # minibatch size (default: 100)
+BATCH_SIZE: 1          # minibatch size (default: 100)
 TAU: 0.005              # for soft update of target parameters (default: 1e-3)
 LR_ACTOR: 0.001         # learning rate of the actor (default: 1e-3)
 LR_CRITIC: 0.001        # learning rate of the critic (default: 1e-3)
 WEIGHT_DECAY: 0         # L2 weight decay (default: 0)
 
-LEARN_EVERY: 20         # learning timestep interval (default: 20)
+LEARN_EVERY: 1         # learning timestep interval (default: 20)
 LEARN_NUM: 10           # number of learning passes (default: 10)
 
 EPSILON: 1.0            # explore->exploit noise process added to act step (default: 1.0)
-EPSILON_DECAY: 0.000001 # decay rate for noise process (default: 1e-6)
+EPSILON_DECAY: 0.000005 # decay rate for noise process (default: 1e-5)
 
 N_EPISODES: 200000      # maximum number of training episodes (default: 200000)
 PRINT_EVERY: 1          # print results every n episodes (default: 1)

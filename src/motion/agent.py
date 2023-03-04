@@ -14,7 +14,7 @@ import rospy
 from numpy import inf
 from utils import Extension
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
@@ -31,18 +31,12 @@ class Agent():
         self.useful = Extension(CONFIG_PATH)
         # Function to load yaml configuration file
         self.param = self.useful.load_config("config.yaml")
-
-        self.state_size = state_size
-        self.action_size = action_size
-        self.seed = random.seed(random_seed)
         
         self.tau = self.param["TAU"]
         self.epsilon = self.param["EPSILON"]
         self.clip_param= self.param["CLIP_PARAM"]
         self.max_action = self.param["MAX_ACTION"]
         self.discount_factor = self.param["DISCOUNT"]
-        self.policy_noise = self.param["POLICY_NOISE"]
-        self.noise_clip = self.param["NOISE_CLIP"]
         self.batch_size = self.param["BATCH_SIZE"]
         self.learn_every = self.param["LEARN_EVERY"]
         self.lr_actor = self.param["LR_ACTOR"]
@@ -83,14 +77,13 @@ class Agent():
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.batch_size and timestep % float(self.learn_every) == 0.0:
                  
-            rospy.logwarn('Agent Learning               => Agent Learning ...')
+            #rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
-            for _ in range(self.learn_num):
-                # Sample a batch of experiences from the replay buffer
-                experiences = self.memory.sample()
-                # Compute the loss and update the priorities
-                loss = self.learn(experiences, timestep, self.policy_freq)
-                loss_numpy = loss.detach().numpy()
+            # Sample a batch of experiences from the replay buffer
+            experiences = self.memory.sample()
+            # Compute the loss and update the priorities
+            loss = self.learn(experiences, timestep, self.policy_freq)
+            loss_numpy = loss.detach().numpy()
             
             rospy.loginfo('Calculate Loss               => Loss: ' + str(loss_numpy))
         
@@ -98,33 +91,29 @@ class Agent():
         """Returns actions for given state as per current policy."""
 
         state = torch.Tensor(state.reshape(1, -1)).to(device)
-        self.actor_local.eval()
-        with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy().flatten()
-        self.actor_local.train()
+        action = self.actor_local(state).cpu().data.numpy().flatten()
 
         if add_noise:
             action += self.epsilon * self.noise.sample()
 
-        return (action + np.random.normal(0, self.epsilon, size=self.action_size)).clip(-1, 1)
-
-        #state = torch.Tensor(state.reshape(1, -1)).to(device)
-        #return self.actor_local(state).cpu().data.numpy().flatten()
+        return action
 
     def reset(self):
         self.noise.reset()
 
     def learn(self, experiences, timestep, policy_freq):
         
-        states, actions, rewards, next_states, dones = experiences
+        state, action, reward, next_state, done = experiences
+
+        # Convert the batch to a torch tensor
+        states      =  torch.Tensor(state).to(device)
+        actions     =  torch.Tensor(action).to(device)
+        rewards     =  torch.Tensor(reward).to(device)
+        next_states =  torch.Tensor(next_state).to(device)
+        dones       =  torch.Tensor(done).to(device)
 
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
-
-        # add noise to the estimated action
-        noise = torch.Tensor(actions).data.normal_(0, self.policy_noise).to(device)
-        noise = noise.clamp(-self.noise_clip, self.noise_clip)
-        next_action = (next_action + noise).clamp(-1, 1)
 
         # ---------------------------- update critic ---------------------------- #
         # Calculate the Q values from the critic-target network for the next state-action pair

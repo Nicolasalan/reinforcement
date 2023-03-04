@@ -8,6 +8,11 @@ DOCKER_VOLUMES = \
 	--volume="$(shell pwd)/src/motion/checkpoints:/ws/src/motion/src/motion/checkpoints":rw \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 	--volume="${HOME}/.Xauthority:/root/.Xauthority:rw" 
+
+DOCKER_GPU = \
+	--gpus all \
+    	--env="NVIDIA_DRIVER_CAPABILITIES=all" \
+	--env="NVIDIA_VISIBLE_DEVICES all" 
 	
 DOCKER_ARGS = ${DOCKER_VOLUMES} ${DOCKER_ENV_VARS}
 
@@ -138,7 +143,7 @@ server:
 .PHONY: start-gpu
 start-gpu:
 	@echo "Starting training in GPU ..."
-	@sudo docker run -it --net=host --gpus all --env="NVIDIA_DRIVER_CAPABILITIES=all" ${DOCKER_ARGS} motion-docker bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch motion start.launch"
+	@sudo docker run -it --net=host --gpus all ${DOCKER_GPU} ${DOCKER_ARGS} motion-docker bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch motion start.launch"
 
 # === Setup Waypoint ===
 .PHONY: waypoint
