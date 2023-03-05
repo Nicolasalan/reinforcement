@@ -59,28 +59,26 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
-
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    bool = 0 if t + 1 == max_t else int(done)
-                    done = 1 if t + 1 == max_t else int(done)
 
                     # save the experiment in the replay buffer, run the learning step at a defined interval
-                    agent.step(states, actions, rewards, next_states, bool, t)
+                    agent.step(states, actions, rewards, next_states, int(done), t)
 
                     states = next_states
                     score += rewards
                     if np.any(done):                                       # exit loop when episode ends
-                         break              
+                         break         
                     
                scores_window.append(score)                                 # save average score for the episode
                scores.append(score)                                        # save average score in the window 
                useful.save_results("reward", scores)                       # save results in a file
+               print("Score: ", score)
 
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
                
                if i_episode % print_every == 0:
-                    rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
+                    useful.evaluate(agent, env, i_episode)
                
                if i_episode % 100 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
@@ -206,11 +204,11 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     count = len(useful.poses(param["CONFIG_PATH"] + "poses.yaml"))
+     count = len(useful.poses(param["CONFIG_PATH"] + "/pose/poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
-     max_t = param["MAX_T"]
+     max_t = param["MAX_TIMESTEP"]
      score_solved = param["SCORE_SOLVED"]
 
      ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful)

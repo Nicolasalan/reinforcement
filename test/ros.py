@@ -19,7 +19,7 @@ print("\033[92mROS Unit Tests\033[0m")
 class TestROS(unittest.TestCase):
 
      def setUp(self):
-          rospy.init_node('test_ros_node', anonymous=True) 
+          rospy.init_node('test_ros_node', log_level=rospy.DEBUG)
           current_dir = os.path.dirname(os.path.abspath(__file__))
           # navigate to the parent directory
           parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
@@ -40,7 +40,7 @@ class TestROS(unittest.TestCase):
           self.success = msg.angular.z and msg.angular.z == 1
 
      def map_callback(self, msg):
-             self.received_map = msg
+          self.received_map = msg
 
      def test_publish_cmd_vel(self):
           # Test function for the publish_cmd_vel function.   

@@ -35,6 +35,7 @@ class Env():
           self.cmd = param["TOPIC_CMD"]
           self.odom = param["TOPIC_ODOM"]
           self.scan = param["TOPIC_SCAN"]
+          self.max_range = param["MAX_RANGE"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -42,8 +43,8 @@ class Env():
           self.goal_x = 0.0
           self.goal_y = 0.0
 
-          self.path_waypoints = param["CONFIG_PATH"] + 'poses.yaml'
-          self.path_random = param["CONFIG_PATH"] + 'random.yaml'
+          self.path_waypoints = param["CONFIG_PATH"] + '/pose/poses.yaml'
+          self.path_random = param["CONFIG_PATH"] + '/pose/random.yaml'
 
           self.goals = self.useful.poses(self.path_waypoints)
           self.objects = self.useful.poses(self.path_random)
@@ -192,6 +193,7 @@ class Env():
           #rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
 
           # ================== SET STATE ================== #
+
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(state_laser, robot_state)
           reward = self.useful.get_reward(target, collision, action, min_laser)
@@ -321,9 +323,10 @@ class Env():
                noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = list(noisy_state)
 
-               rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
+               #rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:
                rospy.logerr('Get state scan              => Error getting state scan')
+               state_laser = np.random.uniform(0, self.max_range, self.environment_dim)
 
           # ==================CALCULATE DISTANCE AND ANGLE ================== #
           # Calculate distance to the goal from the robot

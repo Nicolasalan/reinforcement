@@ -15,6 +15,7 @@ class Extension():
           self.results = param["RESULTS"]
 
           self.max_range = param["MAX_RANGE"]
+          self.max_t = param["MAX_TIMESTEP"]
 
      def angles(self, odom_x, odom_y, goal_x, goal_y, angle):
           """Calculate the relative angle between the robots heading and heading toward the goal."""
@@ -102,20 +103,16 @@ class Extension():
      def range(self, scan):
           """Returns an array of the minimum distances from the laser scan data"""
 
-          try: 
-               scan_range = []
-               for i in range(len(scan.ranges)):
-                    if scan.ranges[i] == float('Inf'):
-                         scan_range.append()
-                    elif np.isnan(scan.ranges[i]):
-                         scan_range.append(0)
-                    else:
-                         scan_range.append(scan.ranges[i])
-          
-               return np.array(scan_range)
-          
-          except:
-               pass
+          scan_range = []
+          for i in range(len(scan.ranges)):
+               if scan.ranges[i] == float('Inf'):
+                    scan_range.append(self.max_range)
+               elif np.isnan(scan.ranges[i]):
+                    scan_range.append(0)
+               else:
+                    scan_range.append(scan.ranges[i])
+     
+          return np.array(scan_range)
      
      # ==== Helper Functions === #
      def shutdownhook(self):
@@ -192,3 +189,20 @@ class Extension():
           if type == "episode":
                file = open(self.results + 'Episode.txt', 'a')
                file.write("%f\n" % (result))
+
+     def evaluate(self, agent, env, epoch, eval_episodes=10):
+          avg_reward = 0.0
+          for _ in range(eval_episodes):
+               state = env.reset_env()
+               done = False
+               for _ in range(self.max_t):
+                    action = agent.action(state)
+                    actions = [(action[0] + 1) / 2, action[1]]
+                    state, reward, done, _ = env.step_env(actions)
+                    avg_reward += reward
+                    if np.any(done):                                       
+                         break  
+
+          avg_reward /= eval_episodes
+          
+          rospy.loginfo('# ====== Episode: ' + str(epoch) + ' Average Score: ' + str(avg_reward) + ' ====== #')

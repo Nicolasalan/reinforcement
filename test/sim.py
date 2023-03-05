@@ -19,7 +19,7 @@ print("\033[92mSimulation Unit Tests\033[0m")
 class TestROS(unittest.TestCase):
 
      def setUp(self):
-          rospy.init_node('test_sim_node', anonymous=True) 
+          rospy.init_node('test_sim_node', log_level=rospy.DEBUG)
           current_dir = os.path.dirname(os.path.abspath(__file__))
           # navigate to the parent directory
           parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))

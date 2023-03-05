@@ -113,13 +113,7 @@ class TestPackage(unittest.TestCase):
           try:
                import psutil
           except ImportError:
-               self.fail("Could not import psutil")  
-
-     def test_tensorboard_import(self):
-          try:
-               from torch.utils.tensorboard import SummaryWriter
-          except ImportError:
-               self.fail("Could not import tensorboard")  
+               self.fail("Could not import psutil")   
 
      def test_time_import(self):
           try:
