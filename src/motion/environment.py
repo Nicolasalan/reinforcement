@@ -176,7 +176,7 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
 
-          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation

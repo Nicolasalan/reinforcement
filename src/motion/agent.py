@@ -64,6 +64,7 @@ class Agent():
         self.av_Q = 0
         self.max_Q = -inf
         self.loss = 0
+        self.iter = 0
 
         # Replay memory
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size, random_seed)
@@ -72,31 +73,30 @@ class Agent():
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
+        print(self.memory)
+        print(int(done))
 
         # Learn, if enough samples are available in memory
-        if len(self.memory) > self.batch_size and done > 0.0:
+        if len(self.memory) > self.batch_size and int(done) > 0:
             #rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
             for steps in range(timestep):
                 # Sample a batch of experiences from the replay buffer
+                rospy.logwarn('Agent Learning               => Agent Learning ...')
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
                 self.learn(experiences, steps, self.policy_freq)
 
-            self.useful.save_results("loss", self.loss / timestep)
-            self.useful.save_results("Av", self.av_Q / timestep)
-            self.useful.save_results("Max", self.max_Q / timestep)
+            self.useful.save_results("loss", self.loss / self.iter)
+            self.useful.save_results("Av", self.av_Q / self.iter)
+            self.useful.save_results("Max", self.max_Q / self.iter)
         
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
 
         state = torch.Tensor(state.reshape(1, -1)).to(device)
-        action = self.actor_local(state).cpu().data.numpy().flatten()
 
-        if add_noise:
-            action += self.epsilon * self.noise.sample()
-
-        return action
+        return self.actor_local(state).cpu().data.numpy().flatten()
 
     def reset(self):
         self.noise.reset()
@@ -107,6 +107,11 @@ class Agent():
 
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
+
+        # add noise to the estimated action
+        noise = torch.Tensor(actions).data.normal_(0, self.policy_noise).to(device)
+        noise = noise.clamp(-self.noise_clip, self.noise_clip)
+        next_action = (next_action + noise).clamp(-1, 1)
 
         # ---------------------------- update critic ---------------------------- #
         # Calculate the Q values from the critic-target network for the next state-action pair
@@ -156,6 +161,7 @@ class Agent():
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(self.epsilon_decay)
         self.loss += critic_loss
+        self.iter += 1
         self.noise.reset()  
 
         return critic_loss    

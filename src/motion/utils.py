@@ -176,19 +176,19 @@ class Extension():
 
           if type == "loss":
                file = open(self.results + 'Loss.txt', 'a')
-               file.write("%f\n" % (result))
+               file.write("%f\n" % (result.item()))
 
           if type == "Av":
                file = open(self.results + 'AvQ.txt', 'a')
-               file.write("%f\n" % (result))
+               file.write("%f\n" % (result.item()))
           
           if type == "Max":
                file = open(self.results + 'MaxQ.txt', 'a')
-               file.write("%f\n" % (result))
+               file.write("%f\n" % (result.item()))
           
           if type == "episode":
                file = open(self.results + 'Episode.txt', 'a')
-               file.write("%f\n" % (result))
+               file.write("%f\n" % int((result)))
 
      def evaluate(self, agent, env, epoch, eval_episodes=10):
           avg_reward = 0.0

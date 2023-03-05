@@ -48,7 +48,7 @@ help:
 .PHONY: build
 build:
 	@echo "Building docker image ..."
-	@sudo docker login && docker build -t motion-docker . 
+	@sudo docker build -t motion-docker . 
 	@sudo mkdir -p ${PWD}/src/motion/checkpoints
 	@sudo mkdir -p ${PWD}/src/motion/run
 	@sudo mkdir -p ${PWD}/config/map
