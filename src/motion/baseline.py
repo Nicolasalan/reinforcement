@@ -36,12 +36,13 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
      expl_noise = 1 
      expl_decay_steps = (500000)
      expl_min = 0.1 
+     random_near_obstacle = False
 
      ## ====================== Training Loop ====================== ##
 
      if param["TYPE"] == 0:
                
-          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=123, CONFIG_PATH=CONFIG_PATH)
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=0, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
           scores_window = deque()                                          # average scores of the most recent episodes                                                     # list of average scores of each episode                     
@@ -64,12 +65,23 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     action = (action + np.random.normal(0, expl_noise, size=action_dim)).clip(
                          -1, 1
                     )
+
+                    if random_near_obstacle:
+                         if (np.random.uniform(0, 1) > 0.85 and min(states[4:-8]) < 0.6 and count_rand_actions < 1):
+                              count_rand_actions = np.random.randint(8, 15)
+                              random_action = np.random.uniform(-1, 1, 2)
+
+                         if count_rand_actions > 0:
+                              count_rand_actions -= 1
+                              action = random_action
+                              action[0] = -1
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    if rewards == 100:
-                         print(rewards)
+
+                    if t == max_t - 1:
+                         done = True
 
                     # save the experiment in the replay buffer, run the learning step at a defined interval
                     agent.step(states, actions, rewards, next_states, int(done), t)
@@ -86,7 +98,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
 
-               rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(score) + ' ====== #')
+               if i_episode % print_every != 0:
+                    rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(score) + ' ====== #')
 
                if i_episode % print_every == 0:
                     rospy.loginfo('# ================================================================================================ #')
@@ -109,14 +122,13 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
 
      if param["TYPE"] == 1:
 
-          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=123, CONFIG_PATH=CONFIG_PATH)
+          agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=0, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
           agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
           agent.critic_local.load_state_dict(torch.load(param["MODEL"] + 'critic_model.pth'))
 
-          scores_window = deque()                                          # average scores of the most recent episodes
-          scores = []                                                      # list of average scores of each episode                     
+          scores_window = deque()                                          # average scores of the most recent episodes             
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
                #rospy.loginfo('Episode: ' + str(i_episode))
@@ -136,13 +148,24 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     action = (action + np.random.normal(0, expl_noise, size=action_dim)).clip(
                          -1, 1
                     )
+
+                    if random_near_obstacle:
+                         if (np.random.uniform(0, 1) > 0.85 and min(states[4:-8]) < 0.6 and count_rand_actions < 1):
+                              count_rand_actions = np.random.randint(8, 15)
+                              random_action = np.random.uniform(-1, 1, 2)
+
+                         if count_rand_actions > 0:
+                              count_rand_actions -= 1
+                              action = random_action
+                              action[0] = -1
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
-                    if rewards == 100:
-                         print(rewards)
 
+                    if t == max_t - 1:
+                         done = True
+                         
                     # save the experiment in the replay buffer, run the learning step at a defined interval
                     agent.step(states, actions, rewards, next_states, int(done), t)
 
@@ -158,7 +181,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
 
-               rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(score) + ' ====== #')
+               if i_episode % print_every != 0:
+                    rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(score) + ' ====== #')
 
                if i_episode % print_every == 0:
                     rospy.loginfo('# ================================================================================================ #')

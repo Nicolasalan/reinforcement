@@ -44,10 +44,10 @@ class Extension():
 
           return theta
 
-     def distance_to_goal(self, odom_x, odom_y, goal_x, goal_y):
+     def distance_to_goal(self, odom_x: float, odom_y: float, goal_x: float, goal_y: float):
           """Calculate the distance between the robot and the goal."""
 
-          distance = np.linalg.norm([odom_x - goal_x, odom_y - goal_y]) # vector length
+          distance = math.hypot(goal_x - odom_x, goal_y - odom_y)
 
           return distance
 

@@ -50,13 +50,13 @@ class Agent():
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.lr_actor)
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters())
 
         # Critic Network (w/ Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.lr_critic, weight_decay=self.weight_decay)
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters())
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -73,14 +73,13 @@ class Agent():
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
-        print(self.memory)
-        print(int(done))
+        #print(self.memory.sample())
 
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.batch_size and int(done) > 0:
             #rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
-            for steps in range(timestep):
+            for steps in range(timestep + 1):
                 # Sample a batch of experiences from the replay buffer
                 rospy.logwarn('Agent Learning               => Agent Learning ...')
                 experiences = self.memory.sample()
@@ -95,7 +94,6 @@ class Agent():
         """Returns actions for given state as per current policy."""
 
         state = torch.Tensor(state.reshape(1, -1)).to(device)
-
         return self.actor_local(state).cpu().data.numpy().flatten()
 
     def reset(self):
@@ -103,7 +101,14 @@ class Agent():
 
     def learn(self, experiences, timestep, policy_freq):
         """Update policy and value parameters using given batch of experience tuples."""
-        states, actions, rewards, next_states, dones = experiences
+        state, action, reward, next_state, done = experiences
+
+        # Convert the batch to a torch tensor
+        states      =  torch.Tensor(state).to(device)
+        actions     =  torch.Tensor(action).to(device)
+        rewards     =  torch.Tensor(reward).to(device)
+        next_states =  torch.Tensor(next_state).to(device)
+        dones       =  torch.Tensor(done).to(device)
 
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
@@ -125,6 +130,7 @@ class Agent():
 
         # normalization [-1, 1]
         rewards_norm = rewards / 100
+        #print("rewards_norm", rewards_norm)
 
         # Calculate the final Q value from the target network parameters by using Bellman equation
         target_Q = rewards_norm + ((1 - dones) * self.discount_factor * target_Q).detach() 
@@ -134,6 +140,7 @@ class Agent():
 
         # Calculate the loss between the current Q value and the target Q value
         critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
+        print("critic_loss", critic_loss)
 
         # Minimize the loss
         self.critic_optimizer.zero_grad()
@@ -153,10 +160,19 @@ class Agent():
             self.actor_optimizer.step()
 
             # Update the critic target networks
-            self.soft_update(self.critic_local, self.critic_target, self.tau)
+            for param, target_param in zip(
+                    self.actor_local.parameters(), self.actor_target.parameters()
+                ):
+                    target_param.data.copy_(
+                        self.tau * param.data + (1 - self.tau) * target_param.data
+                    )
 
-            # Update the critic target networks
-            self.soft_update(self.actor_local, self.actor_target, self.tau)
+            for param, target_param in zip(
+                self.critic_local.parameters(), self.critic_target.parameters()
+            ):
+                target_param.data.copy_(
+                    self.tau * param.data + (1 - self.tau) * target_param.data
+                )
 
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(self.epsilon_decay)

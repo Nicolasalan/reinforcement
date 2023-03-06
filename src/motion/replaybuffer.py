@@ -10,7 +10,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class ReplayBuffer:
      """Fixed-size buffer to store experience tuples."""
 
-     def __init__(self, buffer_size, batch_size, seed=123):
+     def __init__(self, buffer_size, batch_size, seed=0):
           """Initialize a ReplayBuffer object.
           Params
           ======
@@ -51,14 +51,7 @@ class ReplayBuffer:
           batch_next_states    = np.array([_[3] for _ in batch])
           batch_dones          = np.array([_[4] for _ in batch]).reshape(-1, 1)
 
-          # Convert the batch to a torch tensor
-          states      =  torch.Tensor(batch_state).to(device)
-          actions     =  torch.Tensor(batch_action).to(device)
-          rewards     =  torch.Tensor(batch_rewards).to(device)
-          next_states =  torch.Tensor(batch_next_states).to(device)
-          dones       =  torch.Tensor(batch_dones).to(device)
-
-          return (states, actions, rewards, next_states, dones)
+          return batch_state, batch_action, batch_rewards, batch_next_states, batch_dones
 
      def erase(self):
           """Erase the memory."""
