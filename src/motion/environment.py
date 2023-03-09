@@ -47,11 +47,11 @@ class Env():
           self.last_odom_y = 0.0
           self.last_odom_x = 0.0
 
-          self.path_waypoints = param["CONFIG_PATH"] + '/pose/poses.yaml'
-          self.path_random = param["CONFIG_PATH"] + '/pose/random.yaml'
+          self.path_waypoints = 'poses.yaml' # param["CONFIG_PATH"] + 'poses.yaml'
+          self.path_random = 'random.yaml' # param["CONFIG_PATH"] + 'random.yaml'
 
-          self.goals = self.useful.poses(self.path_waypoints)
-          self.objects = self.useful.poses(self.path_random)
+          self.goals = self.useful.poses('poses.yaml')
+          self.objects = self.useful.poses('random.yaml')
           self.last_odom = None
           self.distOld = 0
 
@@ -216,7 +216,10 @@ class Env():
           dot = skew_x * 1 + skew_y * 0
           mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
           mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          beta = math.acos(dot / (mag1 * mag2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
           if skew_y < 0:
                if skew_x < 0:
                     beta = -beta
@@ -260,14 +263,14 @@ class Env():
           elif collision:
                reward = -100.0
           else:
-               r2 = self.distOld - distance * 10
-               print("")
-               r3 = lambda x: 1 - x if x < 1 else 0.0
-               print('r3: ', ((action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) * 5))
-               reward = ((action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) * 5) + r2
-
+               #r2 = self.distOld - distance * 10
+               #print("")
                #r3 = lambda x: 1 - x if x < 1 else 0.0
+               #print('r3: ', ((action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) * 5))
                #reward = (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
+
+               r3 = lambda x: 1 - x if x < 1 else 0.0
+               reward = (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
 
           rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
 
@@ -416,7 +419,10 @@ class Env():
           dot = skew_x * 1 + skew_y * 0
           mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
           mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          beta = math.acos(dot / (mag1 * mag2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
 
           if skew_y < 0:
                if skew_x < 0:

@@ -10,3 +10,4 @@ opencv-python
 scipy
 simplejpeg
 tornado
+tqdm

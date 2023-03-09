@@ -5,7 +5,7 @@ TOPIC_SCAN: 'base_scan_front'     # topic to get the laser scan
 ROBOT: 'robot'                    # name of the robot in gazebo
 
 # ==== Parameters for the Environment ==== #
-GOAL_REACHED_DIST: 1.2            # distance to the goal to consider it reached (in meters)
+GOAL_REACHED_DIST: 1.0            # distance to the goal to consider it reached (in meters)
 COLLISION_DIST: 0.25               # distance to the obstacle to consider it a collision (in meters)
 ORIENTATION_THRESHOLD: 0.1        # threshold to consider the orientation reached (in radians)
 ENVIRONMENT_DIM: 30              # size of the environment (default)
@@ -22,10 +22,10 @@ CONFIG_PATH: '/ws/src/motion/config/'        # default: 'config/'
 RESULTS: '/ws/src/motion/src/motion/run/'    # default: 'results/'
 
 # ==== Path Weights pre-trained ==== #
-MODEL: '/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
+MODEL: '/home/robofei/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
 
 # ==== Parameters Training ==== #
-TYPE: 1                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model
+TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model
 BUFFER_SIZE: 1000000    # replay buffer size (default: 1e6)
 BATCH_SIZE: 100          # minibatch size (default: 100)
 TAU: 0.005              # for soft update of target parameters (default: 1e-3)

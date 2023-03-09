@@ -63,7 +63,7 @@ clean:
 .PHONY: terminal
 terminal:
 	@echo "Terminal docker ..."
-#@sudo xhost + 
+	@sudo xhost + 
 	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash
 
 # === setup model ===
@@ -76,14 +76,14 @@ setup:
 .PHONY: view 
 view:
 	@echo "Setup View World ..."
-#@sudo xhost +
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
+	@sudo xhost +
+	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g motion-docker bash -c "source devel/setup.bash && roslaunch motion view.launch"
 
 # === Start train docker ===
 .PHONY: start 
 start:
 	@echo "Starting training ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g motion-docker bash -c "source devel/setup.bash && roslaunch motion start.launch"
 
 # === Test functions ===
 .PHONY: functions

@@ -11,6 +11,7 @@ import rospy
 from numpy import inf
 from utils import Extension
 import numpy as np
+import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -77,11 +78,11 @@ class Agent():
 
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.batch_size and int(done) > 0:
-            #rospy.logwarn('Agent Learning               => Agent Learning ...')
+            rospy.logwarn('Agent Learning               => Agent Learning ...')
             rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
             for steps in range(timestep + 1):
                 # Sample a batch of experiences from the replay buffer
-                rospy.logwarn('Agent Learning               => Agent Learning ...')
+                #rospy.logwarn('Agent Learning               => Agent Learning ...')
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
                 self.learn(experiences, steps, self.policy_freq)
@@ -140,7 +141,7 @@ class Agent():
 
         # Calculate the loss between the current Q value and the target Q value
         critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
-        print("critic_loss", critic_loss)
+        #print("critic_loss", critic_loss)
 
         # Minimize the loss
         self.critic_optimizer.zero_grad()

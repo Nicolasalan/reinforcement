@@ -19,7 +19,7 @@ checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful):
+def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful):
      """
      parameters
      ======
@@ -36,7 +36,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
      expl_noise = 1 
      expl_decay_steps = (500000)
      expl_min = 0.1 
-     random_near_obstacle = False
+     random_near_obstacle = True
 
      ## ====================== Training Loop ====================== ##
 
@@ -106,7 +106,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
                     rospy.loginfo('# ================================================================================================ #')
                
-               if i_episode % 100 == 0:
+               if i_episode % 300 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 
@@ -128,7 +128,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
           agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
           agent.critic_local.load_state_dict(torch.load(param["MODEL"] + 'critic_model.pth'))
 
-          scores_window = deque()                                          # average scores of the most recent episodes             
+          scores_window = deque()                                          # average scores of the most recent episodes                                                     # list of average scores of each episode                     
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
                #rospy.loginfo('Episode: ' + str(i_episode))
@@ -165,7 +165,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
 
                     if t == max_t - 1:
                          done = True
-                         
+
                     # save the experiment in the replay buffer, run the learning step at a defined interval
                     agent.step(states, actions, rewards, next_states, int(done), t)
 
@@ -189,7 +189,7 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count
                     rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
                     rospy.loginfo('# ================================================================================================ #')
                
-               if i_episode % 100 == 0:
+               if i_episode % 300 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 
@@ -252,11 +252,11 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     count = len(useful.poses(param["CONFIG_PATH"] + "/pose/poses.yaml"))
+     #count = len('/home/robofei/ws/src/motion/config/pose//poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_TIMESTEP"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, count, useful)
+     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful)
