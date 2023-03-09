@@ -11,3 +11,4 @@ scipy
 simplejpeg
 tornado
 tqdm
+torch

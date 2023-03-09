@@ -45,8 +45,8 @@ help:
 	@echo '  waypoint					--Setup Waypoint'
 
 # === Build docker ===
-.PHONY: build
-build:
+.PHONY: build-docker
+build-docker:
 	@echo "Building docker image ..."
 	@sudo docker build -t motion-docker . 
 	@sudo mkdir -p ${PWD}/src/motion/checkpoints
@@ -157,3 +157,58 @@ waypoint:
 rosboard:
 	@echo "Starting rosboard ..."
 	@sudo docker run -it --net=host -p 8888:8888 ${DOCKER_ARGS} motion-docker bash -c "source /opt/ros/noetic/setup.bash && ./ws/src/rosboard/run"
+
+# === Build Local ===
+.PHONY: build-local
+build-local:
+	@echo "Install Dependencies for ROS Noetic ..."
+	@sudo apt-get update
+	@sudo apt-get install -y ros-noetic-ros-controllers 
+	@sudo apt-get install -y ros-noetic-joint-state-controller
+	@sudo apt-get install -y ros-noetic-joint-state-publisher
+	@sudo apt-get install -y ros-noetic-robot-state-publisher
+	@sudo apt-get install -y ros-noetic-robot-state-controller
+	@sudo apt-get install -y ros-noetic-xacro 
+	@sudo apt-get install -y ros-noetic-smach-ros
+	@sudo apt-get install -y ros-noetic-gazebo-ros
+	@sudo apt-get install -y ros-noetic-gazebo-ros-control
+	@sudo apt-get install -y ros-noetic-rplidar-ros
+	@sudo apt-get install -y ros-noetic-driver-base
+	@sudo apt-get install -y ros-noetic-rosserial-arduino
+	@sudo apt-get install -y ros-noetic-map-server
+	@sudo apt-get install -y ros-noetic-gazebo-ros-pkgs
+
+	@echo "Install Dependencies for Environment ..."
+
+	@sudo apt-get install -q -y --no-install-recommends
+	@sudo apt-get install -q -y --no-install-recommends build-essential
+	@sudo apt-get install -q -y --no-install-recommends apt-utils
+	@sudo apt-get install -q -y --no-install-recommends cmake
+	@sudo apt-get install -q -y --no-install-recommends g++
+	@sudo apt-get install -q -y --no-install-recommends git
+	@sudo apt-get install -q -y --no-install-recommends libcanberra-gtk
+	@sudo apt-get install -q -y --no-install-recommends python3-catkin-tools
+	@sudo apt-get install -q -y --no-install-recommends python3-pip
+	@sudo apt-get install -q -y --no-install-recommends python3-tk
+	@sudo apt-get install -q -y --no-install-recommends python3-yaml
+	@sudo apt-get install -q -y --no-install-recommends python3-dev
+	@sudo apt-get install -q -y --no-install-recommends python3-numpy
+	@sudo apt-get install -q -y --no-install-recommends python3-rosinstall
+	@sudo apt-get install -q -y --no-install-recommends python3-catkin-pkg
+	@sudo apt-get install -q -y --no-install-recommends python3-rosdistro
+	@sudo apt-get install -q -y --no-install-recommends python3-rospkg
+	@sudo apt-get install -q -y --no-install-recommends wget
+	@sudo apt-get install -q -y --no-install-recommends curl
+
+	@echo "Install Dependencies for Python ..."
+	@pip3 install --upgrade pip
+	@pip3 install -r requirements.txt	
+
+	@echo "Git clone the repository ..."
+	@git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git 
+	@git clone -b master https://github.com/Nicolasalan/waypoint_navigation_plugin.git 
+	@git clone -b main https://github.com/dheera/rosboard.git
+
+	@echo "Build the workspace ..."
+	@cd ~/ws && source /opt/ros/noetic/setup.bash && catkin build
+	@source devel/setup.bash

@@ -15,12 +15,13 @@ import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-class Agent():
+
+class Agent:
     """Interacts with and learns from the environment."""
-    
+
     def __init__(self, state_size, action_size, random_seed, CONFIG_PATH):
         """Initialize an Agent object.
-         
+
         Params
         ======
             state_size (int): dimension of each state
@@ -31,10 +32,10 @@ class Agent():
         # Function to load yaml configuration file
         self.param = self.useful.load_config("config.yaml")
         self.seed = np.random.seed(random_seed)
-        
+
         self.tau = self.param["TAU"]
         self.epsilon = self.param["EPSILON"]
-        self.clip_param= self.param["CLIP_PARAM"]
+        self.clip_param = self.param["CLIP_PARAM"]
         self.max_action = self.param["MAX_ACTION"]
         self.discount_factor = self.param["DISCOUNT"]
         self.batch_size = self.param["BATCH_SIZE"]
@@ -69,20 +70,22 @@ class Agent():
 
         # Replay memory
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size, random_seed)
-    
+
     def step(self, state, action, reward, next_state, done, timestep):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
-        #print(self.memory.sample())
+        # print(self.memory.sample())
 
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.batch_size and int(done) > 0:
-            rospy.logwarn('Agent Learning               => Agent Learning ...')
-            rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
+            rospy.logwarn("Agent Learning               => Agent Learning ...")
+            rospy.loginfo(
+                "Add Experience to Memory     => Experience: " + str(len(self.memory))
+            )
             for steps in range(timestep + 1):
                 # Sample a batch of experiences from the replay buffer
-                #rospy.logwarn('Agent Learning               => Agent Learning ...')
+                # rospy.logwarn('Agent Learning               => Agent Learning ...')
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
                 self.learn(experiences, steps, self.policy_freq)
@@ -90,7 +93,7 @@ class Agent():
             self.useful.save_results("loss", self.loss / self.iter)
             self.useful.save_results("Av", self.av_Q / self.iter)
             self.useful.save_results("Max", self.max_Q / self.iter)
-        
+
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
 
@@ -105,11 +108,11 @@ class Agent():
         state, action, reward, next_state, done = experiences
 
         # Convert the batch to a torch tensor
-        states      =  torch.Tensor(state).to(device)
-        actions     =  torch.Tensor(action).to(device)
-        rewards     =  torch.Tensor(reward).to(device)
-        next_states =  torch.Tensor(next_state).to(device)
-        dones       =  torch.Tensor(done).to(device)
+        states = torch.Tensor(state).to(device)
+        actions = torch.Tensor(action).to(device)
+        rewards = torch.Tensor(reward).to(device)
+        next_states = torch.Tensor(next_state).to(device)
+        dones = torch.Tensor(done).to(device)
 
         # obtain the estimated action from next state by using the target actor network
         next_action = self.actor_target(next_states)
@@ -131,17 +134,21 @@ class Agent():
 
         # normalization [-1, 1]
         rewards_norm = rewards / 100
-        #print("rewards_norm", rewards_norm)
+        # print("rewards_norm", rewards_norm)
 
         # Calculate the final Q value from the target network parameters by using Bellman equation
-        target_Q = rewards_norm + ((1 - dones) * self.discount_factor * target_Q).detach() 
+        target_Q = (
+            rewards_norm + ((1 - dones) * self.discount_factor * target_Q).detach()
+        )
 
         # Get the Q values of the basis networks with the current parameters
         current_Q1, current_Q2 = self.critic_local(states, actions)
 
         # Calculate the loss between the current Q value and the target Q value
-        critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
-        #print("critic_loss", critic_loss)
+        critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(
+            current_Q2, target_Q
+        )
+        # print("critic_loss", critic_loss)
 
         # Minimize the loss
         self.critic_optimizer.zero_grad()
@@ -150,7 +157,6 @@ class Agent():
 
         # ---------------------------- update actor ---------------------------- #
         if timestep % policy_freq == 0:
-            
             # Compute actor loss
             actor_loss, _ = self.critic_local(states, self.actor_local(states))
             actor_loss = -actor_loss.mean()
@@ -162,11 +168,11 @@ class Agent():
 
             # Update the critic target networks
             for param, target_param in zip(
-                    self.actor_local.parameters(), self.actor_target.parameters()
-                ):
-                    target_param.data.copy_(
-                        self.tau * param.data + (1 - self.tau) * target_param.data
-                    )
+                self.actor_local.parameters(), self.actor_target.parameters()
+            ):
+                target_param.data.copy_(
+                    self.tau * param.data + (1 - self.tau) * target_param.data
+                )
 
             for param, target_param in zip(
                 self.critic_local.parameters(), self.critic_target.parameters()
@@ -179,9 +185,9 @@ class Agent():
         self.epsilon -= float(self.epsilon_decay)
         self.loss += critic_loss
         self.iter += 1
-        self.noise.reset()  
+        self.noise.reset()
 
-        return critic_loss    
+        return critic_loss
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
@@ -190,7 +196,11 @@ class Agent():
         ======
             local_model: PyTorch model (weights will be copied from)
             target_model: PyTorch model (weights will be copied to)
-            tau (float): interpolation parameter 
+            tau (float): interpolation parameter
         """
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            local_param.data.copy_(tau*target_param.data + (1.0-tau)*local_param.data)
+        for target_param, local_param in zip(
+            target_model.parameters(), local_model.parameters()
+        ):
+            local_param.data.copy_(
+                tau * target_param.data + (1.0 - tau) * local_param.data
+            )

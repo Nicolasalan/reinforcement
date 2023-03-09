@@ -61,9 +61,6 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-map-server \
  && apt-get install -y ros-noetic-gazebo-ros-pkgs
 
-# install pytorch
-RUN pip install torch
-
 # create a catkin workspace
 RUN mkdir -p /ws/src \
  && cd /ws/src \
