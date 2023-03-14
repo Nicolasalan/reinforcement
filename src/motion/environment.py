@@ -316,7 +316,7 @@ class Env():
 
           time.sleep(self.time_delta)
 
-          goal, robot = self.useful.select_poses(self.goals)
+          goal, robot = self.select_poses(self.goals)
 
           rospy.loginfo('Set Random Position          => Goal: (' + str(goal[0]) + ', ' + str(goal[1]) + ') Robot: (' + str(robot[0]) + ', ' + str(robot[1]) + ')')
 
@@ -447,3 +447,24 @@ class Env():
 
           # ================== RETURN STATE ================== #
           return np.array(state)
+     
+     # ==== Random Functions ==== #
+     def select_poses(self, poses):
+          """Select two random poses from the list of poses."""
+
+          if len(poses) < 2:
+               raise ValueError("The 'poses' list must have at least two elements")
+
+          index_robot = int(round(np.random.uniform(0, len(poses))))
+          index_target = int(round(np.random.uniform(0, len(poses))))
+
+          # Make sure that the robot and target are not the same
+          while index_robot == index_target:
+               index_target = int(round(np.random.uniform(0, len(poses))))
+
+          # Make sure that the robot and target are not too close to each other
+          while index_robot >= len(poses) or index_target >= len(poses):
+               index_robot = int(round(np.random.uniform(0, len(poses))))
+               index_target = int(round(np.random.uniform(0, len(poses))))
+
+          return poses[index_robot], poses[index_target]

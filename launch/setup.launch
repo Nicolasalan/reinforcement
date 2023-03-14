@@ -1,9 +1,8 @@
 <launch>
-  <arg name="map_resource"          default="$(find motion)/config/map"/>
 
   <!-- mapping -->
   <node name="map_server" pkg="map_server" type="map_server" output="screen"
-    args="$(arg map_resource)/map.yaml">
+    args="/home/robofei/ws/src/aws-robomaker-bookstore-world/maps/map.yaml">
   </node>
 
   <!-- setup -->

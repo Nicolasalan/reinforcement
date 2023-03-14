@@ -51,13 +51,13 @@ class Agent():
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters())
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.param['LR_ACTOR'])
 
         # Critic Network (w/ Network)
         self.critic_local = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target = Critic(state_size, action_size, random_seed).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters())
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.param['LR_CRITIC'])
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -91,11 +91,15 @@ class Agent():
             self.useful.save_results("Av", self.av_Q / self.iter)
             self.useful.save_results("Max", self.max_Q / self.iter)
         
-    def action(self, state, add_noise=True):
+    def action(self, state):
         """Returns actions for given state as per current policy."""
-
         state = torch.Tensor(state.reshape(1, -1)).to(device)
-        return self.actor_local(state).cpu().data.numpy().flatten()
+        #self.actor_local.eval()
+        #with torch.no_grad():
+        action = self.actor_local(state).cpu().data.numpy().flatten()
+        #self.actor_local.train()
+
+        return action
 
     def reset(self):
         self.noise.reset()
