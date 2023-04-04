@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-from motion.utils import Extension
+from vault.utils import Extension
 import unittest
 import rosunit
 
 import os
 
-PKG = 'motion'
+PKG = 'vault'
 NAME = 'library'
 
 print("\033[92mFunction Unit Tests\033[0m")

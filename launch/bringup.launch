@@ -1,34 +1,34 @@
 <launch>
-     <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find motion)/models/" />
+     <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find vault)/models/" />
 
      <arg name="world_name"        default="environment.world"/>
      <arg name="gui"               default="false"/>
 
-     <arg name="model_target"      default="$(find motion)/models/cube.sdf"/>
-     <arg name="model_cube"        default="$(find motion)/models/cylinder.sdf"/>
-     <arg name="model_sphere"      default="$(find motion)/models/sphere.sdf"/>
-     <arg name="model_cylinder"    default="$(find motion)/models/target.sdf"/>
+     <arg name="model_target"      default="$(find vault)/models/cube.sdf"/>
+     <arg name="model_cube"        default="$(find vault)/models/cylinder.sdf"/>
+     <arg name="model_sphere"      default="$(find vault)/models/sphere.sdf"/>
+     <arg name="model_cylinder"    default="$(find vault)/models/target.sdf"/>
 
-     <arg name="model_cylinderA"      default="$(find motion)/models/cubeA.sdf"/>
-     <arg name="model_cubeA"        default="$(find motion)/models/cylinderA.sdf"/>
-     <arg name="model_sphereA"      default="$(find motion)/models/sphereA.sdf"/>
+     <arg name="model_cylinderA"      default="$(find vault)/models/cubeA.sdf"/>
+     <arg name="model_cubeA"        default="$(find vault)/models/cylinderA.sdf"/>
+     <arg name="model_sphereA"      default="$(find vault)/models/sphereA.sdf"/>
 
-     <arg name="model_cylinderB"      default="$(find motion)/models/cubeB.sdf"/>
-     <arg name="model_cubeB"        default="$(find motion)/models/cylinderB.sdf"/>
-     <arg name="model_sphereB"      default="$(find motion)/models/sphereB.sdf"/>
+     <arg name="model_cylinderB"      default="$(find vault)/models/cubeB.sdf"/>
+     <arg name="model_cubeB"        default="$(find vault)/models/cylinderB.sdf"/>
+     <arg name="model_sphereB"      default="$(find vault)/models/sphereB.sdf"/>
 
-     <arg name="model_cylinderC"      default="$(find motion)/models/cubeC.sdf"/>
-     <arg name="model_cubeC"        default="$(find motion)/models/cylinderC.sdf"/>
-     <arg name="model_sphereC"      default="$(find motion)/models/sphereC.sdf"/>
+     <arg name="model_cylinderC"      default="$(find vault)/models/cubeC.sdf"/>
+     <arg name="model_cubeC"        default="$(find vault)/models/cylinderC.sdf"/>
+     <arg name="model_sphereC"      default="$(find vault)/models/sphereC.sdf"/>
 
-     <arg name="model_cylinderD"      default="$(find motion)/models/cubeD.sdf"/>
-     <arg name="model_cubeD"        default="$(find motion)/models/cylinderD.sdf"/>
-     <arg name="model_sphereD"      default="$(find motion)/models/sphereD.sdf"/>
+     <arg name="model_cylinderD"      default="$(find vault)/models/cubeD.sdf"/>
+     <arg name="model_cubeD"        default="$(find vault)/models/cylinderD.sdf"/>
+     <arg name="model_sphereD"      default="$(find vault)/models/sphereD.sdf"/>
 
      <!-- start gazebo server -->
      <param name="/use_sim_time" value="true"/>
      <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
-	    args="--verbose $(find motion)/world/$(arg world_name)" />
+	    args="--verbose $(find vault)/world/$(arg world_name)" />
          
 
     <!-- start gazebo client -->

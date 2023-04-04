@@ -12,3 +12,4 @@ simplejpeg
 tornado
 tqdm
 torch
+koila

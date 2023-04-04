@@ -1,0 +1,24 @@
+[submodule "src/socialdroids/robot_nav"]
+	path = src/socialdroids/robot_nav
+	url = git@github.com:Social-Droids/robot_nav.git
+[submodule "src/socialdroids/robot_data"]
+	path = src/socialdroids/robot_data
+	url = git@github.com:Social-Droids/robot_data.git
+[submodule "src/3rd/navigation_layers"]
+	path = src/3rd/navigation_layers
+	url = git@github.com:DLu/navigation_layers.git
+[submodule "src/3rd/hokuyo_node"]
+	path = src/3rd/hokuyo_node
+	url = git@github.com:ros-drivers/hokuyo_node.git
+[submodule "src/3rd/aws-robomaker-bookstore-world"]
+	path = src/3rd/aws-robomaker-bookstore-world
+	url = git@github.com:aws-robotics/aws-robomaker-bookstore-world.git
+[submodule "src/3rd/waypoint_navigation_plugin"]
+	path = src/3rd/waypoint_navigation_plugin
+	url = git@github.com:Social-Droids/waypoint_navigation_plugin.git
+[submodule "src/socialdroids/robot_description"]
+	path = src/socialdroids/robot_description
+	url = git@github.com:Social-Droids/robot_description.git
+[submodule "src/3rd/rplidar_ros"]
+	path = src/3rd/rplidar_ros
+	url = https://github.com/Social-Droids/rplidar_ros.git

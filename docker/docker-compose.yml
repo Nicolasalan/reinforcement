@@ -1,0 +1,18 @@
+---
+version: "2.1"
+services:
+  webtop:
+    image: ghcr.io/linuxserver/webtop:ubuntu-mate
+    container_name: webtop
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=501 # based on user id
+      - PGID=20 # based on group id
+      - TZ=Etc/UTC # use your timezone
+    volumes:
+      - ./config:/config
+    ports:
+      - 3000:3000
+    shm_size: "2gb" # tamanho da memoria em uso pelo container
+    restart: unless-stopped

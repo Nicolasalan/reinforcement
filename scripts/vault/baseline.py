@@ -20,7 +20,7 @@ if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful):
+def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful):
      """
      parameters
      ======
@@ -359,7 +359,7 @@ if __name__ == "__main__":
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     # count = len('/home/robofei/ws/src/motion/config/pose//poses.yaml"))
+     # count = len('/home/robofei/ws/src/vault/config/pose//poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"]

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from motion.utils import Extension
+from vault.utils import Extension
 from std_srvs.srv import Empty
 from gazebo_msgs.msg import ModelState 
 from gazebo_msgs.srv import GetModelState
@@ -11,7 +11,7 @@ import rostest
 
 import os
 
-PKG = 'motion'
+PKG = 'vault'
 NAME = 'sim'
 
 print("\033[92mSimulation Unit Tests\033[0m")

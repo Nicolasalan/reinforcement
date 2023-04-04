@@ -1,0 +1,48 @@
+- PER -> (Priorized experience replay) !!!
+- Memory -> (summary, type)
+- Class -> (Lightning)
+     - env.make
+     - actor loss
+     - critic loss 
+     - training step
+     - configure_optimizers
+     - optimizer_step
+     - _dataloader
+     - train_dataloader
+     - calc_advantage
+     - generate_trajectory_samples
+     - RLDataset
+- Time -> (programacao dinamica)
+- codespace -> (gazebo, visualize, vscode)
+- docker compose -> ROS, NVIDIA, REPO, webtop
+- tensorboard 
+- robot -> Hera, turtlebot
+- Epsilon -> DQN
+- Batch Size -> Max !!!
+- Dropout, Batchnormal -> Net !!!
+- Style -> (variables, class, commentary)
+- github package
+- github page
+- local x docker !!!
+- vitepress -> documentation
+- PNN or Meta Learning 
+- Add worlds -> (hospital, house, warehouse, bookstore) !!!
+- Automatic create world !!!
+- add people, max objetcs !!!
+- functions -> (theta, random, distance, ...) !!!
+- Find LR !!!
+- Folder -> (lazer, distance, velocity, theta -> x, y, theta)
+- get odom and lazer -> wait_for_result
+- test -> (functions, ros)
+- sensor fusion -> (odom, imu, scan, sonar, camera, infrared, depth)
+- Visualize param model and GPU
+- Painel interactive !!!
+- Integration with RNS
+- update Action test -> (simulation, docker, function, ros, library)
+- Cretae GazeboEnv !!!
+- update config -> (task, ...) !!!
+- update docker hub !!!
+- Save replaybuffer in csv !!!
+- create check -> (preso e inclinado) !!!
+- Pytorch Lightning
+- ROS jupyter + DDPG

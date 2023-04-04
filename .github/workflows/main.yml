@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build the docker image
-        run: docker pull ninim/motion-docker:latest
+        run: docker pull ninim/vault-docker:latest
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
@@ -31,7 +31,7 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun motion ros.py"
+        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun vault ros.py"
         working-directory: ${{env.working-directory}}
 
   Simulation:
@@ -41,7 +41,7 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch motion bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun motion sim.py"
+        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun vault sim.py"
         working-directory: ${{env.working-directory}}
 
   Library:
@@ -51,7 +51,7 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun motion library.py"
+        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun vault library.py"
         working-directory: ${{env.working-directory}}
 
   Package:
@@ -61,5 +61,5 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/motion-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun motion package.py"
+        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun vault package.py"
         working-directory: ${{env.working-directory}}

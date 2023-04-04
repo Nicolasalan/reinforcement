@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-  <node name="planner" pkg="motion" type="baseline.py" output="screen"/>
-    <rosparam command="load" file="$(find motion)/config/config.yaml"/>
+  <node name="planner" pkg="vault" type="baseline.py" output="screen"/>
+    <rosparam command="load" file="$(find vault)/config/config.yaml"/>
 </launch>

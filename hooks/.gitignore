@@ -1,13 +1,13 @@
 # weights and logs #
 ####################
-**src/motion/checkpoints
-**src/motion/run
+**src/vault/checkpoints
+**src/vault/run
 
 # OS generated files #
 ######################
-**src/motion/__pycache__
+**src/vault/__pycache__
 ./src/.DS_Store
-./src/motion/.DS_Store
-./src/motion/.DS_Store
+./src/vault/.DS_Store
+./src/vault/.DS_Store
 .DS_Store
 ./models/.DS_Store
