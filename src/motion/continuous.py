@@ -2,12 +2,11 @@
 
 import rospy
 import numpy as np
-import math
-import tf
 
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
+from squaternion import Quaternion
 
 from utils import Extension
 
@@ -21,14 +20,16 @@ class ContinuousEnv():
           param = self.useful.load_config("config.yaml")
 
           # set the initial state
-          self.goal_model = param["goal_model"]
-          self.goal_reached_dist = param["goal_reached_dist"]
-          self.environment_dim = param["environment_dim"]
-          self.time_delta = param["time_delta"]
-          self.collision_dist = param["collision_dist"]
-          self.robot = param["robot"]
-          self.orientation_threshold = param["orientation_threshold"]
-          self.noise_sigma = param["noise_sigma"]
+          self.goal_reached_dist = param["GOAL_REACHED_DIST"]
+          self.environment_dim = param["ENVIRONMENT_DIM"]
+          self.time_delta = param["TIME_DELTA"]
+          self.collision_dist = param["COLLISION_DIST"]
+          self.robot = param["ROBOT"]
+          self.orientation_threshold = param["ORIENTATION_THRESHOLD"]
+          self.noise_sigma = param["NOISE_SIGMA"]
+          self.cmd = param["TOPIC_CMD"]
+          self.odom = param["TOPIC_ODOM"]
+          self.scan = param["TOPIC_SCAN"]
 
           # initialize global variables
           self.odom_x = 0.0
@@ -37,14 +38,14 @@ class ContinuousEnv():
           self.goal_y = 0.0
 
           self.scan_data = np.ones(self.environment_dim) * 10
-          self.path_targets = param["path_goal"]
-          self.goals = self.useful.path_target(self.path_targets)
+          self.path_targets = param["path_goal"] + '/goal.yaml'
+          self.goals = self.useful.poses(self.path_targets)
           self.last_odom = None
 
           # ROS publications and subscriptions
-          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
-          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=10)
-          self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
+          self.pub_cmd_vel = rospy.Publisher(self.cmd, Twist, queue_size=10)
+          self.odom = rospy.Subscriber(self.odom, Odometry, self.odom_callback, queue_size=10)
+          self.scan = rospy.Subscriber(self.scan, LaserScan, self.scan_callback)
 
           self.gaps = self.useful.array_gaps(self.environment_dim)
           self.count_goals = 0
@@ -126,15 +127,15 @@ class ContinuousEnv():
                self.odom_x = self.last_odom.position.x
                self.odom_y = self.last_odom.position.y
 
-               quaternion = (
+               quaternion = Quaternion(
                     self.last_odom.orientation.x,
                     self.last_odom.orientation.y,
                     self.last_odom.orientation.z,
                     self.last_odom.orientation.w
                )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               angle = math.degrees(yaw)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
+
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
@@ -156,7 +157,7 @@ class ContinuousEnv():
           orientation_diff = abs(angle - self.goal_orientation)
 
           rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
-
+          
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
           if distance < self.goal_reached_dist: #and orientation_diff < self.orientation_threshold:
@@ -180,23 +181,21 @@ class ContinuousEnv():
           Params:
                state (array): array with robot states (leisure, speed, distance and theta)
           """
-          # ================== RESET ENVIRONMENT ================== #
-          rospy.logwarn("Reset Environment            => Resetting environment ...")
+
           # ================== SET ANGLE ================== #
 
           try:
                self.odom_x = self.last_odom.position.x
                self.odom_y = self.last_odom.position.y
 
-               quaternion = (
+               quaternion = Quaternion(
                     self.last_odom.orientation.x,
                     self.last_odom.orientation.y,
                     self.last_odom.orientation.z,
                     self.last_odom.orientation.w
                )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               angle = math.degrees(yaw)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
 
                rospy.loginfo('Set Angle Robot              => Angle: ' + str(angle))
           
@@ -205,7 +204,6 @@ class ContinuousEnv():
                angle = 0.0
 
           path = self.goals
-          print(path)
 
           self.goal_x, self.goal_y, self.goal_orientation = path[self.idx]
 
@@ -240,9 +238,6 @@ class ContinuousEnv():
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           print('========================================================================================================================')
-
-          # remove the first element of the list
-          #self.goals.pop(0)
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]

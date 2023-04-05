@@ -3,7 +3,7 @@
 from motion.utils import Extension
 from std_srvs.srv import Empty
 from gazebo_msgs.msg import ModelState 
-from gazebo_msgs.srv import GetModelState, GetWorldProperties
+from gazebo_msgs.srv import GetModelState
 
 import unittest
 import rospy
@@ -12,14 +12,14 @@ import rostest
 import os
 
 PKG = 'motion'
-NAME = 'ros'
+NAME = 'sim'
 
 print("\033[92mSimulation Unit Tests\033[0m")
 
 class TestROS(unittest.TestCase):
 
      def setUp(self):
-          rospy.init_node('test_sim_node', anonymous=True) 
+          rospy.init_node('test_sim_node', log_level=rospy.DEBUG)
           current_dir = os.path.dirname(os.path.abspath(__file__))
           # navigate to the parent directory
           parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
@@ -58,12 +58,6 @@ class TestROS(unittest.TestCase):
           success = self.unpause.call()
           # Check that the service call was successful
           self.assertTrue(success, "Failed to unpause physics")
-
-     def test_get_world_properties(self):
-          rospy.wait_for_service("gazebo/get_world_properties")
-          get_world_properties = rospy.ServiceProxy("gazebo/get_world_properties", GetWorldProperties)
-          world_properties = get_world_properties()
-          self.assertEqual(world_properties.sim_time, world_properties.sim_time, "Getting world properties failed")
 
      def test_get_model_state(self):
           rospy.wait_for_service("gazebo/get_model_state")

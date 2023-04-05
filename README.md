@@ -24,7 +24,6 @@
   </a>
 </p>
 
-
 This repository contains training neural networks for learning path planning using reinforcement learning, specifically [Deep Deterministic Policy Gradient](https://spinningup.openai.com/en/latest/algorithms/ddpg.html#id1) (DDPG) and its variance [Twin Delayed DDPG](https://spinningup.openai.com/en/latest/algorithms/td3.html#id1) (TD3).
 
 The inputs to the model are data from the lidar sensors, distance to the target, theta angle and speed and have the speed of the robot as output. The entire environment was carried out in **ROS Noetic** and **Gazebo v11**.
@@ -39,7 +38,6 @@ The inputs to the model are data from the lidar sensors, distance to the target,
 - [Training Agent](#Training-Agent)
 - [Limitations](#Limitations)
 - [Directory Structure](#Directory-Structure)
-
 
 ## Getting Started
 <a name="Getting-Started"></a>
@@ -94,11 +92,24 @@ make install
   > **Note** :
   > The weights will be saved in the checkpoint folder under `src/motion/checkpoints`.
 
-The definition of waypoints is necessary for the correct functioning of the robot in the environment. This includes robot spawn, target, and file saving in `motion/config/`. The ***waypoint_navigation_plugin*** repository (available at [waypoints](https://github.com/KumarRobotics/waypoint_navigation_plugin)) is used to mark the points on the map and create a save file of the positions. Also, it is important to specify the full path in the configuration file.
-
-```yaml
-waypoints: '/<your_workspace>/src/motion/config/poses.yaml'
+Set the waypoints and cry the world:
+  
+```bash
+cd <your_workspace>/src/motion
+make waypoint
 ```
+  > **Note** :
+  > The world will be saved in the `src/motion/models/map/map.dae` file.
+
+<div align="center">
+     <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="750px">
+</div>
+
+For a better organization and structuring of the robot's movement planning, it is recommended to separate the waypoints into three distinct categories: targets, robot positions and object spawn.
+
+Targets are specific points in the environment that the robot must reach or interact with. Robot positions refer to locations where the robot can move or stand while executing the task. Finally, the object spawn is used to define the initial position of objects that will be used during the task.
+
+To make waypoints easier to read and maintain, it is recommended to separate the information into two different YAML files: `poses.yaml` and `random.yaml`. In `poses.yaml`, information regarding robot positions and targets must be stored. In `random.yaml`, information about the spawn of objects must be stored
 ## Running the Tests
 
 <a name="Running-the-tests"></a>
@@ -188,12 +199,14 @@ The agent has limitations in its navigation capacity, being effective only in st
 .
 ├── .github/           # [dir] Github actions
 ├── config/            # [dir] Configuration files
+│   └── map/           # [dir] Map files
 ├── launch/            # [dir] Launch files 
-├── models/            # [dir] Model SDF target
+├── models/            # [dir] Model SDF files
 ├── src/motion/        # [dir] Source code
 │   ├── checkpoints/   # [dir] Pre-trained weights for the agent
 │   └── run/           # [dir] Logs and results of the agent
 ├── test/              # [dir] Unit tests 
+├── world/             # [dir] Gazebo world
 ├── .gitignore         # [file] Files to ignore in git
 ├── Dockerfile         # [file] Dockerfile image
 ├── entrypoint.sh      # [file] Entrypoint for the docker image
