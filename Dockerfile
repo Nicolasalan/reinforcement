@@ -57,13 +57,12 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-gazebo-ros-control \
  && apt-get install -y ros-noetic-rplidar-ros \
  && apt-get install -y ros-noetic-driver-base \
- && apt-get install -y ros-noetic-rosserial-arduino 
+ && apt-get install -y ros-noetic-rosserial-arduino \
+ && apt-get install -y ros-noetic-map-server \
+ && apt-get install -y ros-noetic-gazebo-ros-pkgs
 
 # install pytorch
 RUN pip install torch
-
-#RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-RUN pip3 install tensorboard
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \
@@ -71,7 +70,8 @@ RUN mkdir -p /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace \
  && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git \
- && git clone -b ros1 https://github.com/Nicolasalan/bookstore-world.git 
+ && git clone -b master https://github.com/Nicolasalan/waypoint_navigation_plugin.git \
+ && git clone -b main https://github.com/dheera/rosboard.git
 
 # Copy the source files
 COPY . /ws/src/motion

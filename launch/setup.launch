@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- mapping -->
+  <node name="map_server" pkg="map_server" type="map_server" output="screen"
+    args="/home/robofei/ws/src/aws-robomaker-bookstore-world/maps/map.yaml">
+  </node>
+
+  <!-- setup -->
+  <node pkg="rviz" type="rviz" name="waypoint_nav_plugin"
+    args="-d $(find waypoint_navigation_plugin)/rviz/waypoint_nav_plugin.rviz">
+  </node>
+
+  <!-- Create Environment -->
+  <node name="create" pkg="motion" type="create.py" output="screen"/>
+
+</launch>

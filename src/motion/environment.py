@@ -2,11 +2,10 @@
 
 import rospy
 import numpy as np
-import math
-import tf
 import time
+import math
 
-from geometry_msgs.msg import Twist, Pose
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 from gazebo_msgs.msg import ModelState
@@ -27,31 +26,39 @@ class Env():
           param = self.useful.load_config("config.yaml")
 
           # set the initial state
-          self.goal_model = param["goal_model"]
-          self.goal_reached_dist = param["goal_reached_dist"]
-          self.environment_dim = param["environment_dim"]
-          self.time_delta = param["time_delta"]
-          self.collision_dist = param["collision_dist"]
-          self.robot = param["robot"]
-          self.orientation_threshold = param["orientation_threshold"]
-          self.noise_sigma = param["noise_sigma"]
+          self.goal_reached_dist = param["GOAL_REACHED_DIST"]
+          self.environment_dim = param["ENVIRONMENT_DIM"]
+          self.time_delta = param["TIME_DELTA"]
+          self.collision_dist = param["COLLISION_DIST"]
+          self.robot = param["ROBOT"]
+          self.orientation_threshold = param["ORIENTATION_THRESHOLD"]
+          self.noise_sigma = param["NOISE_SIGMA"]
+          self.cmd = param["TOPIC_CMD"]
+          self.odom = param["TOPIC_ODOM"]
+          self.scan = param["TOPIC_SCAN"]
+          self.max_range = param["MAX_RANGE"]
 
           # initialize global variables
           self.odom_x = 0.0
           self.odom_y = 0.0
-          self.goal_x = 0.0
+          self.goal_x = 1.0
           self.goal_y = 0.0
 
-          self.scan_data = np.ones(self.environment_dim) * 10
-          self.path_waypoints = param["waypoints"]
+          self.last_odom_y = 0.0
+          self.last_odom_x = 0.0
 
-          self.goals = self.useful.path_goal(self.path_waypoints)
+          self.path_waypoints = 'poses.yaml' # param["CONFIG_PATH"] + 'poses.yaml'
+          self.path_random = 'random.yaml' # param["CONFIG_PATH"] + 'random.yaml'
+
+          self.goals = self.useful.poses('poses.yaml')
+          self.objects = self.useful.poses('random.yaml')
           self.last_odom = None
+          self.distOld = 0
 
           # ROS publications and subscriptions
-          self.pub_cmd_vel = rospy.Publisher(param["topic_cmd"], Twist, queue_size=10)
-          self.odom = rospy.Subscriber(param["topic_odom"], Odometry, self.odom_callback, queue_size=10)
-          self.scan = rospy.Subscriber(param["topic_scan"], LaserScan, self.scan_callback)
+          self.pub_cmd_vel = rospy.Publisher(self.cmd, Twist, queue_size=10)
+          self.odom = rospy.Subscriber(self.odom, Odometry, self.odom_callback, queue_size=10)
+          self.scan = rospy.Subscriber(self.scan, LaserScan, self.scan_callback)
 
           # ROS services 
           self.reset = rospy.ServiceProxy('gazebo/reset_world', Empty)
@@ -60,8 +67,13 @@ class Env():
           self.set_state = rospy.Publisher("gazebo/set_model_state", ModelState, queue_size=10)
           self.set_light_properties = rospy.ServiceProxy("/gazebo/set_light_properties", SetLightProperties)
 
+          self.gaps = [[-1.4500000476837158, -1.4500000476837158 + np.pi / self.environment_dim]]
+          for m in range(self.environment_dim - 1):
+               self.gaps.append(
+               [    self.gaps[m][1], self.gaps[m][1] + np.pi / self.environment_dim]
+               )
+          self.gaps[-1][-1] += 0.019463086500763893
 
-          self.gaps = self.useful.array_gaps(self.environment_dim)
           rospy.sleep(1)
 
      def odom_callback(self, msg):
@@ -82,10 +94,28 @@ class Env():
                scan (LaserScan): list of range measurements, one for each beam in the scan.
                scan_data (array): A list of range measurements.
           """
-          data = scan.ranges
-          #noisy_data = data + np.random.normal(0, self.noise_sigma, data.shape)
-          self.scan_data = self.useful.scan_rang(self.environment_dim, self.gaps, data)
-          #self.data = self.useful.range(scan)
+          #scan_range = []
+          #for i in range(len(scan.ranges)):
+          #     if scan.ranges[i] == float('Inf'):
+          #          scan_range.append(self.max_range)
+          #     elif np.isnan(scan.ranges[i]):
+          #          scan_range.append(0)
+          #     else:
+          #          scan_range.append(scan.ranges[i])
+      
+          #self.scan_data = np.array(scan_range)
+
+          ranges = np.array(scan.ranges)
+          self.scan_data = np.ones(self.environment_dim) * 10
+          for i in range(len(ranges)):
+               if not np.isnan(ranges[i]) and scan.range_min <= ranges[i] <= scan.range_max:
+                    dist = ranges[i]
+                    angle = scan.angle_min + i * scan.angle_increment
+
+                    for j in range(len(self.gaps)):
+                         if self.gaps[j][0] <= angle < self.gaps[j][1]:
+                              self.scan_data[j] = min(self.scan_data[j], dist)
+                              break
 
      def step_env(self, action):
           """
@@ -125,26 +155,30 @@ class Env():
 
                self.pause()
                
-               rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
+               #rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
           except:
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
           # ================== READ SCAN DATA ================== #
-          
-          done, collision, min_laser = self.useful.observe_collision(self.scan_data, self.collision_dist)
+
+          min_laser = min(self.scan_data)
+          if min_laser < self.collision_dist:
+               done, collision, min_laser = True, True, min_laser
+          else:
+               done, collision, min_laser = False, False, min_laser
 
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
 
                # add noise to the laser data
-               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               state_laser = [list(noisy_state)]
+               #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               state_laser = [v_state]
 
                rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
-               rospy.logerr('Read Scan Data              => Error reading scan data')
+               rospy.logfatal('Read Scan Data              => Error reading scan data')
                done = False
                collision = False
                min_laser = 0.0
@@ -155,15 +189,14 @@ class Env():
                self.odom_x = self.last_odom.position.x
                self.odom_y = self.last_odom.position.y
 
-               quaternion = (
+               quaternion = Quaternion(
                     self.last_odom.orientation.x,
                     self.last_odom.orientation.y,
                     self.last_odom.orientation.z,
                     self.last_odom.orientation.w
                )
-               euler = tf.transformations.euler_from_quaternion(quaternion)
-               yaw = euler[2]
-               angle = math.degrees(yaw)
+               euler = quaternion.to_euler(degrees=False)
+               angle = round(euler[2], 4)
 
                rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
@@ -172,35 +205,78 @@ class Env():
                self.odom_x = 0.0
                self.odom_y = 0.0
                angle = 0.0
-     
+
           # ================== CALCULATE DISTANCE AND THETA ================== #
           # Calculate distance to the goal from the robot
-          distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
-          # Calculate the relative angle between the robots heading and heading toward the goal
-          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
+          distance = np.linalg.norm([self.odom_x - self.goal_x, self.odom_y - self.goal_y])
 
-          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          # Calculate the relative angle between the robots heading and heading toward the goal
+          skew_x = self.goal_x - self.odom_x
+          skew_y = self.goal_y - self.odom_y
+          dot = skew_x * 1 + skew_y * 0
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
+          if skew_y < 0:
+               if skew_x < 0:
+                    beta = -beta
+               else:
+                    beta = 0 - beta
+          theta = beta - angle
+          if theta > np.pi:
+               theta = np.pi - theta
+               theta = -np.pi - theta
+          if theta < -np.pi:
+               theta = -np.pi - theta
+               theta = np.pi - theta
+
+          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Distance Old: ' + str(self.distOld) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation
           orientation_diff = abs(angle - self.goal_orientation)
 
-          rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
+          #rospy.loginfo('Orientation Goal             => Orientation Diff: ' + str(orientation_diff))
+          # verificar se o robo fico preso em algum lugar
+          if self.odom_x == self.last_odom_x and self.odom_y == self.last_odom_y:
+               done = True
 
           # ================== CALCULATE DISTANCE AND ANGLE ================== #
           # Detect if the goal has been reached and give a large positive reward
-          if distance < self.goal_reached_dist and orientation_diff < self.orientation_threshold:
+          if distance < self.goal_reached_dist: # and orientation_diff < self.orientation_threshold:
                target = True
                done = True
           
           rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
 
           # ================== SET STATE ================== #
+
+          reward = 0.0
           robot_state = [distance, theta, action[0], action[1]]
           state = np.append(state_laser, robot_state)
-          reward = self.useful.get_reward(target, collision, action, min_laser)
+          
+          if target:
+               reward =  100.0
+          elif collision:
+               reward = -100.0
+          else:
+               #r2 = self.distOld - distance * 10
+               #print("")
+               #r3 = lambda x: 1 - x if x < 1 else 0.0
+               #print('r3: ', ((action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2) * 5))
+               #reward = (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
+
+               r3 = lambda x: 1 - x if x < 1 else 0.0
+               reward = (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
 
           rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
+
+          self.last_odom_x, self.last_odom_y = self.odom_x, self.odom_y
+          self.distOld = distance
+
           return state, reward, done, target
 
      def reset_env(self):
@@ -230,38 +306,33 @@ class Env():
           try:
                self.goal_orientation = np.random.uniform(-np.pi, np.pi)
 
-               rospy.loginfo('Set Random Angle Target      => Angle: ' + str(self.goal_orientation))
+               #rospy.loginfo('Set Random Angle Target      => Angle: ' + str(self.goal_orientation))
           
           except:
                rospy.logerr('Set Random Orientation      => Error setting random orientation')
                self.goal_orientation = 0.0
 
           # ================== SET RANDOM POSITION ================== #
-          
-          path = self.goals
-          x, y = 0.0, 0.0
 
-          while True:
-               x, y = self.useful.random_goal(path)
-               _x, _y = self.useful.change_goal(path)
-               check = self.useful.check_pose(x, y, _x, _y)
-               if check == True:
-                    break
-                    
-          rospy.loginfo('Set Random Position          => Goal: (' + str(x) + ', ' + str(y) + ') Robot: (' + str(self.odom_x) + ', ' + str(self.odom_y) + ')')
+          time.sleep(self.time_delta)
+
+          goal, robot = self.select_poses(self.goals)
+
+          rospy.loginfo('Set Random Position          => Goal: (' + str(goal[0]) + ', ' + str(goal[1]) + ') Robot: (' + str(robot[0]) + ', ' + str(robot[1]) + ')')
 
           # ================== SET RANDOM ROBOT MODEL ================== #
           try:
                set_robot = ModelState()
                set_robot.model_name = self.robot
-               set_robot.pose.position.x = x
-               set_robot.pose.position.y = y
+               set_robot.pose.position.x = robot[0]
+               set_robot.pose.position.y = robot[1]
                set_robot.pose.position.z = 0.0
                set_robot.pose.orientation.x = quaternion.x
                set_robot.pose.orientation.y = quaternion.y
                set_robot.pose.orientation.z = quaternion.z
                set_robot.pose.orientation.w = quaternion.w
                self.set_state.publish(set_robot)
+               self.odom_x, self.odom_y = robot[0], robot[1]
           
           except:
                rospy.logerr('Set Random Robot Model       => Error setting random robot model')
@@ -271,19 +342,43 @@ class Env():
           # ================== SET RANDOM GOAL MODEL ================== #
           try:
                set_target = ModelState()
-               set_target.model_name = "target"
-               set_target.pose.position.x = _x
-               set_target.pose.position.y = _y
+               set_target.model_name = 'target'
+               set_target.pose.position.x = goal[0]
+               set_target.pose.position.y = goal[1]
                set_target.pose.position.z = 0.0
                set_target.pose.orientation.x = 0.0
                set_target.pose.orientation.y = 0.0
                set_target.pose.orientation.z = 0.0
                set_target.pose.orientation.w = 1.0
                self.set_state.publish(set_target)
-               self.goal_x, self.goal_y = _x, _y
+               self.goal_x, self.goal_y = goal[0], goal[1]
           
           except:
                rospy.logerr('Set Random Goal Model       => Error setting random goal model')
+          
+          time.sleep(self.time_delta)
+
+          # ================== SET RANDOM OBJECT MODEL ================== #
+          names = ['cube', 'cylinder', 'sphere', 'cubeA', 'cylinderA', 'sphereA', 'cubeB', 'cylinderB', 'sphereB', 'cubeC', 'cylinderC', 'sphereC', 'cubeD', 'cylinderD', 'sphereD']
+
+          # Shuffle the list of poses
+          np.random.shuffle(self.objects)
+
+          try:
+               for name, pose in zip(names, self.objects):
+                    # Create a new ModelState message
+                    set_objects = ModelState()
+                    set_objects.model_name = name
+                    set_objects.pose.position.x = pose[0]
+                    set_objects.pose.position.y = pose[1]
+                    set_objects.pose.orientation.x = quaternion.x
+                    set_objects.pose.orientation.y = quaternion.y
+                    set_objects.pose.orientation.z = quaternion.z
+                    set_objects.pose.orientation.w = quaternion.w
+                    self.set_state.publish(set_objects)
+               
+          except:
+               rospy.logerr('Set Random Object Model       => Error setting random object model')
 
           # ================== UNPAUSE SIMULATION ================== #
           rospy.wait_for_service("/gazebo/unpause_physics")
@@ -296,7 +391,7 @@ class Env():
 
                self.pause()
                
-               rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
+               #rospy.loginfo('Unpause Simulation           => Unpause simulation ...')
           except:
                rospy.logerr('Unpause Simulation          => Error unpause simulation')
 
@@ -304,24 +399,47 @@ class Env():
           try:
                v_state = []
                v_state[:] = self.scan_data[:]
-               
+
                # add noise to the laser data
-               noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
-               state_laser = [list(noisy_state)]
+               #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
+               state_laser = [v_state] #list(noisy_state)
 
                rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:
                rospy.logerr('Get state scan              => Error getting state scan')
+               state_laser = np.random.uniform(0, self.max_range, self.environment_dim)
 
           # ==================CALCULATE DISTANCE AND ANGLE ================== #
           # Calculate distance to the goal from the robot
-          distance = self.useful.distance_to_goal(self.odom_x, self.goal_x, self.odom_y, self.goal_y)
+          distance = np.linalg.norm([self.odom_x - self.goal_x, self.odom_y - self.goal_y])
+
           # Calculate the relative angle between the robots heading and heading toward the goal
-          theta = self.useful.angles(self.odom_x, self.goal_x, self.odom_y, self.goal_y, angle)
+          skew_x = self.goal_x - self.odom_x
+          skew_y = self.goal_y - self.odom_y
+          dot = skew_x * 1 + skew_y * 0
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
+
+          if skew_y < 0:
+               if skew_x < 0:
+                    beta = -beta
+               else:
+                    beta = 0 - beta
+          theta = beta - angle
+
+          if theta > np.pi:
+               theta = np.pi - theta
+               theta = -np.pi - theta
+          if theta < -np.pi:
+               theta = -np.pi - theta
+               theta = np.pi - theta
 
           rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
-          print('========================================================================================================================')
-          #self.useful.randomize_objects()
+          #print('========================================================================================================================')
 
           # ================== CREATE STATE ARRAY ================== #
           robot_state = [distance, theta, 0.0, 0.0]
@@ -329,3 +447,24 @@ class Env():
 
           # ================== RETURN STATE ================== #
           return np.array(state)
+     
+     # ==== Random Functions ==== #
+     def select_poses(self, poses):
+          """Select two random poses from the list of poses."""
+
+          if len(poses) < 2:
+               raise ValueError("The 'poses' list must have at least two elements")
+
+          index_robot = int(round(np.random.uniform(0, len(poses))))
+          index_target = int(round(np.random.uniform(0, len(poses))))
+
+          # Make sure that the robot and target are not the same
+          while index_robot == index_target:
+               index_target = int(round(np.random.uniform(0, len(poses))))
+
+          # Make sure that the robot and target are not too close to each other
+          while index_robot >= len(poses) or index_target >= len(poses):
+               index_robot = int(round(np.random.uniform(0, len(poses))))
+               index_target = int(round(np.random.uniform(0, len(poses))))
+
+          return poses[index_robot], poses[index_target]

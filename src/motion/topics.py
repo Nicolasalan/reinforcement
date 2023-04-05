@@ -12,11 +12,11 @@ class Mensage():
           self.CONFIG_PATH = CONFIG_PATH
           param = self.load_config("config.yaml")
 
-          self.vel_publisher = rospy.Publisher(param["topic_cmd"], Twist, queue_size=1)
+          self.cmd = param["TOPIC_CMD"]
+          self.vel_publisher = rospy.Publisher(self.cmd, Twist, queue_size=1)
           self.cmd_vel = Twist()
           self.ctrl_c = False
           self.rate = rospy.Rate(1)
-          self.cmd = param["topic_cmd"]
 
      def publish_cmd_vel(self): 
           """Publishes a command velocity message to control the robot's movement."""

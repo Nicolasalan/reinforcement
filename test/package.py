@@ -113,19 +113,31 @@ class TestPackage(unittest.TestCase):
           try:
                import psutil
           except ImportError:
-               self.fail("Could not import psutil")  
-
-     def test_tensorboard_import(self):
-          try:
-               from torch.utils.tensorboard import SummaryWriter
-          except ImportError:
-               self.fail("Could not import tensorboard")  
+               self.fail("Could not import psutil")   
 
      def test_time_import(self):
           try:
                import time
           except ImportError:
                self.fail("Could not import time") 
+
+     def test_opencv_import(self):
+          try:
+               import cv2
+          except ImportError:
+               self.fail("Could not import cv2") 
+
+     def test_trimesh_import(self):
+          try:
+               import trimesh
+          except ImportError:
+               self.fail("Could not import trimesh") 
+
+     def test_OccupancyGrid_import(self):
+          try:
+               from nav_msgs.msg import OccupancyGrid
+          except ImportError:
+               self.fail("Could not import OccupancyGrid")
 
 if __name__ == '__main__':
     rosunit.unitrun(PKG, NAME, TestPackage)
