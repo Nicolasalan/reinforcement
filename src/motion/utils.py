@@ -56,7 +56,7 @@ class Extension():
           goals = []
           list = []
 
-          with open('/home/robofei/ws/src/motion/config/pose/' + path_waypoints) as f:
+          with open('/home/robofei/ws/src/vault/config/pose/' + path_waypoints) as f:
                data = yaml.safe_load(f)
                for i in data:
                     list.append(i['position'])
@@ -119,7 +119,7 @@ class Extension():
           rospy.is_shutdown()
 
      def load_config(self, config_name):
-          with open(os.path.join('/home/robofei/ws/src/motion/config/config.yaml')) as file:
+          with open(os.path.join('/home/robofei/ws/src/vault/config/config.yaml')) as file:
                param = yaml.safe_load(file)
 
           return param
@@ -170,23 +170,23 @@ class Extension():
           if result == None:
                result = 0
           if type == "reward":
-               file = open('/home/robofei/ws/src/motion/src/motion/run/' + 'Reward.txt', 'a')
+               file = open('/home/robofei/ws/src/vault/src/vault/run/' + 'Reward.txt', 'a')
                file.write("%f\n" % (np.mean(result)))
 
           if type == "loss":
-               file = open('/home/robofei/ws/src/motion/src/motion/run/' + 'Loss.txt', 'a')
+               file = open('/home/robofei/ws/src/vault/src/vault/run/' + 'Loss.txt', 'a')
                file.write("%f\n" % (result.item()))
 
           if type == "Av":
-               file = open('/home/robofei/ws/src/motion/src/motion/run/' + 'AvQ.txt', 'a')
+               file = open('/home/robofei/ws/src/vault/src/vault/run/' + 'AvQ.txt', 'a')
                file.write("%f\n" % (result.item()))
           
           if type == "Max":
-               file = open('/home/robofei/ws/src/motion/src/motion/run/' + 'MaxQ.txt', 'a')
+               file = open('/home/robofei/ws/src/vault/src/vault/run/' + 'MaxQ.txt', 'a')
                file.write("%f\n" % (result.item()))
           
           if type == "episode":
-               file = open('/home/robofei/ws/src/motion/src/motion/run/' + 'Episode.txt', 'a')
+               file = open('/home/robofei/ws/src/vault/src/vault/run/' + 'Episode.txt', 'a')
                file.write("%f\n" % int((result)))
 
      def evaluate(self, agent, env, epoch, eval_episodes=10):

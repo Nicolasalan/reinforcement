@@ -252,7 +252,7 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     #count = len('/home/robofei/ws/src/motion/config/pose//poses.yaml"))
+     #count = len('/home/robofei/ws/src/vault/config/pose//poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 

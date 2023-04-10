@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from motion.topics import Mensage
+from vault.topics import Mensage
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
@@ -11,7 +11,7 @@ import time
 
 import os
 
-PKG = 'motion'
+PKG = 'vault'
 NAME = 'ros'
 
 print("\033[92mROS Unit Tests\033[0m")

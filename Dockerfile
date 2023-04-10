@@ -74,7 +74,7 @@ RUN mkdir -p /ws/src \
  && git clone -b main https://github.com/dheera/rosboard.git
 
 # Copy the source files
-COPY . /ws/src/motion
+COPY . /ws/src/vault
 
 # Set the working directory
 WORKDIR /ws
@@ -89,7 +89,7 @@ RUN cd /ws \
 RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc 
 
 # Install python dependencies
-RUN cd /ws/src/motion && pip3 install -r requirements.txt
+RUN cd /ws/src/vault && pip3 install -r requirements.txt
 
 # Remove display warnings
 RUN mkdir /tmp/runtime-root
@@ -97,4 +97,4 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
 # command to run on container start
-ENTRYPOINT [ "/ws/src/motion/entrypoint.sh" ]
+ENTRYPOINT [ "/ws/src/vault/entrypoint.sh" ]

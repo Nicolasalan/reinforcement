@@ -17,12 +17,12 @@ RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
 MAX_RANGE: 10.0                   # max range of the laser scan
 
 # ==== Path to the model and config ==== #
-MODEL_PATH: '/ws/src/motion/models/'         # default: 'models/'
-CONFIG_PATH: '/ws/src/motion/config/'        # default: 'config/'
-RESULTS: '/ws/src/motion/src/motion/run/'    # default: 'results/'
+MODEL_PATH: '/ws/src/vault/models/'         # default: 'models/'
+CONFIG_PATH: '/ws/src/vault/config/'        # default: 'config/'
+RESULTS: '/ws/src/vault/src/vault/run/'    # default: 'results/'
 
 # ==== Path Weights pre-trained ==== #
-MODEL: '/home/robofei/ws/src/motion/src/motion/checkpoints/' # default: 'checkpoints/'
+MODEL: '/home/robofei/ws/src/vault/src/vault/checkpoints/' # default: 'checkpoints/'
 
 # ==== Parameters Training ==== #
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model

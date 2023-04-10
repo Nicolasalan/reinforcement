@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(motion)
+project(vault)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy

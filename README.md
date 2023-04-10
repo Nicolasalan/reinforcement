@@ -71,13 +71,13 @@ Clone the repository and run the following commands:
 ```bash
 mkdir <your_workspace>/src
 cd <your_workspace>/src
-git clone https://github.com/Nicolasalan/motion.git
+git clone https://github.com/Nicolasalan/vault.git
 ```
 
 Build the image Dockerfile:
 
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make build
 ```
   > **Warning** :
@@ -86,20 +86,20 @@ make build
 ***(Optional)*** Install weights for the model:
 
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make install
 ```
   > **Note** :
-  > The weights will be saved in the checkpoint folder under `src/motion/checkpoints`.
+  > The weights will be saved in the checkpoint folder under `src/vault/checkpoints`.
 
 Set the waypoints and cry the world:
   
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make waypoint
 ```
   > **Note** :
-  > The world will be saved in the `src/motion/models/map/map.dae` file.
+  > The world will be saved in the `src/vault/models/map/map.dae` file.
 
 <div align="center">
      <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="750px">
@@ -116,7 +116,7 @@ To make waypoints easier to read and maintain, it is recommended to separate the
 
 To verify that everything is working correctly, run the unit tests.
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make setup # no visualization
 ```
 In the second terminal, start the tests.
@@ -164,21 +164,21 @@ For training, the robot Hera from the [RoboFEI At Home](https://github.com/robof
 
 To start the Gazebo sandbox, you need to start the world first and then the robot. Afterwards, you can spawn the target in the world to complete the simulation.
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make spawn
 ```
 
 To start training:
 
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make start # or make start-gpu
 ```
 
 To view agent results
 
 ```bash
-cd <your_workspace>/src/motion
+cd <your_workspace>/src/vault
 make tensorboard
 ```
 
@@ -202,7 +202,7 @@ The agent has limitations in its navigation capacity, being effective only in st
 │   └── map/           # [dir] Map files
 ├── launch/            # [dir] Launch files 
 ├── models/            # [dir] Model SDF files
-├── src/motion/        # [dir] Source code
+├── src/vault/        # [dir] Source code
 │   ├── checkpoints/   # [dir] Pre-trained weights for the agent
 │   └── run/           # [dir] Logs and results of the agent
 ├── test/              # [dir] Unit tests 
