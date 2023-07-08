@@ -22,7 +22,7 @@ CONFIG_PATH: '/ws/src/vault/config/'        # default: 'config/'
 RESULTS: '/ws/src/vault/src/vault/run/'    # default: 'results/'
 
 # ==== Path Weights pre-trained ==== #
-MODEL: '/home/robofei/ws/src/vault/src/vault/checkpoints/' # default: 'checkpoints/'
+MODEL: '/ws/src/vault/src/vault/checkpoints/' # default: 'checkpoints/'
 
 # ==== Parameters Training ==== #
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model

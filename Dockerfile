@@ -1,12 +1,9 @@
-# ROS Noetic
+# Image ROS Noetic
 FROM osrf/ros:noetic-desktop-full
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y locales lsb-release
-RUN dpkg-reconfigure locales
 
-RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 # Change the default shell to Bash
 SHELL [ "/bin/bash" , "-c" ]
 
@@ -52,7 +49,7 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-gazebo-ros-pkgs
 
 # install pytorch
-RUN pip install torch
+RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \

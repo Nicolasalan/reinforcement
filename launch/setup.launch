@@ -2,7 +2,7 @@
 
   <!-- mapping -->
   <node name="map_server" pkg="map_server" type="map_server" output="screen"
-    args="/home/robofei/ws/src/aws-robomaker-bookstore-world/maps/map.yaml">
+    args="/ws/src/aws-robomaker-bookstore-world/maps/map.yaml">
   </node>
 
   <!-- setup -->
