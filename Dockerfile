@@ -1,22 +1,12 @@
-# Ubuntu 20.04 image with NVIDIA CUDA + OpenGL and ROS Noetic
-FROM nvidia/cuda:11.8.0-base-ubuntu20.04 
+# ROS Noetic
+FROM osrf/ros:noetic-desktop-full
 
 # Install basic apt packages
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y locales lsb-release
 RUN dpkg-reconfigure locales
 
-# Install ROS Noetic
-RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-RUN apt-get update \
- && apt-get install -y --no-install-recommends ros-noetic-ros-base
-RUN apt-get install -y --no-install-recommends python3-rosdep
-RUN rosdep init \
- && rosdep fix-permissions \
- && rosdep update
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
-
 # Change the default shell to Bash
 SHELL [ "/bin/bash" , "-c" ]
 
