@@ -10,8 +10,8 @@ jobs:
   Checkout:
     runs-on: ubuntu-latest
     steps:
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Checkout submodules
         run: git submodule update --init --recursive
   
