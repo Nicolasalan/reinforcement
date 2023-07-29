@@ -44,6 +44,10 @@ help:
 	@echo '  start-gpu					--Start Training GPU'
 	@echo '  waypoint					--Setup Waypoint'
 
+#########################################################################################################################
+################################################ INSTALL ################################################################
+#########################################################################################################################
+
 # === Build docker ===
 .PHONY: build
 build:
@@ -62,11 +66,34 @@ npm:
 	@sudo npm install -g npm@latest
 	@sudo npm install -g vitepress
 
+# === Install Weights ===
+.PHONY: weights
+weights:
+	@echo "Install Weights ..."
+	@cd ${PWD}/src/vault/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
+
+# === Setup Waypoint ===
+.PHONY: waypoint
+waypoint:
+	@echo "Setup Waypoint and Create Env..."
+	@sudo xhost + 
+	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roslaunch vault setup.launch map_file:=/ws/src/vault/config/map/map.yaml"
+
+########################################################################################################################
+################################################ USAGE #################################################################
+########################################################################################################################
+
 # === Clean docker ===
 .PHONY: clean
 clean:
 	@echo "Closing all running docker containers ..."
 	@sudo docker system prune -f
+
+# === setup model ===
+.PHONY: setup
+setup:
+	@echo "Setup world ..."
+	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roslaunch vault bringup.launch"
 
 # === Run terminal docker ===
 .PHONY: terminal
@@ -74,12 +101,6 @@ terminal:
 	@echo "Terminal docker ..."
 	@sudo xhost + 
 	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash
-
-# === setup model ===
-.PHONY: setup
-setup:
-	@echo "Setup world ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roslaunch vault bringup.launch"
 
 # === setup view ===
 .PHONY: view 
@@ -94,11 +115,27 @@ start:
 	@echo "Starting training ..."
 	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g vault-docker bash -c "source devel/setup.bash && roslaunch vault start.launch"
 
+# === Start All Training ===
+.PHONY: start-all
+start-all:
+	@echo "Starting training All ..."
+	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch vault start.launch"
+
+# === Start Training GPU ===
+.PHONY: start-gpu
+start-gpu:
+	@echo "Starting training in GPU ..."
+	@sudo docker run -it --net=host --gpus all ${DOCKER_GPU} ${DOCKER_ARGS} vault-docker bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch vault start.launch"
+
+########################################################################################################################
+################################################ TESTS #################################################################
+########################################################################################################################
+
 # === Test functions ===
-.PHONY: functions
-functions:
+.PHONY: func
+func:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roscd vault && python3 test/functions.py"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roscd vault && python3 test/func.py"
 
 # === Test ROS ===
 .PHONY: ros
@@ -123,46 +160,3 @@ package:
 integration:
 	@echo "Testing ..."
 	@docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roscd vault && python3 test/ros.py && python3 test/functions.py && python3 test/package.py && python3 test/sim.py"
-
-# === Tensorboard ===
-.PHONY: tensorboard
-tensorboard:
-	@echo "tensorboard ..."
-	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} vault-docker bash -c "cd /ws/src/vault/src/vault && tensorboard --logdir=run/"
-
-# === Install Weights ===
-.PHONY: install
-install:
-	@echo "Install Weights ..."
-	@cd ${PWD}/src/vault/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
-
-# === Start All Training ===
-.PHONY: start-all
-start-all:
-	@echo "Starting training All ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch vault start.launch"
-
-# === Start Training Server ===
-.PHONY: server
-server:
-	@echo "Starting training in Server..."
-	@sudo docker run -it ${DOCKER_ARGS} vault-docker bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch vault start.launch"
-
-# === Start Training GPU ===
-.PHONY: start-gpu
-start-gpu:
-	@echo "Starting training in GPU ..."
-	@sudo docker run -it --net=host --gpus all ${DOCKER_GPU} ${DOCKER_ARGS} vault-docker bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch vault start.launch"
-
-# === Setup Waypoint ===
-.PHONY: waypoint
-waypoint:
-	@echo "Setup Waypoint and Create Env..."
-	@sudo xhost + 
-	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roslaunch vault setup.launch map_file:=/ws/src/vault/config/map/map.yaml"
-
-# === Start Rosboard ===
-.PHONY: rosboard
-rosboard:
-	@echo "Starting rosboard ..."
-	@sudo docker run -it --net=host -p 8888:8888 ${DOCKER_ARGS} vault-docker bash -c "source /opt/ros/noetic/setup.bash && ./ws/src/rosboard/run"
