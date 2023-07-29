@@ -1,8 +1,11 @@
 <launch>
 
+  <!-- Definir a variável do caminho do mapa -->
+  <arg name="map_file" default="$(find vault)/config/map/map.yaml" />
+
   <!-- mapping -->
   <node name="map_server" pkg="map_server" type="map_server" output="screen"
-    args="/ws/src/aws-robomaker-bookstore-world/maps/map.yaml">
+    args="$(arg map_file)">
   </node>
 
   <!-- setup -->
