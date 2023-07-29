@@ -53,6 +53,15 @@ build:
 	@sudo mkdir -p ${PWD}/src/vault/run
 	@sudo mkdir -p ${PWD}/config/map
 
+.PHONY: npm
+npm:
+	@echo "Installing npm ..."
+	@sudo install npm
+	@sudo npm install -g n
+	@sudo n stable
+	@sudo npm install -g npm@latest
+	@sudo npm install -g vitepress
+
 # === Clean docker ===
 .PHONY: clean
 clean:
