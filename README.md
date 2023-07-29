@@ -22,7 +22,14 @@
   <a href="https://developer.nvidia.com/cuda-downloads">
     <img src="https://img.shields.io/badge/Cuda-v11.8-red" alt="Cuda">
   </a>
+  <a href="https://github.com/psf/black">
+    <img src="https://img.shields.io/badge/Code%20Style-Black-000000.svg" alt="Black">
+  </a>
+  <a href="https://github.com/Nicolasalan/vault/actions">
+    <img src="https://img.shields.io/badge/CI-Build%20Passing-brightgreen" alt="CI">
+  </a>
 </p>
+
 
 This repository contains training neural networks for learning path planning using reinforcement learning, specifically [Deep Deterministic Policy Gradient](https://spinningup.openai.com/en/latest/algorithms/ddpg.html#id1) (DDPG) and its variance [Twin Delayed DDPG](https://spinningup.openai.com/en/latest/algorithms/td3.html#id1) (TD3).
 
