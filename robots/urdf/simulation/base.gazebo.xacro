@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="gazebo_base" params="reference update_rate">
+
+      <gazebo>
+        <plugin name="${reference}_controller" filename="libgazebo_ros_planar_move.so">
+          <robotNamespace>/</robotNamespace>
+          <commandTopic>cmd_vel</commandTopic>
+          <odometryTopic>odom</odometryTopic>
+          <odometryFrame>odom</odometryFrame>
+          <odometryRate>${update_rate}</odometryRate>
+          <cmdTimeout>-1</cmdTimeout>
+          <robotBaseFrame>${reference}_footprint</robotBaseFrame>
+        </plugin>
+      </gazebo>
+
+    </xacro:macro>
+  </robot>

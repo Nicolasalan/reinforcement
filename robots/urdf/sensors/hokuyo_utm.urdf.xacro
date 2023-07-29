@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="hokuyo_utm_mass"   value="0.01"/>
+  <xacro:property name="hokuyo_utm_size_x" value="0.06"/>
+  <xacro:property name="hokuyo_utm_size_y" value="0.06"/>
+  <xacro:property name="hokuyo_utm_size_z" value="0.09"/>
+
+  <xacro:macro name="hokuyo_utm" params="name parent *origin">
+
+    <link name="${name}" type="laser">
+      <xacro:create_box
+        m="${hokuyo_utm_mass}"
+        x="${hokuyo_utm_size_x}"
+        y="${hokuyo_utm_size_y}"
+        z="${hokuyo_utm_size_z}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:create_box>
+      <visual>
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+        <geometry>
+          <mesh filename="package://vault/robots/meshes/hokuyo_utm.stl"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${name}_hokuyo_utm_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+    </joint>
+
+  </xacro:macro>
+</robot>

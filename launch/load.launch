@@ -1,25 +1,35 @@
+<?xml version="1.0"?>
 <launch>
 
-<!--######################## argument list #################################-->
+  <arg name="robot_name" 	default="robot"/>
+  <arg name="init_pos_x" 	default="0.0"/>
+  <arg name="init_pos_y" 	default="0.0"/>
+  <arg name="init_pos_z" 	default="0.0"/>
+  <arg name="init_yaw"   	default="0.0"/>
 
-  <arg name="robot_name" default="woody"/>
-  <arg name="x"           default="3"/>
-  <arg name="y"           default="1"/>
-  <arg name="yaw"         default="4"/>
+  <arg name="use_jsp_gui" default="false"/>
 
-<!--#################### generate urdf from xacro  ########################-->
-
+  <!-- load robot_description -->
   <param name="robot_description"
-    command="$(find xacro)/xacro $(find robot_description)/robots/$(arg robot_name).urdf.xacro" />
+    command="$(find xacro)/xacro $(find vault)/robots/robot/hera_base.urdf.xacro"/>
 
-<!--#################### simulation #######################################-->
+  <!-- publishers -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <group if="$(arg use_jsp_gui)" >
+    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  </group>
+  <group unless="$(arg use_jsp_gui)" >
 
+  </group>
+
+  <!-- spawn simulated robot -->
   <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
 	args="-param robot_description
 	      -urdf
-	      -x $(arg x)
-	      -y $(arg y)
-	      -Y $(arg yaw)
+	      -x $(arg init_pos_x)
+	      -y $(arg init_pos_y)
+	      -z $(arg init_pos_z)
+	      -Y $(arg init_yaw)
 	      -model $(arg robot_name)">
   </node>
 

@@ -56,9 +56,8 @@ RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace \
- && git clone -b master https://github.com/Home-Environment-Robot-Assistant/hera_description.git \
  && git clone -b master https://github.com/Nicolasalan/waypoint_navigation_plugin.git \
- && git clone -b main https://github.com/dheera/rosboard.git
+ && git clone -b main https://github.com/dheera/rosboard.git 
 
 # Copy the source files
 COPY . /ws/src/vault

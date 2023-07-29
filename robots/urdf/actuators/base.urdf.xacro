@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<robot xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="base_mass"      value="99.0"/>
+  <xacro:property name="base_size_x"    value="0.50"/>
+  <xacro:property name="base_size_y"    value="0.30"/>
+  <xacro:property name="base_size_z"    value="0.07"/>
+
+  <xacro:property name="wheel_mass"     value="2.50"/>
+  <xacro:property name="wheel_radius"   value="0.10"/>
+  <xacro:property name="wheel_length"   value="0.07"/>
+  <xacro:property name="wheel_gap"      value="0.02"/>
+
+  <xacro:property name="wheel_effort"   value="30.0" />
+  <xacro:property name="wheel_velocity" value="0.50" />
+
+  <xacro:macro name="wheel" params="name parent *origin *visual">
+    <link name="${name}">
+      <xacro:create_cylinder m="${wheel_mass}" r="${wheel_radius}" l="${wheel_length}">
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0"/>
+      </xacro:create_cylinder>
+      <xacro:insert_block name="visual"/>
+
+      <!-- wheel suport: used to reduce wheel contact in the floor -->
+      <xacro:create_sphere m="${0.001}" r="${0.005}">
+        <origin xyz="0 0 -${wheel_radius}" rpy="0 0 0"/>
+      </xacro:create_sphere>
+      <!-- wheel suport -->
+
+    </link>
+    <!-- should be continuous. Change if you do not use wheel support -->
+    <joint name="joint_${parent}_to_${name}" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}"/>
+      <child link="${name}"/>
+
+    </joint>
+
+  </xacro:macro>
+
+  <xacro:macro name="base" params="name">
+
+    <!-- footprint -->
+    <link name='${name}_footprint'/>
+    <joint name="joint_${name}_footprint_to_${name}" type="fixed">
+      <origin xyz="0 0 ${wheel_radius}"/>
+      <parent link="${name}_footprint"/>
+      <child link="${name}"/>
+    </joint>
+
+    <!-- base -->
+    <link name="${name}">
+      <xacro:create_box m="${base_mass}" x="${base_size_x}" y="${base_size_y}" z="${base_size_z}">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </xacro:create_box>
+      <visual >
+        <material name="black"/>
+        <geometry>
+          <mesh filename="package://vault/robots/meshes/base.stl"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- front right wheel -->
+    <xacro:wheel name="${name}_wheelFR" parent="${name}">
+      <origin
+        xyz="${0.4*base_size_x} -${base_size_y/2+wheel_length/2+wheel_gap} 0.0"
+        rpy="0 0 0" />
+      <visual>
+        <origin xyz="0 -0.045 0" rpy=" 0 0 -${M_PI/2}"/>
+        <material name="white"/>
+        <geometry>
+          <mesh filename="package://vault/robots/meshes/wheelF.stl"/>
+        </geometry>
+      </visual>
+    </xacro:wheel>
+
+    <!-- front left wheel -->
+    <xacro:wheel name="${name}_wheelFL" parent="${name}">
+      <origin
+        xyz="${0.4*base_size_x} ${base_size_y/2+wheel_length/2+wheel_gap} 0.0"
+        rpy="0 0 0" />
+      <visual>
+        <origin xyz="0 0.045 0" rpy=" 0 0 ${M_PI/2}"/>
+        <material name="white"/>
+        <geometry>
+          <mesh filename="package://vault/robots/meshes/wheelF.stl"/>
+        </geometry>
+      </visual>
+    </xacro:wheel>
+
+    <!-- back right wheel -->
+    <xacro:wheel name="${name}_wheelBR" parent="${name}">
+      <origin
+        xyz="-${0.4*base_size_x} -${base_size_y/2+wheel_length/2+wheel_gap} 0.0"
+        rpy="0 0 0"/>
+      <visual>
+        <origin xyz="0 -0.045 0" rpy="0 0 -${M_PI/2}"/>
+        <material name="white"/>
+        <geometry>
+          <mesh filename="package://vault/robots/meshes/wheelB.stl"/>
+        </geometry>
+      </visual>
+    </xacro:wheel>
+
+    <!-- back left wheel -->
+    <xacro:wheel name="${name}_wheelBL" parent="${name}">
+      <origin
+        xyz="-${0.4*base_size_x} ${base_size_y/2+wheel_length/2+wheel_gap} 0.0"
+        rpy="0 0 0"/>
+      <visual>
+        <origin xyz="0 0.045 0" rpy="0 0 ${M_PI/2}"/>
+        <material name="white"/>
+        <geometry>
+          <mesh filename="package://vault/robots/meshes/wheelB.stl"/>
+        </geometry>
+      </visual>
+    </xacro:wheel>
+
+  </xacro:macro>
+</robot>

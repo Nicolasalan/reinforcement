@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+
+<robot name="hera"
+       xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+       xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+       xmlns:xacro="http://ros.org/wiki/xacro" >
+
+  <!-- <xacro:arg name="prefix" default="" /> -->
+
+  <!-- ##################################################################### -->
+  <!-- ######################### includes ################################## -->
+  <!-- ##################################################################### -->
+
+  <!-- commons -->
+  <xacro:include filename="$(find vault)/robots/urdf/commons.urdf.xacro" />
+
+  <!-- actuators -->
+  <xacro:include filename="$(find vault)/robots/urdf/actuators/base.urdf.xacro" />
+
+  <!-- sensors -->
+  <xacro:include filename="$(find vault)/robots/urdf/sensors/hokuyo_utm.urdf.xacro"/>
+  <xacro:include filename="$(find vault)/robots/urdf/sensors/hokuyo_urg.urdf.xacro"/>
+
+  <!-- simulation -->
+  <xacro:include filename="$(find vault)/robots/urdf/simulation/control.gazebo.xacro" />
+  <xacro:include filename="$(find vault)/robots/urdf/simulation/base.gazebo.xacro"/>
+  <xacro:include filename="$(find vault)/robots/urdf/simulation/hokuyo_utm.gazebo.xacro" />
+  <xacro:include filename="$(find vault)/robots/urdf/simulation/hokuyo_urg.gazebo.xacro" />
+
+<!-- ####################################################################### -->
+<!-- ######################## robot parts ################################## -->
+<!-- ####################################################################### -->
+
+  <!-- base -->
+  <xacro:base
+    name="base"/>
+
+  <!-- base laser front -->
+  <xacro:hokuyo_utm
+    name="base_scan_front"
+    parent="base">
+    <origin xyz="0.3 0 0.01" rpy="0 0 0"/>
+  </xacro:hokuyo_utm>
+
+  <!-- base laser back -->
+  <xacro:hokuyo_urg
+    name="base_scan_back"
+    parent="base">
+    <origin xyz="-0.3 0 0.01" rpy="0 0 ${M_PI}"/>
+  </xacro:hokuyo_urg>
+
+
+<!-- ####################################################################### -->
+<!-- ####################### gazebo extensions ##############################-->
+<!-- ####################################################################### -->
+
+  <!-- base -->
+  <xacro:gazebo_base
+    reference="base"
+    update_rate="30"/>
+
+  <!-- hokuyo_utm -->
+  <xacro:gazebo_hokuyo_utm
+    reference="base_scan_front"
+    update_rate="10"
+    min_angle="-1.45"
+    max_angle="1.45"/>
+
+  <!-- hokuyo_urg -->
+  <xacro:gazebo_hokuyo_urg
+    reference="base_scan_back"
+    update_rate="10"
+    min_angle="-1.45"
+    max_angle="1.45" />
+
+</robot>
