@@ -1,0 +1,1 @@
+import{_ as e,o as t,c as o}from"./chunks/framework.adbdbaa5.js";const d=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"configs.md","filePath":"configs.md"}'),a={name:"configs.md"};function s(c,n,r,i,f,p){return t(),o("div")}const m=e(a,[["render",s]]);export{d as __pageData,m as default};
