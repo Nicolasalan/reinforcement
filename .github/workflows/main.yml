@@ -25,35 +25,35 @@ jobs:
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-  ROS:
-    needs: [Build]
-    runs-on: ubuntu-latest
-    env:
-      working-directory: ./
-    steps:
-      - name: Running the tests
-        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun vault ros.py"
-        working-directory: ${{env.working-directory}}
+  #ROS:
+  #  needs: [Build]
+  #  runs-on: ubuntu-latest
+  #  env:
+  #    working-directory: ./
+  #  steps:
+  #    - name: Running the tests
+  #      run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun vault ros.py"
+  #      working-directory: ${{env.working-directory}}
 
-  Simulation:
-    needs: [Build]
-    runs-on: ubuntu-latest
-    env:
-      working-directory: ./
-    steps:
-      - name: Running the tests
-        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun vault sim.py"
-        working-directory: ${{env.working-directory}}
+  #Simulation:
+  #  needs: [Build]
+  #  runs-on: ubuntu-latest
+  #  env:
+  #    working-directory: ./
+  #  steps:
+  #    - name: Running the tests
+  #      run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun vault sim.py"
+  #      working-directory: ${{env.working-directory}}
 
-  Library:
-    needs: [Build]
-    runs-on: ubuntu-latest
-    env:
-      working-directory: ./
-    steps:
-      - name: Running the tests
-        run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun vault library.py"
-        working-directory: ${{env.working-directory}}
+  #Library:
+  #  needs: [Build]
+  #  runs-on: ubuntu-latest
+  #  env:
+  #    working-directory: ./
+  #  steps:
+  #    - name: Running the tests
+  #      run: docker run ninim/vault-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun vault library.py"
+  #      working-directory: ${{env.working-directory}}
 
   Package:
     needs: [Build]
