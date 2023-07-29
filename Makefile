@@ -11,7 +11,7 @@ DOCKER_VOLUMES = \
 
 DOCKER_GPU = \
 	--gpus all \
-    	--env="NVIDIA_DRIVER_CAPABILITIES=all" \
+    --env="NVIDIA_DRIVER_CAPABILITIES=all" \
 	--env="NVIDIA_VISIBLE_DEVICES all" 
 	
 DOCKER_ARGS = ${DOCKER_VOLUMES} ${DOCKER_ENV_VARS}
@@ -150,7 +150,7 @@ start-gpu:
 waypoint:
 	@echo "Setup Waypoint and Create Env..."
 	@sudo xhost + 
-	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roslaunch vault setup.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} vault-docker bash -c "source devel/setup.bash && roslaunch vault setup.launch map_file:=/ws/src/vault/config/map/map.yaml"
 
 # === Start Rosboard ===
 .PHONY: rosboard
