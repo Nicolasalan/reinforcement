@@ -1,7 +1,0 @@
-unityagents
-tensorflow
-torch
-cupy-cuda102
-numpy
-matplotlib
-tqdm
