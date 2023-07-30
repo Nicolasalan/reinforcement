@@ -189,6 +189,9 @@ cd <your_workspace>/src/vault
 make tensorboard
 ```
 
+### Resources
+[![Google Colab](https://img.shields.io/badge/View%20on-Google%20Colab-orange?logo=google-colab&logoColor=white)](https://colab.research.google.com/drive/1krpIYujBNb15WwgcJ5dE4Pe7cr3xQyFa?usp=sharing) [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel&logoColor=white)](https://vault-chi.vercel.app/)
+
 ## Limitations
 
 <a name="Limitations"></a>
@@ -202,6 +205,10 @@ The agent has limitations in its navigation capacity, being effective only in st
 
 <a name="Directory-Structure"></a>
 
+<details>
+
+  <summary>The project is structured as follows:</summary>
+  
 ```
 .
 ├── .github/           # [dir] Github actions
@@ -224,3 +231,8 @@ The agent has limitations in its navigation capacity, being effective only in st
 ├── CMakeLists.txt     # [file] Colcon-enabled CMake recipe
 └── package.xml        # [file] ROS Noetic package metadata
 ```
+</details>
+
+## **Licença**
+
+This project is licensed under the MIT license - see archive [LICENSE](https://github.com/Nicolasalan/vault/blob/main/LICENSE.md) for details.
