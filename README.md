@@ -108,7 +108,7 @@ make waypoint
   > The world will be saved in the `src/vault/models/map/map.dae` file.
 
 <div align="center">
-     <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/img/3D.png" alt="Create World 3D" width="750px">
+     <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="750px">
 </div>
 
 For a better organization and structuring of the robot's movement planning, it is recommended to separate the waypoints into three distinct categories: targets, robot positions and object spawn.
