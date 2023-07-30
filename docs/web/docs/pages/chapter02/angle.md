@@ -15,20 +15,3 @@ elif angle_diff < -np.pi:
 ```
 
 Um vetor é um medida de direcao e magnitude. Com dois vetores conseguimos caclular com geometria analitica o angulo entre o robo e o objetivo
-
-<center>
-$\theta = \arccos\left(\frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \cdot \|\vec{B}\|}\right)$
-</center>
-
-* $\vec{A} \cdot \vec{B}$ representa o produto escalar (produto interno) entre os vetores A e B.
-* $|\vec{A}|$ e $|\vec{B}|$ representam as normas (magnitudes) dos vetores A e B, respectivamente.
-
-$$
-\theta = \arccos\left(\frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \cdot \|\vec{B}\|}\right)
-$$
-
-$$
-\theta = \arccos\left(\frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \cdot \|\vec{B}\|}\right)
-$$
-
-$\sqrt{3x-1}+(1+x)^2$

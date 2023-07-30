@@ -37,6 +37,13 @@ export default {
             { text: "Angle of the robot", link: "/pages/chapter02/angle.md" },
           ],
         },
+        {
+          text: "Learning",
+          collapsible: true,
+          items: [
+            { text: "Actor Critic", link: "/pages/chapter03/critic_actor.md" },
+          ],
+        },
        ],
        footer: {
          message: "Released under the MIT License.",
