@@ -43,7 +43,6 @@ The inputs to the model are data from the lidar sensors, distance to the target,
 - [Running the tests](#Running-the-tests)
 - [Usage](#Usage)
 - [Training Agent](#Training-Agent)
-- [Limitations](#Limitations)
 - [Directory Structure](#Directory-Structure)
 
 ## Getting Started
@@ -109,7 +108,7 @@ make waypoint
   > The world will be saved in the `src/vault/models/map/map.dae` file.
 
 <div align="center">
-     <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="750px">
+     <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/img/3D.png" alt="Create World 3D" width="750px">
 </div>
 
 For a better organization and structuring of the robot's movement planning, it is recommended to separate the waypoints into three distinct categories: targets, robot positions and object spawn.
@@ -191,15 +190,6 @@ make tensorboard
 
 ### Resources
 [![Google Colab](https://img.shields.io/badge/View%20on-Google%20Colab-orange?logo=google-colab&logoColor=white)](https://colab.research.google.com/drive/1krpIYujBNb15WwgcJ5dE4Pe7cr3xQyFa?usp=sharing) [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel&logoColor=white)](https://vault-chi.vercel.app/)
-
-## Limitations
-
-<a name="Limitations"></a>
-
-The agent has limitations in its navigation capacity, being effective only in static environments and without significant variations. He has difficulty detecting obstacles such as chairs, tables and similar objects, which can affect his efficiency in carrying out tasks. It is necessary to manually define the waypoints on the map so that the agent can move properly.
-
-  > **Note** :
-  > This repository also serves as a template for ROS applications, has CI/CD, automated tests and easy configuration templates.
 
 ## Directory Structure
 
