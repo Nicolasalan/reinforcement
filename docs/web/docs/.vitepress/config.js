@@ -30,6 +30,13 @@ export default {
              { text: "Install", link: "/pages/chapter01/instructions.md" },
            ],
          },
+         {
+          text: "Environment",
+          collapsible: true,
+          items: [
+            { text: "Angle of the robot", link: "/pages/chapter02/angle.md" },
+          ],
+        },
        ],
        footer: {
          message: "Released under the MIT License.",
