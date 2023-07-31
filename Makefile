@@ -131,7 +131,7 @@ start-gpu:
 .PHONY: board
 board:
 	@echo "tensorboard ..."
-	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} vault-docker bash -c "cd /ws/src/vault/src/vault && tensorboard --logdir=runs"
+	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} vault-docker bash -c "tensorboard --logdir=/ws/src/vault/src/vault/logs"
 
 ########################################################################################################################
 ################################################ TESTS #################################################################

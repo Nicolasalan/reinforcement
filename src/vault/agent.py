@@ -13,6 +13,8 @@ from utils import Extension
 import numpy as np
 import tqdm
 
+from torch.utils.tensorboard import SummaryWriter
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Agent():
@@ -66,6 +68,10 @@ class Agent():
         self.max_Q = -inf
         self.loss = 0
         self.iter = 0
+
+        log_dir = "/ws/src/vault/src/vault/logs"
+
+        self.writer = SummaryWriter(log_dir)
 
         # Replay memory
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size, random_seed)
@@ -178,11 +184,18 @@ class Agent():
                 target_param.data.copy_(
                     self.tau * param.data + (1 - self.tau) * target_param.data
                 )
+            
+            self.loss += critic_loss
 
         # ---------------------------- update noise ---------------------------- #
         self.epsilon -= float(self.epsilon_decay)
-        self.loss += critic_loss
+        
         self.iter += 1
+
+        self.writer.add_scalar("loss", self.loss / timestep, self.iter)
+        self.writer.add_scalar("Av. Q", self.av_Q / timestep, self.iter)
+        self.writer.add_scalar("Max. Q", self.max_Q, self.iter)
+
         self.noise.reset()  
 
         return critic_loss    

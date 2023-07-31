@@ -33,13 +33,9 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
      state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
      action_dim = param["ACTION_DIM"]
 
-     writer = SummaryWriter()
+     log_dir = "/ws/src/vault/src/vault/logs"
 
-     for n_iter in range(100):
-    writer.add_scalar('Loss/train', np.random.random(), n_iter)
-    writer.add_scalar('Loss/test', np.random.random(), n_iter)
-    writer.add_scalar('Accuracy/train', np.random.random(), n_iter)
-    writer.add_scalar('Accuracy/test', np.random.random(), n_iter)
+     writer = SummaryWriter(log_dir)
 
      ## ====================== Training Loop ====================== ##
 
@@ -177,6 +173,8 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
                     break
 
+          writer.close()
+
           return scores
      
      ## ====================== Test Environment ====================== ##
@@ -235,5 +233,6 @@ if __name__ == '__main__':
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_TIMESTEP"]
      score_solved = param["SCORE_SOLVED"]
+     
 
      td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful)
