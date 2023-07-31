@@ -127,6 +127,12 @@ start-gpu:
 	@echo "Starting training in GPU ..."
 	@sudo docker run -it --net=host --gpus all ${DOCKER_GPU} ${DOCKER_ARGS} vault-docker bash -c "cd /ws && source devel/setup.bash && roslaunch vault bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch vault start.launch"
 
+# === Tensorboard ===
+.PHONY: board
+board:
+	@echo "tensorboard ..."
+	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} vault-docker bash -c "cd /ws/src/vault/src/vault && tensorboard --logdir=runs"
+
 ########################################################################################################################
 ################################################ TESTS #################################################################
 ########################################################################################################################

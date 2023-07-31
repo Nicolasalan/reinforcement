@@ -14,12 +14,15 @@ import numpy as np
 import os
 import psutil
 
+from torch.utils.tensorboard import SummaryWriter
+import numpy as np
+
 script_dir = os.path.dirname(os.path.realpath(__file__))
 checkpoints_dir = os.path.join(script_dir, 'checkpoints')
 if not os.path.exists(checkpoints_dir):
     os.makedirs(checkpoints_dir)
 
-def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful):
+def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful):
      """
      parameters
      ======
@@ -30,13 +33,13 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
      state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
      action_dim = param["ACTION_DIM"]
 
-     count_rand_actions = 0
-     random_action = []
+     writer = SummaryWriter()
 
-     expl_noise = 1 
-     expl_decay_steps = (500000)
-     expl_min = 0.1 
-     random_near_obstacle = True
+     for n_iter in range(100):
+    writer.add_scalar('Loss/train', np.random.random(), n_iter)
+    writer.add_scalar('Loss/test', np.random.random(), n_iter)
+    writer.add_scalar('Accuracy/train', np.random.random(), n_iter)
+    writer.add_scalar('Accuracy/test', np.random.random(), n_iter)
 
      ## ====================== Training Loop ====================== ##
 
@@ -45,7 +48,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=0, CONFIG_PATH=CONFIG_PATH)
           env = Env(CONFIG_PATH)
 
-          scores_window = deque()                                          # average scores of the most recent episodes                                                     # list of average scores of each episode                     
+          scores_window = deque()                                          # average scores of the most recent episodes                                                     
+          scores = []                                                      # list of average scores of each episode                  
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
                #rospy.loginfo('Episode: ' + str(i_episode))
@@ -59,22 +63,6 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    # add some exploration noise
-                    if expl_noise > expl_min:
-                         expl_noise = expl_noise - ((1 - expl_min) / expl_decay_steps)
-                    action = (action + np.random.normal(0, expl_noise, size=action_dim)).clip(
-                         -1, 1
-                    )
-
-                    if random_near_obstacle:
-                         if (np.random.uniform(0, 1) > 0.85 and min(states[4:-8]) < 0.6 and count_rand_actions < 1):
-                              count_rand_actions = np.random.randint(8, 15)
-                              random_action = np.random.uniform(-1, 1, 2)
-
-                         if count_rand_actions > 0:
-                              count_rand_actions -= 1
-                              action = random_action
-                              action[0] = -1
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
@@ -92,6 +80,9 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
                          break         
           
                scores_window.append(score)                                 # save average score for the episode
+               scores.append(score)  
+
+               writer.add_scalar('Reward/train', score, i_episode)
 
                useful.save_results("reward", score)                        # save results in a file
 
@@ -128,7 +119,8 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
           agent.actor_local.load_state_dict(torch.load(param["MODEL"] + 'actor_model.pth'))
           agent.critic_local.load_state_dict(torch.load(param["MODEL"] + 'critic_model.pth'))
 
-          scores_window = deque()                                          # average scores of the most recent episodes                                                     # list of average scores of each episode                     
+          scores_window = deque()                                          # average scores of the most recent episodes                      
+          scores = []                                                      # list of average scores of each episode  
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
                #rospy.loginfo('Episode: ' + str(i_episode))
@@ -142,22 +134,6 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
                for t in range(max_t):   
                          
                     action = agent.action(states)                          # choose an action for each agent
-                    # add some exploration noise
-                    if expl_noise > expl_min:
-                         expl_noise = expl_noise - ((1 - expl_min) / expl_decay_steps)
-                    action = (action + np.random.normal(0, expl_noise, size=action_dim)).clip(
-                         -1, 1
-                    )
-
-                    if random_near_obstacle:
-                         if (np.random.uniform(0, 1) > 0.85 and min(states[4:-8]) < 0.6 and count_rand_actions < 1):
-                              count_rand_actions = np.random.randint(8, 15)
-                              random_action = np.random.uniform(-1, 1, 2)
-
-                         if count_rand_actions > 0:
-                              count_rand_actions -= 1
-                              action = random_action
-                              action[0] = -1
                     
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
                     #action_random = useful.random_near_obstacle(states, count_rand_actions, random_action, param["random_near_obstacle"])
@@ -171,10 +147,12 @@ def ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, usefu
 
                     states = next_states
                     score += rewards
+                    
                     if np.any(done):                                       # exit loop when episode ends
                          break         
           
                scores_window.append(score)                                 # save average score for the episode
+               scores.append(score)  
 
                useful.save_results("reward", score)                        # save results in a file
 
@@ -252,11 +230,10 @@ if __name__ == '__main__':
      useful = Extension(CONFIG_PATH)
 
      param = useful.load_config("config.yaml")
-     #count = len('/home/robofei/ws/src/vault/config/pose//poses.yaml"))
 
      n_episodes = param["N_EPISODES"]
      print_every = param["PRINT_EVERY"] 
      max_t = param["MAX_TIMESTEP"]
      score_solved = param["SCORE_SOLVED"]
 
-     ddpg(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful)
+     td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful)

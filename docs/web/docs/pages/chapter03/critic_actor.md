@@ -18,7 +18,7 @@ Agora, vamos imaginar o mesmo jogador entrando em uma nova partida, mas desta ve
 Na primeira analogia, a pessoa aprende a agir corretamente, buscando melhorar suas ações com base nas experiências passadas e nas reflexões sobre o jogo anterior. Já na segunda analogia, a pessoa tenta aprender a avaliar a qualidade de suas ações em relação ao objetivo geral (placar final do jogo), utilizando a estimativa do valor do jogo em cada jogada.
 :::
 
-#### Aproximação de Funções
+## Aproximação de Funções
 
 O método baseado em valor utiliza uma rede neural ou outra função de aproximação para estimar a função de valor, que atribui uma nota para cada ação tomada em um determinado estado. Essa aproximação pode ser feita por meio de funções de transferência como `Vπ(S)` (função de valor do estado), `Qπ(S, A)` (função de valor do estado-ação) e `Aπ(S, A)` (função de vantagem, medindo a vantagem de tomar uma ação A em relação a outras ações no estado S).
 

@@ -8,7 +8,5 @@ pycollada
 trimesh
 opencv-python
 scipy
-simplejpeg
-tornado
 tqdm
-stable-baselines
+tensorboard
