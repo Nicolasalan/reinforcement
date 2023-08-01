@@ -165,30 +165,6 @@ class Extension():
           else:
                return action, count_rand_actions, random_action
 
-     def save_results(self, type, result):
-          """Save the results to a yaml file."""
-          if result == None:
-               result = 0
-          if type == "reward":
-               file = open('/ws/src/vault/src/vault/data/' + 'Reward.txt', 'a')
-               file.write("%f\n" % (np.mean(result)))
-
-          if type == "loss":
-               file = open('/ws/src/vault/src/vault/data/' + 'Loss.txt', 'a')
-               file.write("%f\n" % (result.item()))
-
-          if type == "Av":
-               file = open('/ws/src/vault/src/vault/data/' + 'AvQ.txt', 'a')
-               file.write("%f\n" % (result.item()))
-          
-          if type == "Max":
-               file = open('/ws/src/vault/src/vault/data/' + 'MaxQ.txt', 'a')
-               file.write("%f\n" % (result.item()))
-          
-          if type == "episode":
-               file = open('/ws/src/vault/src/vault/data/' + 'Episode.txt', 'a')
-               file.write("%f\n" % int((result)))
-
      def evaluate(self, agent, env, epoch, eval_episodes=10):
           avg_reward = 0.0
           for _ in range(eval_episodes):

@@ -49,7 +49,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
 
           for i_episode in range(n_episodes+1):                            # initialize score for each agent
                #rospy.loginfo('Episode: ' + str(i_episode))
-               useful.save_results("episode", i_episode)
                score = 0.0                
                done = False
 
@@ -79,8 +78,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                scores.append(score)  
 
                writer.add_scalar('Reward/train', score, i_episode)
-
-               useful.save_results("reward", score)                        # save results in a file
 
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
@@ -149,8 +146,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
           
                scores_window.append(score)                                 # save average score for the episode
                scores.append(score)  
-
-               useful.save_results("reward", score)                        # save results in a file
 
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')

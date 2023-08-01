@@ -92,10 +92,6 @@ class Agent():
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
                 self.learn(experiences, steps, self.policy_freq)
-
-            self.useful.save_results("loss", self.loss / self.iter)
-            self.useful.save_results("Av", self.av_Q / self.iter)
-            self.useful.save_results("Max", self.max_Q / self.iter)
         
     def action(self, state):
         """Returns actions for given state as per current policy."""
