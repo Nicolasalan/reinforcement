@@ -27,7 +27,7 @@ MODEL: '/ws/src/vault/src/vault/checkpoints/' # default: 'checkpoints/'
 # ==== Parameters Training ==== #
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model
 BUFFER_SIZE: 1000000    # replay buffer size (default: 1e6)
-BATCH_SIZE: 10          # minibatch size (default: 100)
+BATCH_SIZE: 256         # minibatch size (default: 100)
 TAU: 0.005              # for soft update of target parameters (default: 1e-3)
 LR_ACTOR: 0.0001        # learning rate of the actor (default: 1e-3)
 LR_CRITIC: 0.0001       # learning rate of the critic (default: 1e-3)

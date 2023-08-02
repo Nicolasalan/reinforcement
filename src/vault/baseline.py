@@ -13,8 +13,6 @@ import rospy
 import numpy as np
 import os
 import psutil
-
-from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -32,10 +30,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
 
      state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
      action_dim = param["ACTION_DIM"]
-
-     log_dir = "/ws/src/vault/src/vault/logs"
-
-     writer = SummaryWriter(log_dir)
 
      ## ====================== Training Loop ====================== ##
 
@@ -67,7 +61,7 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                          done = True
 
                     # save the experiment in the replay buffer, run the learning step at a defined interval
-                    agent.step(states, actions, rewards, next_states, int(done), t)
+                    agent.step(states, actions, rewards, next_states, int(done), t, i_episode, score)
 
                     states = next_states
                     score += rewards
@@ -77,7 +71,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                scores_window.append(score)                                 # save average score for the episode
                scores.append(score)  
 
-               writer.add_scalar('Reward/train', score, i_episode)
 
                cpu_usage = psutil.cpu_percent()
                rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')

@@ -8,8 +8,6 @@ Um agente baseado em valor avalia cada ação tomada em um determinado estado at
 
 Já um agente baseado em política depende de um "conselheiro" para orientar suas decisões. Nesse caso, o "conselheiro" é uma pessoa experiente que já sabe como realizar a tarefa com sucesso. O agente, por sua vez, é como um iniciante que está aprendendo a realizar a tarefa e segue as sugestões do "conselheiro" para tomar suas ações.
 
-Ambas as abordagens têm como objetivo ensinar ao agente como realizar uma tarefa através do aprendizado por reforço. Um agente baseado em valor utiliza recompensas (ou penalizações) para avaliar suas ações em relação ao objetivo, enquanto um agente baseado em política se apoia em conselhos externos para tomar decisões. Cada abordagem possui suas aplicações e vantagens, dependendo do tipo de problema que estão sendo usadas para resolver.
-
 ::: tip Método Baseado em Política e Método Baseado em Valor
 Vamos considerar uma pessoa que está tentando jogar tênis. Após uma partida, ela retorna para casa e reflete sobre o jogo, buscando melhorar seus acertos e reduzir os erros cometidos durante a partida. No dia seguinte, ela leva em conta essas reflexões e tenta realizar as jogadas corretas. Essa abordagem é conhecida como método baseado em política.
 
