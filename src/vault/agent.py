@@ -80,15 +80,14 @@ class Agent():
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
-        #print(self.memory.sample())
 
         # Learn, if enough samples are available in memory
         if len(self.memory) > self.batch_size and int(done) > 0:
-            rospy.logwarn('Agent Learning               => Agent Learning ...')
-            rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
+            #rospy.logwarn('Agent Learning               => Agent Learning ...')
+            #rospy.loginfo('Add Experience to Memory     => Experience: ' + str(len(self.memory)))
             for steps in range(timestep + 1):
                 # Sample a batch of experiences from the replay buffer
-                rospy.logwarn('Agent Learning               => Agent Learning ...')
+                #rospy.logwarn('Agent Learning               => Agent Learning ...')
                 experiences = self.memory.sample()
                 # Compute the loss and update the priorities
                 self.learn(experiences, steps, self.policy_freq, i_episode, score)
@@ -111,21 +110,21 @@ class Agent():
     def reset(self):
         self.noise.reset()
 
-    def learn(self, experiences, timestep, policy_fre, i_episode, score):
+    def learn(self, experiences, timestep, policy_freq, i_episode, score):
         """Update policy and value parameters using given batch of experience tuples."""
         state, action, reward, next_state, done = experiences
 
         # obtain the estimated action from next state by using the target actor network
-        next_action = self.actor_target(next_states)
+        next_action = self.actor_target(next_state)
 
         # add noise to the estimated action
-        noise = torch.Tensor(actions).data.normal_(0, self.policy_noise).to(device)
+        noise = torch.Tensor(action).data.normal_(0, self.policy_noise).to(device)
         noise = noise.clamp(-self.noise_clip, self.noise_clip)
         next_action = (next_action + noise).clamp(-1, 1)
 
         # ---------------------------- update critic ---------------------------- #
         # Calculate the Q values from the critic-target network for the next state-action pair
-        target_Q1, target_Q2 = self.critic_target(next_states, next_action)
+        target_Q1, target_Q2 = self.critic_target(next_state, next_action)
 
         # Select the minimal Q value from the 2 calculated values
         target_Q = torch.min(target_Q1, target_Q2)
@@ -137,9 +136,9 @@ class Agent():
         #print("rewards_norm", rewards_norm)
 
         # Calculate the final Q value from the target network parameters by using Bellman equation 
-        target_Q = rewards_norm + ((1 - dones) * self.discount_factor * target_Q).detach() 
+        target_Q = reward + ((1 - done) * self.discount_factor * target_Q).detach() 
         # Get the Q values of the basis networks with the current parameters
-        current_Q1, current_Q2 = self.critic_local(states, actions)
+        current_Q1, current_Q2 = self.critic_local(state, action)
 
         # Calculate the loss between the current Q value and the target Q value
         critic_loss = F.mse_loss(current_Q1, target_Q) + F.mse_loss(current_Q2, target_Q)
@@ -147,14 +146,13 @@ class Agent():
         # Minimize the loss
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        nn.utils.clip_grad_norm_(self.critic_local.parameters(), max_norm=2.0, norm_type=2)
         self.critic_optimizer.step()
 
         # ---------------------------- update actor ---------------------------- #
         if timestep % policy_freq == 0:
             
             # Compute actor loss
-            actor_loss, _ = self.critic_local(states, self.actor_local(states))
+            actor_loss, _ = self.critic_local(state, self.actor_local(state))
             actor_loss = -actor_loss.mean()
             # Minimize the loss
             self.actor_optimizer.zero_grad()
@@ -163,8 +161,8 @@ class Agent():
             self.actor_optimizer.step()
 
             # Update the critic target networks
-            self.soft_update(self.critic_local, self.critic_target, TAU)
-            self.soft_update(self.actor_local, self.actor_target, TAU)                     
+            self.soft_update(self.critic_local, self.critic_target, self.tau)
+            self.soft_update(self.actor_local, self.actor_target, self.tau)                     
 
             self.loss += critic_loss
 

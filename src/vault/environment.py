@@ -129,7 +129,7 @@ class Env():
                target (bool): check if you reached the target
           """
 
-          rospy.logwarn('Step Environment             => Stepping environment ...')
+          #rospy.logwarn('Step Environment             => Stepping environment ...')
           target = False
 
           # ================== PUBLISH ACTION ================== #
@@ -139,7 +139,7 @@ class Env():
                vel_cmd.linear.x = action[0]
                vel_cmd.angular.z = action[1]
                self.pub_cmd_vel.publish(vel_cmd)
-               rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
+               #rospy.loginfo('Publish Action               => Linear: ' + str(vel_cmd.linear.x) + ' Angular: ' + str(vel_cmd.angular.z))
 
           except:
                rospy.logerr('Publish Action              => Failed to publish action')
@@ -175,7 +175,7 @@ class Env():
                #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = [v_state]
 
-               rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
+               #rospy.loginfo('Read Scan Data               => Min Lazer: ' + str(min_laser) + ' Collision: ' + str(collision) + ' Done: ' + str(done))
           
           except:
                rospy.logfatal('Read Scan Data              => Error reading scan data')
@@ -198,7 +198,7 @@ class Env():
                euler = quaternion.to_euler(degrees=False)
                angle = round(euler[2], 4)
 
-               rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
+               #rospy.loginfo('Read Odom Data               => Odom x: ' + str(self.odom_x) + ' Odom y: ' + str(self.odom_y) + ' Angle: ' + str(angle))
 
           except:
                rospy.logfatal('Read Odom Data              => Error reading odometry data')
@@ -236,7 +236,7 @@ class Env():
           angle = np.arctan2(skew_x, skew_y)
           theta = angle - np.pi / 4
 
-          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Distance Old: ' + str(self.distOld) + ' Angle: ' + str(theta))
+          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Distance Old: ' + str(self.distOld) + ' Angle: ' + str(theta))
 
           # ================== ORIENTATION GOAL ================== #
           # Calculate difference between current orientation and target orientation
@@ -253,7 +253,7 @@ class Env():
                target = True
                done = True
           
-          rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
+          #rospy.loginfo('Check (Collided or Arrive)   => Target: ' + str(target) + ' Done: ' + str(done))
 
           # ================== SET STATE ================== #
 
@@ -275,7 +275,7 @@ class Env():
                r3 = lambda x: 1 - x if x < 1 else 0.0
                reward = (action[0] / 2 - abs(action[1]) / 2 - r3(min_laser) / 2)
 
-          rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
+          #rospy.loginfo('Get Reward                   => Reward: ' + str(reward))
 
           self.last_odom_x, self.last_odom_y = self.odom_x, self.odom_y
           self.distOld = distance
@@ -291,7 +291,7 @@ class Env():
           """
 
           # ================== RESET ENVIRONMENT ================== #
-          rospy.logwarn("Reset Environment            => Resetting environment ...")
+          #rospy.logwarn("Reset Environment            => Resetting environment ...")
           # Resets the state of the environment and returns an initial observation.
           rospy.wait_for_service("/gazebo/reset_simulation")
           try:
@@ -303,7 +303,7 @@ class Env():
           # ================== SET RANDOM ANGLE ================== #
           angle = np.random.uniform(-np.pi, np.pi)
           quaternion = Quaternion.from_euler(0.0, 0.0, angle)
-          rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
+          #rospy.loginfo('Set Random Angle Robot       => Angle: ' + str(angle))
 
           # ================== SET RANDOM ORIENTATION ================== #
           try:
@@ -321,7 +321,7 @@ class Env():
 
           goal, robot = self.select_poses(self.goals)
 
-          rospy.loginfo('Set Random Position          => Goal: (' + str(goal[0]) + ', ' + str(goal[1]) + ') Robot: (' + str(robot[0]) + ', ' + str(robot[1]) + ')')
+          #rospy.loginfo('Set Random Position          => Goal: (' + str(goal[0]) + ', ' + str(goal[1]) + ') Robot: (' + str(robot[0]) + ', ' + str(robot[1]) + ')')
 
           # ================== SET RANDOM ROBOT MODEL ================== #
           try:
@@ -407,7 +407,7 @@ class Env():
                #noisy_state = np.clip(v_state + np.random.normal(0, self.noise_sigma, len(v_state)), 0, 10.0)
                state_laser = [v_state] #list(noisy_state)
 
-               rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
+               #rospy.loginfo('Get state scan               => Laser: ' + str(np.mean(state_laser)))
           except:
                rospy.logerr('Get state scan              => Error getting state scan')
                state_laser = np.random.uniform(0, self.max_range, self.environment_dim)
@@ -442,7 +442,7 @@ class Env():
           angle = np.arctan2(skew_x, skew_y)
           theta = angle - np.pi / 4
 
-          rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
+          #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           #print('========================================================================================================================')
 
           # ================== CREATE STATE ARRAY ================== #

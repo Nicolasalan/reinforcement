@@ -73,17 +73,17 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
 
 
                cpu_usage = psutil.cpu_percent()
-               rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
+               #rospy.loginfo('CPU and Memory               => usage: ' + str(cpu_usage) + '%, ' + str(psutil.virtual_memory().percent) + '%')
 
                if i_episode % print_every != 0:
                     rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(score) + ' ====== #')
 
                if i_episode % print_every == 0:
-                    rospy.loginfo('# ================================================================================================ #')
+                    #rospy.loginfo('# ================================================================================================ #')
                     rospy.loginfo('# ====== Episode: ' + str(i_episode) + ' Average Score: ' + str(np.mean(scores_window)) + ' ====== #')
-                    rospy.loginfo('# ================================================================================================ #')
+                    #rospy.loginfo('# ================================================================================================ #')
                
-               if i_episode % 300 == 0:
+               if i_episode % 1000 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 
@@ -160,8 +160,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, 'actor_checkpoint.pth'))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, 'critic_checkpoint.pth'))
                     break
-
-          writer.close()
 
           return scores
      
