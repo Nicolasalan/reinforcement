@@ -213,28 +213,28 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           skew_x = self.goal_x - self.odom_x
           skew_y = self.goal_y - self.odom_y
-          #dot = skew_x * 1 + skew_y * 0
-          #mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
-          #mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          #if mag1 * mag2 == 0:
-          #     beta = 0
-          #else:
-          #     beta = math.acos(dot / (mag1 * mag2))
-          #if skew_y < 0:
-          #     if skew_x < 0:
-          #          beta = -beta
-          #     else:
-          #          beta = 0 - beta
-          #theta = beta - angle
-          #if theta > np.pi:
-          #     theta = np.pi - theta
-          #     theta = -np.pi - theta
-          #if theta < -np.pi:
-          #     theta = -np.pi - theta
-          #     theta = np.pi - theta
+          dot = skew_x * 1 + skew_y * 0
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
+          if skew_y < 0:
+               if skew_x < 0:
+                    beta = -beta
+               else:
+                    beta = 0 - beta
+          theta = beta - angle
+          if theta > np.pi:
+               theta = np.pi - theta
+               theta = -np.pi - theta
+          if theta < -np.pi:
+               theta = -np.pi - theta
+               theta = np.pi - theta
 
-          angle = np.arctan2(skew_x, skew_y)
-          theta = angle - np.pi / 4
+          #angle = np.arctan2(skew_x, skew_y)
+          #theta = angle - np.pi / 4
 
           #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Distance Old: ' + str(self.distOld) + ' Angle: ' + str(theta))
 
@@ -419,28 +419,28 @@ class Env():
           # Calculate the relative angle between the robots heading and heading toward the goal
           skew_x = self.goal_x - self.odom_x
           skew_y = self.goal_y - self.odom_y
-          #dot = skew_x * 1 + skew_y * 0
-          #mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
-          #mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
-          #if mag1 * mag2 == 0:
-          #     beta = 0
-          #else:
-          #     beta = math.acos(dot / (mag1 * mag2))
-          #if skew_y < 0:
-          #     if skew_x < 0:
-          #          beta = -beta
-          #     else:
-          #          beta = 0 - beta
-          #theta = beta - angle
-          #if theta > np.pi:
-          #     theta = np.pi - theta
-          #     theta = -np.pi - theta
-          #if theta < -np.pi:
-          #     theta = -np.pi - theta
-          #     theta = np.pi - theta
+          dot = skew_x * 1 + skew_y * 0
+          mag1 = math.sqrt(math.pow(skew_x, 2) + math.pow(skew_y, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          if mag1 * mag2 == 0:
+               beta = 0
+          else:
+               beta = math.acos(dot / (mag1 * mag2))
+          if skew_y < 0:
+               if skew_x < 0:
+                    beta = -beta
+               else:
+                    beta = 0 - beta
+          theta = beta - angle
+          if theta > np.pi:
+               theta = np.pi - theta
+               theta = -np.pi - theta
+          if theta < -np.pi:
+               theta = -np.pi - theta
+               theta = np.pi - theta
 
-          angle = np.arctan2(skew_x, skew_y)
-          theta = angle - np.pi / 4
+          #angle = np.arctan2(skew_x, skew_y)
+          #theta = angle - np.pi / 4
 
           #rospy.loginfo('Calculate distance and angle => Distance: ' + str(distance) + ' Angle: ' + str(theta))
           #print('========================================================================================================================')

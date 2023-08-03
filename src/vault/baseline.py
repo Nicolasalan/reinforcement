@@ -53,7 +53,7 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
                     # save the experiment in the replay buffer, run the learning step at a defined interval
-                    agent.step(states, actions, rewards, next_states, int(done), t, i_episode, score)
+                    agent.step(states, actions, rewards, next_states, int(done), t, i_episode, scores)
                     states = next_states
                     score += rewards
                     if np.any(done) or t == max_t - 1:                                       # exit loop when episode ends
