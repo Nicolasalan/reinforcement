@@ -33,6 +33,10 @@ class Agent():
         # Function to load yaml configuration file
         self.param = self.useful.load_config("config.yaml")
         self.seed = np.random.seed(random_seed)
+
+        self.noise=0.2
+        self.noise_std=0.1
+        self.noise_clip=0.5
         
         self.tau = self.param["TAU"]
         self.epsilon = self.param["EPSILON"]
@@ -97,7 +101,7 @@ class Agent():
 
     def learn(self, experiences, timestep, policy_fre, i_episode, score):
 
-        if len(self.memory) > BATCH_SIZE:
+        if len(self.memory) > self.batch_size:
             for i in range(n_iteraion):
                 state, action, reward, next_state, done = self.memory.sample()
 
@@ -126,7 +130,7 @@ class Agent():
                 critic_loss.backward()
                 self.critic_optimizer.step()
 
-                if i % UPDATE_EVERY_STEP == 0:
+                if i % self.policy_freq == 0:
                     # ---------------------------- update actor ---------------------------- #
                     # Compute actor loss
                     actor_loss, _ = self.critic_local(state, self.actor_local(state))
@@ -137,8 +141,8 @@ class Agent():
                     self.actor_optimizer.step()
 
                     # ----------------------- update target networks ----------------------- #
-                    self.soft_update(self.critic_local, self.critic_target, TAU)
-                    self.soft_update(self.actor_local, self.actor_target, TAU)
+                    self.soft_update(self.critic_local, self.critic_target, self.tau)
+                    self.soft_update(self.actor_local, self.actor_target, self.tau)
 
         self.writer.add_scalar("loss", self.loss / timestep, self.iter)
         self.writer.add_scalar("Av. Q", self.av_Q / timestep, self.iter)
