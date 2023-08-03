@@ -8,7 +8,7 @@ ROBOT: 'robot'                    # name of the robot in gazebo
 GOAL_REACHED_DIST: 1.0            # distance to the goal to consider it reached (in meters)
 COLLISION_DIST: 0.25               # distance to the obstacle to consider it a collision (in meters)
 ORIENTATION_THRESHOLD: 0.1        # threshold to consider the orientation reached (in radians)
-ENVIRONMENT_DIM: 30              # size of the environment (default)
+ENVIRONMENT_DIM: 150              # size of the environment (default)
 ROBOT_DIM: 4                      # distance, theta, velocity linear, velocity angular (default)
 ACTION_DIM: 2                     # angular and linear (default)
 TIME_DELTA: 1.0                   # 10 Hz (default)

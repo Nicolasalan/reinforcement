@@ -13,8 +13,6 @@ from utils import Extension
 import numpy as np
 import tqdm
 
-from torch.utils.tensorboard import SummaryWriter
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Agent():
@@ -64,18 +62,6 @@ class Agent():
         self.critic_target = Critic(state_size, action_size).to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.param['LR_CRITIC'])
-
-        # Noise process
-        self.noise = OUNoise(action_size, random_seed)
-
-        self.av_Q = 0
-        self.max_Q = -inf
-        self.loss = 0
-        self.iter = 0
-
-        log_dir = "/ws/src/vault/src/vault/logs"
-
-        self.writer = SummaryWriter(log_dir)
 
         # Replay memory
         self.memory = ReplayBuffer(self.buffer_size, self.batch_size, random_seed)
@@ -143,10 +129,6 @@ class Agent():
                     # ----------------------- update target networks ----------------------- #
                     self.soft_update(self.critic_local, self.critic_target, self.tau)
                     self.soft_update(self.actor_local, self.actor_target, self.tau)
-
-        self.writer.add_scalar("loss", self.loss / timestep, self.iter)
-        self.writer.add_scalar("Av. Q", self.av_Q / timestep, self.iter)
-        self.writer.add_scalar('Reward', score, i_episode)
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
