@@ -5,7 +5,6 @@ import numpy as np
 
 from agent import Agent
 from environment import Env
-from continuous import ContinuousEnv
 from utils import Extension
 from collections import deque
 
@@ -45,7 +44,7 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                score = 0.0                
                done = False
 
-               agent.reset()                                               # reset environment    
+               #agent.reset()                                               # reset environment    
                states = env.reset_env()                                    # get the current state of each agent
                
                for t in range(max_t):   
@@ -62,13 +61,14 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
           
                scores_window.append(score)                                 # save average score for the episode
                scores.append(score)  
+               mean_score = np.mean(scores_window)                          # save average score for the episode
 
                print('\rEpisode {}\tAverage Score: {:.2f}\tScore: {:.2f}'.format(i_episode, mean_score, score), end="")
 
                if i_episode % 100 == 0:
                     print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, mean_score))
 
-               if i_episode % 600 == 0:
+               if i_episode % 300 == 0:
                     torch.save(agent.actor_local.state_dict(), os.path.join(checkpoints_dir, '{}_actor_checkpoint.pth'.format(i_episode)))
                     torch.save(agent.critic_local.state_dict(), os.path.join(checkpoints_dir, '{}_critic_checkpoint.pth'.format(i_episode)))
 

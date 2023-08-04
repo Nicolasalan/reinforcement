@@ -271,28 +271,6 @@ class Env():
           
           time.sleep(self.time_delta)
 
-          # ================== SET RANDOM OBJECT MODEL ================== #
-          names = ['cube', 'cylinder', 'sphere', 'cubeA', 'cylinderA', 'sphereA', 'cubeB', 'cylinderB', 'sphereB', 'cubeC', 'cylinderC', 'sphereC', 'cubeD', 'cylinderD', 'sphereD']
-
-          # Shuffle the list of poses
-          np.random.shuffle(self.objects)
-
-          try:
-               for name, pose in zip(names, self.objects):
-                    # Create a new ModelState message
-                    set_objects = ModelState()
-                    set_objects.model_name = name
-                    set_objects.pose.position.x = pose[0]
-                    set_objects.pose.position.y = pose[1]
-                    set_objects.pose.orientation.x = quaternion.x
-                    set_objects.pose.orientation.y = quaternion.y
-                    set_objects.pose.orientation.z = quaternion.z
-                    set_objects.pose.orientation.w = quaternion.w
-                    self.set_state.publish(set_objects)
-               
-          except:
-               rospy.logerr('Set Random Object Model       => Error setting random object model')
-
           # ================== UNPAUSE SIMULATION ================== #
           rospy.wait_for_service("/gazebo/unpause_physics")
           try:

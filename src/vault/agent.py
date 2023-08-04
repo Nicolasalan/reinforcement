@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from model import Actor, Critic
-from noise import OUNoise
 from replaybuffer import ReplayBuffer
 
 import torch
@@ -32,6 +31,9 @@ class Agent():
         self.param = self.useful.load_config("config.yaml")
         self.seed = np.random.seed(random_seed)
 
+        self.action_size = action_size
+        self.state_size = state_size
+
         self.noise=0.2
         self.noise_std=0.1
         self.noise_clip=0.5
@@ -39,7 +41,8 @@ class Agent():
         self.tau = self.param["TAU"]
         self.epsilon = self.param["EPSILON"]
         self.clip_param= self.param["CLIP_PARAM"]
-        self.max_action = self.param["MAX_ACTION"]
+        self.max_action = 1
+        self.min_action = -1
         self.discount_factor = self.param["DISCOUNT"]
         self.batch_size = self.param["BATCH_SIZE"]
         self.lr_actor = self.param["LR_ACTOR"]
@@ -50,6 +53,7 @@ class Agent():
         self.epsilon_decay = self.param["EPSILON_DECAY"]
         self.policy_noise = self.param["POLICY_NOISE"]
         self.noise_clip = self.param["NOISE_CLIP"]
+        self.gamma = 0.99
 
         # Actor Network (w/ Network)
         self.actor_local = Actor(state_size, action_size).to(device)
@@ -81,11 +85,11 @@ class Agent():
             # Generate a random noise
             noise = np.random.normal(0, self.noise_std, size=self.action_size)
             # Add noise to the action for exploration
-            action = (action + noise).clip(self.min_action[0], self.max_action[0])
+            action = (action + noise).clip(self.min_action, self.max_action)
         self.actor_local.train()
         return action
 
-    def learn(self, experiences, timestep, policy_fre, i_episode, score):
+    def learn(self, n_iteraion, ):
 
         if len(self.memory) > self.batch_size:
             for i in range(n_iteraion):
@@ -100,13 +104,13 @@ class Agent():
                 # Generate a random noise
                 noise = torch.FloatTensor(action_).data.normal_(0, self.noise).to(device)
                 noise = noise.clamp(-self.noise_clip, self.noise_clip)
-                actions_next = (actions_next + noise).clamp(self.min_action[0].astype(float), self.max_action[0].astype(float))
+                actions_next = (actions_next + noise).clamp(-1.0, 1) # mudar aqui depois
 
                 Q1_targets_next, Q2_targets_next = self.critic_target(next_state, actions_next)
 
                 Q_targets_next = torch.min(Q1_targets_next, Q2_targets_next)
                 # Compute Q targets for current states (y_i)
-                Q_targets = reward + (gamma * Q_targets_next * (1 - done)).detach()
+                Q_targets = reward + (self.gamma * Q_targets_next * (1 - done)).detach()
                 # Compute critic loss
                 Q1_expected, Q2_expected = self.critic_local(state, action)
                 critic_loss = F.mse_loss(Q1_expected, Q_targets) + F.mse_loss(Q2_expected, Q_targets)

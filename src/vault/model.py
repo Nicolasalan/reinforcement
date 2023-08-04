@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class Actor(nn.Module):
-    def __init__(self, state_dim, action_dim, l1=800, l2=600):
+    def __init__(self, state_size, action_size, max_action=1, fc1_units=800, fc2_units=600):
 
         super(Actor, self).__init__()
         self.fc1 = nn.Linear(state_size, fc1_units)
@@ -14,7 +14,7 @@ class Actor(nn.Module):
         self.fc3 = nn.Linear(fc2_units, action_size)
         self.max_action = max_action
 
-    def forward(self, s):
+    def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
