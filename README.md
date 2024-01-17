@@ -188,9 +188,6 @@ cd <your_workspace>/src/vault
 make tensorboard
 ```
 
-### Resources
-[![Google Colab](https://img.shields.io/badge/View%20on-Google%20Colab-orange?logo=google-colab&logoColor=white)](https://colab.research.google.com/drive/1krpIYujBNb15WwgcJ5dE4Pe7cr3xQyFa?usp=sharing) [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel&logoColor=white)](https://vault-chi.vercel.app/)
-
 ## Directory Structure
 
 <a name="Directory-Structure"></a>
@@ -206,7 +203,7 @@ make tensorboard
 │   └── map/           # [dir] Map files
 ├── launch/            # [dir] Launch files 
 ├── models/            # [dir] Model SDF files
-├── src/vault/        # [dir] Source code
+├── src/vault/         # [dir] Source code
 │   ├── checkpoints/   # [dir] Pre-trained weights for the agent
 │   └── run/           # [dir] Logs and results of the agent
 ├── test/              # [dir] Unit tests 
