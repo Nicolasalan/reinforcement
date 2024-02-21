@@ -17,6 +17,7 @@ class TestLibrary(unittest.TestCase):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
         config_dir = os.path.join(parent_dir, 'config')
+        print(config_dir)
 
         self.rc = Extension(config_dir)
          

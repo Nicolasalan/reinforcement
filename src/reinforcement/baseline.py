@@ -27,10 +27,6 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
           max_t(int): maximum number of timesteps per episode
      """
 
-     agent.actor_local.load_state_dict(torch.load(param["MODEL"] + "actor_model.pth"))
-     agent.critic_local.load_state_dict(torch.load(param["MODEL"] + "critic_model.pth"))
-
-
      state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
      action_dim = param["ACTION_DIM"]
 
@@ -39,6 +35,10 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
      if param["TYPE"] == 0:
                
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=0, CONFIG_PATH=CONFIG_PATH)
+
+          agent.actor_local.load_state_dict(torch.load(param["TRAIN"] + "actor_model.pth", map_location=torch.device('cpu')))
+          agent.critic_local.load_state_dict(torch.load(param["TRAIN"] + "critic_model.pth", map_location=torch.device('cpu')))
+
           env = Env(CONFIG_PATH)
 
           scores_window = deque()                                          # average scores of the most recent episodes                                                     

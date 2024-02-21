@@ -297,9 +297,10 @@ class Env():
           heading_to_goal = math.atan2(diff_y, diff_x)
           theta = heading_to_goal - angle
 
-          while goal_angle > math.pi:
+          # TODO: mudar aqui
+          while to_goal > math.pi:
                theta -= 2 * math.pi
-          while goal_angle < -math.pi:
+          while to_goal < -math.pi:
                theta += 2 * math.pi
                     
           # ================== CREATE STATE ARRAY ================== #
@@ -349,7 +350,7 @@ class Env():
           # [-2 * (2.2^2), 0]
           r_vlinear = -1 * (((0.22 - action_linear) * 10) ** 2)
 
-          reward = r_yaw + r_distance + r_obstacle + r_vlinear + r_vangular - 1
+          reward = r_yaw + + r_distance + r_obstacle + r_vlinear + r_vangular - 1 
 
           if succeed == SUCCESS:
                reward += 2500
