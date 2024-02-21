@@ -56,14 +56,14 @@ class Agent():
         self.gamma = 0.99
 
         # Actor Network (w/ Network)
-        self.actor_local = Actor(state_size, action_size).to(device)
-        self.actor_target = Actor(state_size, action_size).to(device)
+        self.actor_local = Actor().to(device)
+        self.actor_target = Actor().to(device)
         self.actor_target.load_state_dict(self.actor_local.state_dict())
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.param['LR_ACTOR'])
 
         # Critic Network (w/ Network)
-        self.critic_local = Critic(state_size, action_size).to(device)
-        self.critic_target = Critic(state_size, action_size).to(device)
+        self.critic_local = Critic().to(device)
+        self.critic_target = Critic().to(device)
         self.critic_target.load_state_dict(self.critic_local.state_dict())
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.param['LR_CRITIC'])
 
