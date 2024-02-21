@@ -3,8 +3,8 @@ DOCKER_ENV_VARS = \
 	--env="DISPLAY" \
 	--env="QT_X11_NO_MITSHM=1" 
 
-# --volume="$(shell pwd)":"/ws/src/reinforcement-navigation":rw \
-# --volume="$(shell pwd)/src/reinforcement-navigation/checkpoints:/ws/src/reinforcement-navigation/src/reinforcement-navigation/checkpoints":rw \
+# --volume="$(shell pwd)":"/ws/src/reinforcement":rw \
+# --volume="$(shell pwd)/src/reinforcement/checkpoints:/ws/src/reinforcement/src/reinforcement/checkpoints":rw \
 
 DOCKER_VOLUMES = \
 	--volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
@@ -53,10 +53,10 @@ help:
 .PHONY: build
 build:
 	@echo "Building docker image ..."
-	@docker build -t reinforcement-navigation-docker . 
+	@docker build -t reinforcement-docker . 
 	
-# @sudo mkdir -p ${PWD}/src/reinforcement-navigation/checkpoints
-# @sudo mkdir -p ${PWD}/src/reinforcement-navigation/run
+# @sudo mkdir -p ${PWD}/src/reinforcement/checkpoints
+# @sudo mkdir -p ${PWD}/src/reinforcement/run
 # @sudo mkdir -p ${PWD}/config/map
 
 .PHONY: npm
@@ -72,14 +72,14 @@ npm:
 .PHONY: weights
 weights:
 	@echo "Install Weights ..."
-	@cd ${PWD}/src/reinforcement-navigation/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
+	@cd ${PWD}/src/reinforcement/checkpoints && wget https://nicolasalan.github.io/data/checkpoints/critic_model.pth && wget https://nicolasalan.github.io/data/checkpoints/actor_model.pth
 
 # === Setup Waypoint ===
 .PHONY: waypoint
 waypoint:
 	@echo "Setup Waypoint and Create Env..."
 	@sudo xhost + 
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roslaunch reinforcement-navigation setup.launch map_file:=/ws/src/reinforcement-navigation/config/map/map.yaml"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roslaunch reinforcement setup.launch map_file:=/ws/src/reinforcement/config/map/map.yaml"
 
 ########################################################################################################################
 ################################################ USAGE #################################################################
@@ -95,45 +95,45 @@ clean:
 .PHONY: setup
 setup:
 	@echo "Setup world ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roslaunch reinforcement-navigation bringup.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roslaunch reinforcement bringup.launch"
 
 # === Run terminal docker ===
 .PHONY: terminal
 terminal:
 	@echo "Terminal docker ..."
 	@sudo xhost + 
-	@docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash
+	@docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash
 
 # === setup view ===
 .PHONY: view 
 view:
 	@echo "Setup View World ..."
 	@sudo xhost +
-	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g reinforcement-navigation-docker bash -c "source devel/setup.bash && roslaunch reinforcement-navigation view.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g reinforcement-docker bash -c "source devel/setup.bash && roslaunch reinforcement view.launch"
 
 # === Start train docker ===
 .PHONY: start 
 start:
 	@echo "Starting training ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g reinforcement-navigation-docker bash -c "source devel/setup.bash && roslaunch reinforcement-navigation start.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} --memory=40g reinforcement-docker bash -c "source devel/setup.bash && roslaunch reinforcement start.launch"
 
 # === Start All Training ===
 .PHONY: start-all
 start-all:
 	@echo "Starting training All ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement-navigation bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch reinforcement-navigation start.launch"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch reinforcement start.launch"
 
 # === Start Training GPU ===
 .PHONY: start-gpu
 start-gpu:
 	@echo "Starting training in GPU ..."
-	@sudo docker run -it --net=host --gpus all ${DOCKER_GPU} ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement-navigation bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch reinforcement-navigation start.launch"
+	@sudo docker run -it --net=host --gpus all ${DOCKER_GPU} ${DOCKER_ARGS} reinforcement-docker bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && roslaunch reinforcement start.launch"
 
 # === Tensorboard ===
 .PHONY: board
 board:
 	@echo "tensorboard ..."
-	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "tensorboard --logdir=/ws/src/reinforcement-navigation/src/reinforcement-navigation/logs"
+	@sudo docker run -it --net=host -p 6006:6006 ${DOCKER_ARGS} reinforcement-docker bash -c "tensorboard --logdir=/ws/src/reinforcement/src/reinforcement/logs"
 
 ########################################################################################################################
 ################################################ TESTS #################################################################
@@ -143,28 +143,28 @@ board:
 .PHONY: func
 func:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roscd reinforcement-navigation && python3 test/func.py"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roscd reinforcement && python3 test/func.py"
 
 # === Test ROS ===
 .PHONY: ros
 ros:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roscd reinforcement-navigation && python3 test/ros.py"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roscd reinforcement && python3 test/ros.py"
 
 # === Test Simulation ===
 .PHONY: sim
 sim:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roscd reinforcement-navigation && python3 test/sim.py"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roscd reinforcement && python3 test/sim.py"
 
 # === Test Package ===
 .PHONY: package
 package:
 	@echo "Testing ..."
-	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roscd reinforcement-navigation && python3 test/package.py"
+	@sudo docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roscd reinforcement && python3 test/package.py"
 
 # === Test Full ===
 .PHONY: integration
 integration:
 	@echo "Testing ..."
-	@docker run -it --net=host ${DOCKER_ARGS} reinforcement-navigation-docker bash -c "source devel/setup.bash && roscd reinforcement-navigation && python3 test/ros.py && python3 test/functions.py && python3 test/package.py && python3 test/sim.py"
+	@docker run -it --net=host ${DOCKER_ARGS} reinforcement-docker bash -c "source devel/setup.bash && roscd reinforcement && python3 test/ros.py && python3 test/functions.py && python3 test/package.py && python3 test/sim.py"

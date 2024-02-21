@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from reinforcement-navigation.topics import Mensage
+from reinforcement.topics import Mensage
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import LaserScan
@@ -11,7 +11,7 @@ import time
 
 import os
 
-PKG = 'reinforcement-navigation'
+PKG = 'reinforcement'
 NAME = 'ros'
 
 print("\033[92mROS Unit Tests\033[0m")

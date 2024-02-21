@@ -20,7 +20,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
         <geometry>
-          <mesh filename="package://reinforcement-navigation/robots/meshes/hokuyo_utm.stl"/>
+          <mesh filename="package://reinforcement/robots/meshes/hokuyo_utm.stl"/>
         </geometry>
       </visual>
     </link>

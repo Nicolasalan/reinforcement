@@ -1,13 +1,13 @@
 # weights and logs #
 ####################
-**src/reinforcement-navigation/checkpoints
-**src/reinforcement-navigation/run
+**src/reinforcement/checkpoints
+**src/reinforcement/run
 
 # OS generated files #
 ######################
-**src/reinforcement-navigation/__pycache__
+**src/reinforcement/__pycache__
 ./src/.DS_Store
-./src/reinforcement-navigation/.DS_Store
-./src/reinforcement-navigation/.DS_Store
+./src/reinforcement/.DS_Store
+./src/reinforcement/.DS_Store
 .DS_Store
 ./models/.DS_Store

@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build the docker image
-        run: docker pull ninim/reinforcement-navigation-docker:latest
+        run: docker pull ninim/reinforcement-docker:latest
       - name: Login to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
@@ -36,7 +36,7 @@ jobs:
   #    working-directory: ./
   #  steps:
   #    - name: Running the tests
-  #      run: docker run ninim/reinforcement-navigation-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement-navigation bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun reinforcement-navigation ros.py"
+  #      run: docker run ninim/reinforcement-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun reinforcement ros.py"
   #      working-directory: ${{env.working-directory}}
 
   #Simulation:
@@ -46,7 +46,7 @@ jobs:
   #    working-directory: ./
   #  steps:
   #    - name: Running the tests
-  #      run: docker run ninim/reinforcement-navigation-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement-navigation bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun reinforcement-navigation sim.py"
+  #      run: docker run ninim/reinforcement-docker:latest bash -c "cd /ws && source devel/setup.bash && roslaunch reinforcement bringup.launch & sleep 20 && cd /ws && source devel/setup.bash && rosrun reinforcement sim.py"
   #      working-directory: ${{env.working-directory}}
 
   #Library:
@@ -56,7 +56,7 @@ jobs:
   #    working-directory: ./
   #  steps:
   #    - name: Running the tests
-  #      run: docker run ninim/reinforcement-navigation-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun reinforcement-navigation library.py"
+  #      run: docker run ninim/reinforcement-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun reinforcement library.py"
   #      working-directory: ${{env.working-directory}}
 
   Package:
@@ -66,5 +66,5 @@ jobs:
       working-directory: ./
     steps:
       - name: Running the tests
-        run: docker run ninim/reinforcement-navigation-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun reinforcement-navigation package.py"
+        run: docker run ninim/reinforcement-docker:latest bash -c "cd /ws && source devel/setup.bash && rosrun reinforcement package.py"
         working-directory: ${{env.working-directory}}

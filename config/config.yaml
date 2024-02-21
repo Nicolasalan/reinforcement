@@ -17,12 +17,12 @@ RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
 MAX_RANGE: 10.0                   # max range of the laser scan
 
 # ==== Path to the model and config ==== #
-MODEL_PATH: '/ws/src/reinforcement-navigation/models/'         # default: 'models/'
-CONFIG_PATH: '/ws/src/reinforcement-navigation/config/'        # default: 'config/'
-RESULTS: '/ws/src/reinforcement-navigation/src/reinforcement-navigation/run/'    # default: 'results/'
+MODEL_PATH: '/ws/src/reinforcement/models/'         # default: 'models/'
+CONFIG_PATH: '/ws/src/reinforcement/config/'        # default: 'config/'
+RESULTS: '/ws/src/reinforcement/src/reinforcement/run/'    # default: 'results/'
 
 # ==== Path Weights pre-trained ==== #
-MODEL: '/ws/src/reinforcement-navigation/src/reinforcement-navigation/checkpoints/' # default: 'checkpoints/'
+MODEL: '/ws/src/reinforcement/src/reinforcement/checkpoints/' # default: 'checkpoints/'
 
 # ==== Parameters Training ==== #
 TYPE: 0                 # (0) -> Train from scratch, (1) -> Load model and continue training, (2) -> Test Model

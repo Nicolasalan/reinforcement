@@ -11,7 +11,7 @@
 
   <!-- load robot_description -->
   <param name="robot_description"
-    command="$(find xacro)/xacro $(find reinforcement-navigation)/robots/robot/hera_base.urdf.xacro"/>
+    command="$(find xacro)/xacro $(find reinforcement)/robots/robot/hera_base.urdf.xacro"/>
 
   <!-- publishers -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />

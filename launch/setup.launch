@@ -1,7 +1,7 @@
 <launch>
 
   <!-- Definir a variável do caminho do mapa -->
-  <arg name="map_file" default="$(find reinforcement-navigation)/config/map/map.yaml" />
+  <arg name="map_file" default="$(find reinforcement)/config/map/map.yaml" />
 
   <!-- mapping -->
   <node name="map_server" pkg="map_server" type="map_server" output="screen"
@@ -14,6 +14,6 @@
   </node>
 
   <!-- Create Environment -->
-  <node name="create" pkg="reinforcement-navigation" type="create.py" output="screen"/>
+  <node name="create" pkg="reinforcement" type="create.py" output="screen"/>
 
 </launch>

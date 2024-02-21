@@ -56,7 +56,7 @@ class Extension():
           goals = []
           list = []
 
-          with open('/ws/src/reinforcement-navigation/config/pose/' + path_waypoints) as f:
+          with open('/ws/src/reinforcement/config/pose/' + path_waypoints) as f:
                data = yaml.safe_load(f)
                for i in data:
                     list.append(i['position'])
@@ -119,7 +119,7 @@ class Extension():
           rospy.is_shutdown()
 
      def load_config(self, config_name):
-          with open(os.path.join('/ws/src/reinforcement-navigation/config/config.yaml')) as file:
+          with open(os.path.join('/ws/src/reinforcement/config/config.yaml')) as file:
                param = yaml.safe_load(file)
 
           return param

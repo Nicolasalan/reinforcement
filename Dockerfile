@@ -60,7 +60,7 @@ RUN mkdir -p /ws/src \
  && git clone -b master https://github.com/Nicolasalan/waypoint_navigation_plugin.git 
  
 # Copy the source files
-COPY . /ws/src/reinforcement-navigation
+COPY . /ws/src/reinforcement
 
 # Set the working directory
 WORKDIR /ws
@@ -75,7 +75,7 @@ RUN cd /ws \
 RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc 
 
 # Install python dependencies
-RUN cd /ws/src/reinforcement-navigation && pip3 install -r requirements.txt
+RUN cd /ws/src/reinforcement && pip3 install -r requirements.txt
 
 # Remove display warnings
 RUN mkdir /tmp/runtime-root
@@ -83,4 +83,4 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
 # command to run on container start
-ENTRYPOINT [ "/ws/src/reinforcement-navigation/entrypoint.sh" ]
+ENTRYPOINT [ "/ws/src/reinforcement/entrypoint.sh" ]

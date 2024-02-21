@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from reinforcement-navigation.utils import Extension
+from reinforcement.utils import Extension
 from std_srvs.srv import Empty
 from gazebo_msgs.msg import ModelState 
 from gazebo_msgs.srv import GetModelState
@@ -11,7 +11,7 @@ import rostest
 
 import os
 
-PKG = 'reinforcement-navigation'
+PKG = 'reinforcement'
 NAME = 'sim'
 
 print("\033[92mSimulation Unit Tests\033[0m")

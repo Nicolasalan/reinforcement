@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-from reinforcement-navigation.utils import Extension
+from reinforcement.utils import Extension
 import unittest
 import rosunit
 
 import os
 
-PKG = 'reinforcement-navigation'
+PKG = 'reinforcement'
 NAME = 'library'
 
 print("\033[92mFunction Unit Tests\033[0m")

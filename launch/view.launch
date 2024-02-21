@@ -1,15 +1,15 @@
 <launch>
-     <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find reinforcement-navigation)/models/" />
+     <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find reinforcement)/models/" />
 
      <arg name="world_name"        default="environment.world"/>
      <arg name="gui"               default="true"/>
 
-     <arg name="model_target"      default="$(find reinforcement-navigation)/models/target.sdf"/>
+     <arg name="model_target"      default="$(find reinforcement)/models/target.sdf"/>
 
      <!-- start gazebo server -->
      <param name="/use_sim_time" value="true"/>
      <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
-	    args="--verbose $(find reinforcement-navigation)/world/$(arg world_name)" />     
+	    args="--verbose $(find reinforcement)/world/$(arg world_name)" />     
 
     <!-- start gazebo client -->
     <group if="$(arg gui)">
@@ -17,7 +17,7 @@
     </group>
 
      <!-- Launch Robot -->
-     <include file="$(find reinforcement-navigation)/launch/load.launch">
+     <include file="$(find reinforcement)/launch/load.launch">
      </include>
 
 
