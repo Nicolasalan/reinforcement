@@ -77,7 +77,7 @@ class Agent():
         
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
-        action = self.actor(torch.as_tensor(state, dtype=torch.float32).view(1, -1)).cpu().data.numpy().flatten()
+        action = self.actor_local(torch.as_tensor(state, dtype=torch.float32).view(1, -1)).cpu().data.numpy().flatten()
         return action        
         # state = torch.from_numpy(state).float().to(device)
         # self.actor_local.eval()
