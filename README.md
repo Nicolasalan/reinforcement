@@ -25,7 +25,7 @@
   <a href="https://github.com/psf/black">
     <img src="https://img.shields.io/badge/Code%20Style-Black-000000.svg" alt="Black">
   </a>
-  <a href="https://github.com/Nicolasalan/vault/actions">
+  <a href="https://github.com/Nicolasalan/reinforcement-navigation/actions">
     <img src="https://img.shields.io/badge/CI-Build%20Passing-brightgreen" alt="CI">
   </a>
 </p>
@@ -77,13 +77,13 @@ Clone the repository and run the following commands:
 ```bash
 mkdir <your_workspace>/src
 cd <your_workspace>/src
-git clone https://github.com/Nicolasalan/vault.git
+git clone https://github.com/Nicolasalan/reinforcement-navigation.git
 ```
 
 Build the image Dockerfile:
 
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make build
 ```
   > **Warning** :
@@ -92,20 +92,20 @@ make build
 ***(Optional)*** Install weights for the model:
 
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make install
 ```
   > **Note** :
-  > The weights will be saved in the checkpoint folder under `src/vault/checkpoints`.
+  > The weights will be saved in the checkpoint folder under `src/reinforcement-navigation/checkpoints`.
 
 Set the waypoints and cry the world:
   
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make waypoint
 ```
   > **Note** :
-  > The world will be saved in the `src/vault/models/map/map.dae` file.
+  > The world will be saved in the `src/reinforcement-navigation/models/map/map.dae` file.
 
 <div align="center">
      <img src="https://raw.githubusercontent.com/Nicolasalan/data/main/3D.png" alt="Create World 3D" width="750px">
@@ -122,7 +122,7 @@ To make waypoints easier to read and maintain, it is recommended to separate the
 
 To verify that everything is working correctly, run the unit tests.
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make setup # no visualization
 ```
 In the second terminal, start the tests.
@@ -170,21 +170,21 @@ For training, the robot Hera from the [RoboFEI At Home](https://github.com/robof
 
 To start the Gazebo sandbox, you need to start the world first and then the robot. Afterwards, you can spawn the target in the world to complete the simulation.
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make spawn
 ```
 
 To start training:
 
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make start # or make start-gpu
 ```
 
 To view agent results
 
 ```bash
-cd <your_workspace>/src/vault
+cd <your_workspace>/src/reinforcement-navigation
 make tensorboard
 ```
 
@@ -203,7 +203,7 @@ make tensorboard
 │   └── map/           # [dir] Map files
 ├── launch/            # [dir] Launch files 
 ├── models/            # [dir] Model SDF files
-├── src/vault/         # [dir] Source code
+├── src/reinforcement-navigation/         # [dir] Source code
 │   ├── checkpoints/   # [dir] Pre-trained weights for the agent
 │   └── run/           # [dir] Logs and results of the agent
 ├── test/              # [dir] Unit tests 
@@ -222,4 +222,4 @@ make tensorboard
 
 ## **Licença**
 
-This project is licensed under the MIT license - see archive [LICENSE](https://github.com/Nicolasalan/vault/blob/main/LICENSE.md) for details.
+This project is licensed under the MIT license - see archive [LICENSE](https://github.com/Nicolasalan/reinforcement-navigation/blob/main/LICENSE.md) for details.

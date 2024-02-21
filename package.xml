@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>vault</name>
+  <name>reinforcement-navigation</name>
   <version>0.0.0</version>
   <description>Reinforcement learnings with DDPG</description>
   <maintainer email="nicolasalangrotti03@gmail.com">Nicolas Alan</maintainer>

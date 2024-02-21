@@ -3,7 +3,7 @@
 import unittest
 import rosunit
 
-PKG = 'vault'
+PKG = 'reinforcement-navigation'
 NAME = 'package'
 
 print("\033[92mPackage Unit Tests\033[0m")

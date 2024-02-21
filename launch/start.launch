@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-  <node name="planner" pkg="vault" type="baseline.py" output="screen"/>
-    <rosparam command="load" file="$(find vault)/config/config.yaml"/>
+  <node name="planner" pkg="reinforcement-navigation" type="baseline.py" output="screen"/>
+    <rosparam command="load" file="$(find reinforcement-navigation)/config/config.yaml"/>
 </launch>

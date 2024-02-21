@@ -49,18 +49,18 @@ RUN apt-get update && apt-get install -y ros-noetic-ros-controllers \
  && apt-get install -y ros-noetic-gazebo-ros-pkgs
 
 # install pytorch
-RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
+#RUN pip install torch 
+#--index-url https://download.pytorch.org/whl/cpu
 
 # create a catkin workspace
 RUN mkdir -p /ws/src \
  && cd /ws/src \
  && source /opt/ros/noetic/setup.bash \
  && catkin_init_workspace \
- && git clone -b master https://github.com/Nicolasalan/waypoint_navigation_plugin.git \
- && git clone -b main https://github.com/dheera/rosboard.git 
-
+ && git clone -b master https://github.com/Nicolasalan/waypoint_navigation_plugin.git 
+ 
 # Copy the source files
-COPY . /ws/src/vault
+COPY . /ws/src/reinforcement-navigation
 
 # Set the working directory
 WORKDIR /ws
@@ -75,7 +75,7 @@ RUN cd /ws \
 RUN echo "source /ws/devel/setup.bash" >> ~/.bashrc 
 
 # Install python dependencies
-RUN cd /ws/src/vault && pip3 install -r requirements.txt
+RUN cd /ws/src/reinforcement-navigation && pip3 install -r requirements.txt
 
 # Remove display warnings
 RUN mkdir /tmp/runtime-root
@@ -83,4 +83,4 @@ ENV XDG_RUNTIME_DIR "/tmp/runtime-root"
 ENV NO_AT_BRIDGE 1
 
 # command to run on container start
-ENTRYPOINT [ "/ws/src/vault/entrypoint.sh" ]
+ENTRYPOINT [ "/ws/src/reinforcement-navigation/entrypoint.sh" ]

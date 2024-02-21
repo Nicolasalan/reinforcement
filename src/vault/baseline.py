@@ -27,6 +27,10 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
           max_t(int): maximum number of timesteps per episode
      """
 
+     agent.actor_local.load_state_dict(torch.load(param["MODEL"] + "actor_model.pth"))
+     agent.critic_local.load_state_dict(torch.load(param["MODEL"] + "critic_model.pth"))
+
+
      state_dim = param["ENVIRONMENT_DIM"] + param["ROBOT_DIM"]
      action_dim = param["ACTION_DIM"]
 

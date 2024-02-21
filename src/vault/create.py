@@ -14,7 +14,7 @@ class CreateEnvironment(object):
           rospy.Subscriber(map_topic, OccupancyGrid, self.map_callback)
           rospack = rospkg.RosPack()
                     
-          self.path_to_package = rospack.get_path('vault')
+          self.path_to_package = rospack.get_path('reinforcement-navigation')
           self.threshold = thresholds
           self.height = height
 

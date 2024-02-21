@@ -13,20 +13,20 @@
   <!-- ##################################################################### -->
 
   <!-- commons -->
-  <xacro:include filename="$(find vault)/robots/urdf/commons.urdf.xacro" />
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/commons.urdf.xacro" />
 
   <!-- actuators -->
-  <xacro:include filename="$(find vault)/robots/urdf/actuators/base.urdf.xacro" />
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/actuators/base.urdf.xacro" />
 
   <!-- sensors -->
-  <xacro:include filename="$(find vault)/robots/urdf/sensors/hokuyo_utm.urdf.xacro"/>
-  <xacro:include filename="$(find vault)/robots/urdf/sensors/hokuyo_urg.urdf.xacro"/>
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/sensors/hokuyo_utm.urdf.xacro"/>
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/sensors/hokuyo_urg.urdf.xacro"/>
 
   <!-- simulation -->
-  <xacro:include filename="$(find vault)/robots/urdf/simulation/control.gazebo.xacro" />
-  <xacro:include filename="$(find vault)/robots/urdf/simulation/base.gazebo.xacro"/>
-  <xacro:include filename="$(find vault)/robots/urdf/simulation/hokuyo_utm.gazebo.xacro" />
-  <xacro:include filename="$(find vault)/robots/urdf/simulation/hokuyo_urg.gazebo.xacro" />
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/simulation/control.gazebo.xacro" />
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/simulation/base.gazebo.xacro"/>
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/simulation/hokuyo_utm.gazebo.xacro" />
+  <xacro:include filename="$(find reinforcement-navigation)/robots/urdf/simulation/hokuyo_urg.gazebo.xacro" />
 
 <!-- ####################################################################### -->
 <!-- ######################## robot parts ################################## -->

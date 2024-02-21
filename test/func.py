@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-from vault.utils import Extension
+from reinforcement-navigation.utils import Extension
 import unittest
 import rosunit
 
 import os
 
-PKG = 'vault'
+PKG = 'reinforcement-navigation'
 NAME = 'library'
 
 print("\033[92mFunction Unit Tests\033[0m")

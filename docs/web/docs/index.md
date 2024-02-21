@@ -3,7 +3,7 @@ layout: home
 
 # Hero section
 hero:
-  name: Vault
+  name: reinforcement-navigation
   text: Project documentation
   image:
     src: /logo.svg
@@ -20,4 +20,4 @@ hero:
       link: /guide
     - theme: alt
       text: View on GitHub
-      link: https://github.com/Nicolasalan/vault
+      link: https://github.com/Nicolasalan/reinforcement-navigation
