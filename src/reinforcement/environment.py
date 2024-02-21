@@ -39,13 +39,13 @@ class Env():
           self.max_range = param["MAX_RANGE"]
 
           # initialize global variables
-          self.odom_x = 0.0
-          self.odom_y = 0.0
-          self.goal_x = 1.0
-          self.goal_y = 0.0
+          self.odomX = 0                                          
+          self.odomY = 0
+          self.goalX = 1                                          
+          self.goalY = 0.0
 
-          self.last_odom_y = 0.0
-          self.last_odom_x = 0.0
+          self.last_odom_y = None
+          self.last_odom_x = None
 
           self.path_waypoints = 'poses.yaml' # param["CONFIG_PATH"] + 'poses.yaml'
           self.path_random = 'random.yaml' # param["CONFIG_PATH"] + 'random.yaml'
@@ -53,7 +53,7 @@ class Env():
           self.goals = self.useful.poses('poses.yaml')
           self.objects = self.useful.poses('random.yaml')
           self.last_odom = None
-          self.distOld = 0
+           self.distOld = math.sqrt(math.pow(self.odomX - self.goalX, 2) + math.pow(self.odomY - self.goalY, 2))
 
           # ROS publications and subscriptions
           self.pub_cmd_vel = rospy.Publisher(self.cmd, Twist, queue_size=10)
@@ -152,53 +152,80 @@ class Env():
                angle = 0.0
 
           # ================== CALCULATE DISTANCE AND THETA ================== #
-          diff_y = self.goal_y - self.odom_y
-          diff_x = self.goal_x - self.odom_x
-          distance = math.sqrt(diff_x**2 + diff_y**2)
-          heading_to_goal = math.atan2(diff_y, diff_x)
-          theta = heading_to_goal - angle
+          Dist = math.sqrt(math.pow(self.odomX - self.goalX, 2) + math.pow(self.odomY - self.goalY, 2))
+          skewX = self.goalX - self.odomX
+          skewY = self.goalY - self.odomY
+          dot = skewX * 1 + skewY * 0
+          mag1 = math.sqrt(math.pow(skewX, 2) + math.pow(skewY, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          beta = math.acos(dot / (mag1 * mag2))
+          if skewY < 0:
+               if skewX < 0: beta = -beta
+               else: beta = 0 - beta
+          beta2 = (beta - angle)
+          if beta2 > np.pi:
+               beta2 = np.pi - beta2
+               beta2 = -np.pi - beta2
+          if beta2 < -np.pi:
+               beta2 = -np.pi - beta2
+               beta2 = np.pi - beta2
 
-          while theta > math.pi:
-               theta -= 2 * math.pi
-          while theta < -math.pi:
-               theta += 2 * math.pi
+          r3 = lambda x: 1 - x if x < 1 else 0.0
+          reward = act[0] / 2 - abs(act[1]) / 2 - r3(min(laser_state[0])) / 2
+          self.distOld = Dist
 
           # ================== ORIENTATION GOAL ================== #
-          orientation_diff = abs(angle - self.goal_orientation)
-          if self.odom_x == self.last_odom_x and self.odom_y == self.last_odom_y:
-               done = True
+          # orientation_diff = abs(angle - self.goal_orientation)
+          # if self.odom_x == self.last_odom_x and self.odom_y == self.last_odom_y:
+          #      done = True
 
-          # ================== CALCULATE DISTANCE AND ANGLE ================== #
-          if distance < self.goal_reached_dist: # and orientation_diff < self.orientation_threshold:
-               target = True
-               done = True
+          # # ================== CALCULATE DISTANCE AND ANGLE ================== #
+          # if distance < self.goal_reached_dist: # and orientation_diff < self.orientation_threshold:
+          #      target = True
+          #      done = True
      
           # ================== SET STATE ================== #
 
-          reward = 0.0
-          robot_state = [distance, theta, action[0], action[1]]
-          state = np.append(state_laser, robot_state)
+          if Dist < 0.3:
+               target = True
+               done = True
+               self.distOld = math.sqrt(math.pow(self.odomX - self.goalX, 2) + math.pow(self.odomY - self.goalY, 2))
+               reward = 80
+          if col:
+               reward = -100
+          if timestep == 499:
+               reward -= 100
 
-          self.last_odom_x, self.last_odom_y = self.odom_x, self.odom_y
-          self.distOld = distance
+        toGoal = [Dist, beta2, act[0], act[1]]
+
+        state = np.append(laser_state, toGoal)
+
+        return state, reward, done, target
+
+          # reward = 0.0
+          # robot_state = [distance, theta, action[0], action[1]]
+          # state = np.append(state_laser, robot_state)
+
+          # self.last_odom_x, self.last_odom_y = self.odom_x, self.odom_y
+          # self.distOld = distance
           
-          if target:
-               reward = 100.0
-          elif collision:
-               reward = -100.0
-          else:
-               r_yaw = -1 * abs(theta)
-               r_vangular = -1 * (action[1]**2)
-               r_distance = (2 * self.distOld) / (self.distOld + distance) - 1
-               if min_obstacle_dist < 0.22:
-                    r_obstacle = -20
-               else:
-                    r_obstacle = 0
-               r_vlinear = -1 * (((0.22 - action[0]) * 10) ** 2)
+          # if target:
+          #      reward = 100.0
+          # elif collision:
+          #      reward = -100.0
+          # else:
+          #      r_yaw = -1 * abs(theta)
+          #      r_vangular = -1 * (action[1]**2)
+          #      r_distance = (2 * self.distOld) / (self.distOld + distance) - 1
+          #      if min_obstacle_dist < 0.22:
+          #           r_obstacle = -20
+          #      else:
+          #           r_obstacle = 0
+          #      r_vlinear = -1 * (((0.22 - action[0]) * 10) ** 2)
 
-               reward = r_yaw + r_distance + r_obstacle + r_vlinear + r_vangular - 1
+          #      reward = r_yaw + r_distance + r_obstacle + r_vlinear + r_vangular - 1
 
-          return state, reward, done, target
+          # return state, reward, done, target
 
      def reset_env(self):
 
@@ -265,6 +292,9 @@ class Env():
           
           time.sleep(self.time_delta)
 
+          self.distOld = math.sqrt(math.pow(self.odomX - self.goalX, 2) + math.pow(self.odomY - self.goalY, 2))     
+
+
           # ================== UNPAUSE SIMULATION ================== #
           rospy.wait_for_service("/gazebo/unpause_physics")
           try:
@@ -290,25 +320,48 @@ class Env():
                rospy.logerr('Get state scan              => Error getting state scan')
                state_laser = np.random.uniform(0, self.max_range, self.environment_dim)
 
-          # ==================CALCULATE DISTANCE AND ANGLE ================== #
-          diff_y = self.goal_y - self.odom_y
-          diff_x = self.goal_x - self.odom_x
-          distance = math.sqrt(diff_x**2 + diff_y**2)
-          heading_to_goal = math.atan2(diff_y, diff_x)
-          theta = heading_to_goal - angle
+          # # ==================CALCULATE DISTANCE AND ANGLE ================== #
+          # diff_y = self.goal_y - self.odom_y
+          # diff_x = self.goal_x - self.odom_x
+          # distance = math.sqrt(diff_x**2 + diff_y**2)
+          # heading_to_goal = math.atan2(diff_y, diff_x)
+          # theta = heading_to_goal - angle
 
-          # TODO: mudar aqui
-          while to_goal > math.pi:
-               theta -= 2 * math.pi
-          while to_goal < -math.pi:
-               theta += 2 * math.pi
+          # # TODO: mudar aqui
+          # while to_goal > math.pi:
+          #      theta -= 2 * math.pi
+          # while to_goal < -math.pi:
+          #      theta += 2 * math.pi
                     
-          # ================== CREATE STATE ARRAY ================== #
-          robot_state = [distance, theta, 0.0, 0.0]
-          state = np.append(state_laser, robot_state)
+          # # ================== CREATE STATE ARRAY ================== #
+          # robot_state = [distance, theta, 0.0, 0.0]
+          # state = np.append(state_laser, robot_state)
+
+          Dist = math.sqrt(math.pow(self.odomX - self.goalX, 2) + math.pow(self.odomY - self.goalY, 2))
+          skewX = self.goalX - self.odomX
+          skewY = self.goalY - self.odomY
+          dot = skewX * 1 + skewY * 0
+          mag1 = math.sqrt(math.pow(skewX, 2) + math.pow(skewY, 2))
+          mag2 = math.sqrt(math.pow(1, 2) + math.pow(0, 2))
+          beta = math.acos(dot / (mag1 * mag2))
+
+          if skewY < 0:
+               if skewX < 0: beta = -beta
+               else:beta = 0 - beta
+          beta2 = (beta - angle)
+          if beta2 > np.pi:
+               beta2 = np.pi - beta2
+               beta2 = -np.pi - beta2
+          if beta2 < -np.pi:
+               beta2 = -np.pi - beta2
+               beta2 = np.pi - beta2
+          toGoal = [Dist, beta2, 0.0, 0.0]
+
+          state = np.append(state_laser, toGoal)
+          return state
 
           # ================== RETURN STATE ================== #
-          return np.array(state)
+          # return np.array(state)
      
      # ==== Random Functions ==== #
      def select_poses(self, poses):

@@ -77,17 +77,19 @@ class Agent():
         
     def action(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
-        state = torch.from_numpy(state).float().to(device)
-        self.actor_local.eval()
-        with torch.no_grad():
-            action = self.actor_local(state).cpu().data.numpy()
-        if add_noise:
-            # Generate a random noise
-            noise = np.random.normal(0, self.noise_std, size=self.action_size)
-            # Add noise to the action for exploration
-            action = (action + noise).clip(self.min_action, self.max_action)
-        self.actor_local.train()
-        return action
+        action = self.actor(torch.as_tensor(state, dtype=torch.float32).view(1, -1)).cpu().data.numpy().flatten()
+        return action        
+        # state = torch.from_numpy(state).float().to(device)
+        # self.actor_local.eval()
+        # with torch.no_grad():
+        #     action = self.actor_local(state).cpu().data.numpy()
+        # if add_noise:
+        #     # Generate a random noise
+        #     noise = np.random.normal(0, self.noise_std, size=self.action_size)
+        #     # Add noise to the action for exploration
+        #     action = (action + noise).clip(self.min_action, self.max_action)
+        # self.actor_local.train()
+        # return action
 
     def learn(self, n_iteraion, ):
 
