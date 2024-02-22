@@ -89,8 +89,7 @@ class Env():
         # Ensure the length is exactly 20, padding with zeros if needed
         selected_ranges.extend([0] * (20 - len(selected_ranges)))
 
-        self.lidar_data = np.array(selected_ranges)
-        print(len(self.lidar_data))
+        self.scan_data = np.array(selected_ranges)
 
     def step_env(self, action):
         target = False
