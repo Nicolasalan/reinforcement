@@ -9,10 +9,7 @@ from utils import Extension
 from collections import deque
 
 import rospy
-import numpy as np
 import os
-import psutil
-import numpy as np
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
 checkpoints_dir = os.path.join(script_dir, 'checkpoints')
@@ -33,7 +30,10 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
      ## ====================== Training Loop ====================== ##
 
      if param["TYPE"] == 0:
-               
+
+          torch.manual_seed(0)
+          np.random.seed(0)
+
           agent = Agent(state_size=state_dim, action_size=action_dim, random_seed=0, CONFIG_PATH=CONFIG_PATH)
 
           agent.actor_local.load_state_dict(torch.load(param["TRAIN"] + "actor_model.pth", map_location=torch.device('cpu')))
@@ -54,9 +54,10 @@ def td3(n_episodes, print_every, max_t, score_solved, param, CONFIG_PATH, useful
                for t in range(max_t):   
                     action = agent.action(states)                          # choose an action for each agent
                     actions = [(action[0] + 1) / 2, action[1]]             # Update action to fall in range [0,1] for linear velocity and [-1,1] for angular velocity
+                    print("Action: ", actions)
                     next_states, rewards, done, _ = env.step_env(actions)  # send all actions to the environment
                     # save the experiment in the replay buffer, run the learning step at a defined interval
-                    agent.step(states, actions, rewards, next_states, int(done), t, i_episode, scores)
+                    agent.step(states, actions, rewards, next_states, done, t, i_episode, scores)
                     states = next_states
                     score += rewards
                     if np.any(done) or t == max_t - 1:                                       # exit loop when episode ends

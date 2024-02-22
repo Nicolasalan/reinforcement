@@ -89,6 +89,8 @@ class Env():
         # Ensure the length is exactly 20, padding with zeros if needed
         selected_ranges.extend([0] * (20 - len(selected_ranges)))
 
+        #print("Laser estado: ", np.array(selected_ranges))
+
         self.scan_data = np.array(selected_ranges)
 
     def step_env(self, action):
@@ -262,15 +264,15 @@ class Env():
         try:
             set_robot = ModelState()
             set_robot.model_name = self.robot
-            set_robot.pose.position.x = robot[0]
-            set_robot.pose.position.y = robot[1]
+            set_robot.pose.position.x = 0
+            set_robot.pose.position.y = 2
             set_robot.pose.position.z = 0.0
             set_robot.pose.orientation.x = quaternion.x
             set_robot.pose.orientation.y = quaternion.y
             set_robot.pose.orientation.z = quaternion.z
             set_robot.pose.orientation.w = quaternion.w
             self.set_state.publish(set_robot)
-            self.odom_x, self.odom_y = robot[0], robot[1]
+            self.odom_x, self.odom_y = 0, 2
         
         except:
             rospy.logerr('Set Random Robot Model       => Error setting random robot model')
@@ -281,15 +283,15 @@ class Env():
         try:
             set_target = ModelState()
             set_target.model_name = 'target'
-            set_target.pose.position.x = goal[0]
-            set_target.pose.position.y = goal[1]
+            set_target.pose.position.x = 0
+            set_target.pose.position.y = -2
             set_target.pose.position.z = 0.0
             set_target.pose.orientation.x = 0.0
             set_target.pose.orientation.y = 0.0
             set_target.pose.orientation.z = 0.0
             set_target.pose.orientation.w = 1.0
             self.set_state.publish(set_target)
-            self.goal_x, self.goal_y = goal[0], goal[1]
+            self.goal_x, self.goal_y = 0, -2
         
         except:
             rospy.logerr('Set Random Goal Model       => Error setting random goal model')
