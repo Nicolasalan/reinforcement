@@ -1,7 +1,7 @@
 <launch>
      <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find reinforcement)/models/" />
 
-     <arg name="world_name"        default="environment.world"/>
+     <arg name="world_name"        default="simulation.world"/>
      <arg name="gui"               default="true"/>
 
      <arg name="model_target"      default="$(find reinforcement)/models/target.sdf"/>
@@ -22,5 +22,5 @@
 
 
      <!-- Launch Objects -->
-     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 3.55 -y 0.09 -z 0"/>
+     <node name="spawn_model_target"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_target) -sdf -model target -x 0 -y -2.0 -z 0"/>
 </launch>

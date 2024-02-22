@@ -3,9 +3,9 @@
 
   <arg name="robot_name" 	default="robot"/>
   <arg name="init_pos_x" 	default="0.0"/>
-  <arg name="init_pos_y" 	default="0.0"/>
+  <arg name="init_pos_y" 	default="2.0"/>
   <arg name="init_pos_z" 	default="0.0"/>
-  <arg name="init_yaw"   	default="0.0"/>
+  <arg name="init_yaw"   	default="4.6"/>
 
   <arg name="use_jsp_gui" default="false"/>
 
