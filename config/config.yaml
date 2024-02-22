@@ -8,13 +8,13 @@ ROBOT: 'robot'                    # name of the robot in gazebo
 GOAL_REACHED_DIST: 1.0            # distance to the goal to consider it reached (in meters)
 COLLISION_DIST: 0.3               # distance to the obstacle to consider it a collision (in meters)
 ORIENTATION_THRESHOLD: 0.1        # threshold to consider the orientation reached (in radians)
-ENVIRONMENT_DIM: 24              # size of the environment (default)
+ENVIRONMENT_DIM: 20               # size of the environment (default)
 ROBOT_DIM: 4                      # distance, theta, velocity linear, velocity angular (default)
 ACTION_DIM: 2                     # angular and linear (default)
 TIME_DELTA: 1.0                   # 10 Hz (default)
 NOISE_SIGMA: 0.1                  # noise for the laser scan (gaussian) 0.0 -> no noise 10.0 -> 100% noise
 RANDOM_NEAR_OBSTACLE: true        # To take random actions near obstacles or not
-MAX_RANGE: 20.0                   # max range of the laser scan
+MAX_RANGE: 10.0                   # max range of the laser scan
 
 # ==== Path to the model and config ==== #
 MODEL_PATH: '/home/user/ws/src/reinforcement/models/'         # default: 'models/'

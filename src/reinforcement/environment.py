@@ -74,6 +74,7 @@ class Env():
 
     def scan_callback(self, scan):
         scan_range = []
+
         for i in range(len(scan.ranges)):
             if scan.ranges[i] == float('Inf'):
                 scan_range.append(self.max_range)
@@ -81,8 +82,15 @@ class Env():
                 scan_range.append(0)
             else:
                 scan_range.append(scan.ranges[i])
-    
-        self.scan_data = np.array(scan_range)
+
+        # Select only 20 lidar data points
+        selected_ranges = scan_range[:20]
+
+        # Ensure the length is exactly 20, padding with zeros if needed
+        selected_ranges.extend([0] * (20 - len(selected_ranges)))
+
+        self.lidar_data = np.array(selected_ranges)
+        print(len(self.lidar_data))
 
     def step_env(self, action):
         target = False
